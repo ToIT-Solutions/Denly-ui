@@ -2,10 +2,14 @@
 import Navbar from '@/components/Navbar'
 import Spinner from '@/components/Spinner'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import useAuthStore from '@/store/useAuthStore'
 import Link from 'next/link'
 
 export default function DashboardPage() {
     usePageTitle('Dashboard - Denly')
+
+    const user = useAuthStore((state) => state.user)
+
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
             <Navbar />
@@ -14,7 +18,7 @@ export default function DashboardPage() {
                 <div className="max-w-6xl mx-auto">
                     {/* Welcome Header */}
                     <div className="mb-8">
-                        <h1 className="text-3xl font-serif text-gray-900 mb-2">Welcome back, Alex</h1>
+                        <h1 className="text-3xl font-serif text-gray-900 mb-2">Welcome back, {user?.firstName}</h1>
                         <p className="text-gray-600">Here's your property portfolio overview</p>
                         {/* <Spinner /> */}
                     </div>

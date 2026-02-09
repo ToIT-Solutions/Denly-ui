@@ -9,6 +9,8 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useSignup } from '@/hooks/useAuth'
 import { toast } from "sonner"
 import Spinner from '@/components/Spinner'
+import useAuthStore from '@/store/useAuthStore';
+import { useRouter } from 'next/navigation'
 
 interface SignupForm {
     firstName: string
@@ -16,7 +18,7 @@ interface SignupForm {
     email: string
     password: string
     confirmPassword: string
-    company?: string
+    // company?: string
     terms: boolean
 }
 
@@ -40,6 +42,10 @@ export default function SignupPage() {
 
     const { mutate, isPending, error } = useSignup()
 
+    const setUser = useAuthStore((state) => state.setUser)
+
+    const router = useRouter()
+
     const onSubmit = async (data: SignupForm) => {
         console.log('📝 Form submitted with data:', data)
         setShowAllErrors(true)
@@ -47,10 +53,13 @@ export default function SignupPage() {
         mutate(data, {
             onSuccess: (data) => {
                 console.log(data)
+                setUser(data)
+                router.push('/company/dashboard')
             },
             onError: (error: any) => {
                 console.log(error)
-                toast('An error occured trying to create your account', {
+                console.log(error.message)
+                toast(error.message, {
                     style: {
                         background: 'red',
                         border: 'none',

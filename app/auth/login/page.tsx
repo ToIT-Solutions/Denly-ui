@@ -9,6 +9,8 @@ import Spinner from '@/components/Spinner'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useLogin } from '@/hooks/useAuth'
 import { toast } from "sonner"
+import useAuthStore from '@/store/useAuthStore';
+import { useRouter } from 'next/navigation'
 
 interface LoginForm {
     email: string
@@ -29,6 +31,10 @@ export default function LoginPage() {
         reValidateMode: 'onBlur'
     })
 
+    const router = useRouter()
+
+    const setUser = useAuthStore((state) => state.setUser)
+
     const [showAllErrors, setShowAllErrors] = useState(false)
 
     const { mutate, isPending, error } = useLogin()
@@ -40,10 +46,12 @@ export default function LoginPage() {
         mutate(data, {
             onSuccess: (data) => {
                 console.log(data)
+                setUser(data)
+                router.push('/company/dashboard')
             },
             onError: (error: any) => {
                 console.log(error)
-                toast('An error occured trying to log you in', {
+                toast(error.message, {
                     style: {
                         background: 'red',
                         border: 'none',

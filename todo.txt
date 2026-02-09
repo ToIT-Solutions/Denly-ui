@@ -1,0 +1,14 @@
+-----------DONE--------------
+signup
+state management
+token
+
+
+
+
+
+
+-----------TODO--------------
+everything else
+
+kill tokens on expire/logout
