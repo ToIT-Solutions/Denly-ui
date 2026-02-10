@@ -4,26 +4,32 @@ import { useForm, useWatch } from 'react-hook-form'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { useAddProperty } from '@/hooks/useProperty'
+import { toast } from "sonner"
+import { useRouter } from 'next/navigation'
+import Spinner from '@/components/Spinner'
 
 interface PropertyForm {
     name: string
-    propertyType: 'residential' | 'commercial'
+    propertyType: string,
     type: string
     address: string
     city: string
     state: string
     zipCode: string
     country: string
-    bedrooms: number
-    bathrooms: number
-    squareFeet: number
+    squareMeter: number
     monthlyRent: number
     features: string[]
     description: string
-    businessType: string
-    leaseType: string
-    totalUnits: number
-    parkingSpaces: number
+
+    // Conditional fields - only required based on propertyType
+    bedrooms?: number
+    bathrooms?: number
+    businessType?: string
+    leaseType?: string
+    totalUnits?: number
+    parkingSpaces?: number
 }
 
 export default function AddPropertyPage() {
@@ -40,7 +46,9 @@ export default function AddPropertyPage() {
         }
     })
 
-    usePageTitle('Add Property - Denly')
+    const router = useRouter()
+
+    const { mutate, isPending, error } = useAddProperty()
 
     const propertyType = useWatch({
         control,
@@ -49,7 +57,34 @@ export default function AddPropertyPage() {
 
     const onSubmit = async (data: PropertyForm) => {
         console.log('📝 Property form submitted with data:', data)
-        // Handle form submission here
+
+        mutate(data, {
+            onSuccess: (data) => {
+                console.log(data)
+                toast("Property added successfully", {
+                    style: {
+                        background: 'green',
+                        border: 'none',
+                        textAlign: "center",
+                        justifyContent: "center",
+                        color: "white"
+                    }
+                })
+                router.back()
+            },
+            onError: (error: any) => {
+                console.log(error)
+                toast(error.message, {
+                    style: {
+                        background: 'red',
+                        border: 'none',
+                        textAlign: "center",
+                        justifyContent: "center",
+                        color: "white"
+                    }
+                })
+            }
+        })
     }
 
     const residentialFeatures = ['Parking', 'Laundry', 'Gym', 'Pool', 'Pet Friendly', 'Furnished', 'Air Conditioning', 'Balcony', 'Storage', 'Patio']
@@ -277,18 +312,18 @@ export default function AddPropertyPage() {
                                             )}
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Square Feet</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Square Meter</label>
                                             <input
                                                 type="number"
-                                                {...register('squareFeet', {
-                                                    min: { value: 0, message: 'Square feet cannot be negative' },
+                                                {...register('squareMeter', {
+                                                    min: { value: 0, message: 'Square Meter cannot be negative' },
                                                     valueAsNumber: true
                                                 })}
                                                 placeholder="0"
                                                 className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
                                             />
-                                            {errors.squareFeet && (
-                                                <p className="mt-1 text-xs text-red-600">{errors.squareFeet.message}</p>
+                                            {errors.squareMeter && (
+                                                <p className="mt-1 text-xs text-red-600">{errors.squareMeter.message}</p>
                                             )}
                                         </div>
                                         <div>
@@ -371,11 +406,11 @@ export default function AddPropertyPage() {
                                             />
                                         </div>
                                         <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Square Feet</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Square Meter</label>
                                             <input
                                                 type="number"
-                                                {...register('squareFeet', {
-                                                    min: { value: 0, message: 'Square feet cannot be negative' },
+                                                {...register('squareMeter', {
+                                                    min: { value: 0, message: 'Square Meter cannot be negative' },
                                                     valueAsNumber: true
                                                 })}
                                                 placeholder="0"
@@ -438,21 +473,24 @@ export default function AddPropertyPage() {
                             </div>
 
                             {/* Actions */}
-                            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 transition-colors cursor-pointer text-sm font-medium"
-                                >
-                                    {isSubmitting ? 'Adding Property...' : 'Add Property'}
-                                </button>
-                                <Link
-                                    href="/company/dashboard/properties"
-                                    className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm text-center font-medium"
-                                >
-                                    Cancel
-                                </Link>
-                            </div>
+                            {isPending ?
+                                <Spinner /> :
+                                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 transition-colors cursor-pointer text-sm font-medium"
+                                    >
+                                        {isSubmitting ? 'Adding Property...' : 'Add Property'}
+                                    </button>
+                                    <Link
+                                        href="/company/dashboard/properties"
+                                        className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm text-center font-medium"
+                                    >
+                                        Cancel
+                                    </Link>
+                                </div>
+                            }
                         </form>
                     </div>
                 </div>

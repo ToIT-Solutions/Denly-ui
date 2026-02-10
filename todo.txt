@@ -2,7 +2,11 @@
 signup
 state management
 token
+add property
 
+
+
+-----------DOING-------------
 
 
 
@@ -12,3 +16,12 @@ token
 everything else
 
 kill tokens on expire/logout
+sending and veryfying invites
+resetpassword
+
+get
+create
+put
+delete
+---routes
+

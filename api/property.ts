@@ -10,7 +10,7 @@ interface PropertyData {
     state: string
     zipCode: string
     country: string
-    squareFeet: number
+    squareMeter: number
     monthlyRent: number
     features: string[]
     description: string
@@ -26,7 +26,7 @@ interface PropertyData {
 
 export const addProperty = async(data: PropertyData) => {
     try {
-        const response = await api.post("/property/add", data);
+        const response = await api.post("/v1/property/add", data);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured when adding property";
