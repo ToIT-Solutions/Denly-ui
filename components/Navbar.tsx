@@ -15,7 +15,7 @@ export default function Navbar() {
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
     const user = useAuthStore((state) => state.user)
-    console.log(user)
+    // console.log(user)
     const clearUser = useAuthStore((state) => state.clearUser)
     const router = useRouter()
 

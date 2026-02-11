@@ -1,18 +1,23 @@
 "use client"
 import Navbar from '@/components/Navbar'
+import Spinner from '@/components/Spinner'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { useFetchAllProperties } from '@/hooks/useProperty'
 import Link from 'next/link'
 
 export default function PropertiesPage() {
     usePageTitle('Properties - Denly')
-    const properties = [
-        { id: 1, name: 'Downtown Loft', address: '123 Main St, City', rent: 2400, status: 'Occupied', tenant: 'John Smith', image: '/property-1.jpg' },
-        { id: 2, name: 'Garden Villa', address: '456 Oak Ave, Town', rent: 3200, status: 'Occupied', tenant: 'Sarah Johnson', image: '/property-2.jpg' },
-        { id: 3, name: 'Urban Suite', address: '789 Pine Rd, Metro', rent: 1800, status: 'Vacant', tenant: '', image: '/property-3.jpg' },
-        { id: 4, name: 'Riverside Apartment', address: '101 River Dr, Valley', rent: 2750, status: 'Occupied', tenant: 'Mike Chen', image: '/property-4.jpg' },
-        { id: 5, name: 'Mountain View Condo', address: '202 Hilltop Blvd, Heights', rent: 2200, status: 'Occupied', tenant: 'Lisa Wang', image: '/property-5.jpg' },
-        { id: 6, name: 'City Center Studio', address: '303 Urban Ln, Downtown', rent: 1500, status: 'Vacant', tenant: '', image: '/property-6.jpg' },
-    ]
+    // const properties = [
+    //     { id: 1, name: 'Downtown Loft', address: '123 Main St, City', rent: 2400, status: 'Occupied', tenant: 'John Smith', image: '/property-1.jpg' },
+    //     { id: 2, name: 'Garden Villa', address: '456 Oak Ave, Town', rent: 3200, status: 'Occupied', tenant: 'Sarah Johnson', image: '/property-2.jpg' },
+    //     { id: 3, name: 'Urban Suite', address: '789 Pine Rd, Metro', rent: 1800, status: 'Vacant', tenant: '', image: '/property-3.jpg' },
+    //     { id: 4, name: 'Riverside Apartment', address: '101 River Dr, Valley', rent: 2750, status: 'Occupied', tenant: 'Mike Chen', image: '/property-4.jpg' },
+    //     { id: 5, name: 'Mountain View Condo', address: '202 Hilltop Blvd, Heights', rent: 2200, status: 'Occupied', tenant: 'Lisa Wang', image: '/property-5.jpg' },
+    //     { id: 6, name: 'City Center Studio', address: '303 Urban Ln, Downtown', rent: 1500, status: 'Vacant', tenant: '', image: '/property-6.jpg' },
+    // ]
+
+    const { data, isLoading, error } = useFetchAllProperties("7a25216b-20ca-46cf-94f6-d97a24032d77")
+    console.log(data)
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -41,107 +46,115 @@ export default function PropertiesPage() {
                         </div>
                     </div>
 
-                    {/* Property Stats */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-                        {[
-                            { title: 'Total Properties', value: '12', subtitle: 'Portfolio size', trend: '+2' },
-                            { title: 'Occupied', value: '10', subtitle: '83% occupancy', trend: '+1' },
-                            { title: 'Vacant', value: '2', subtitle: 'Ready to rent', trend: '-1' },
-                            { title: 'Monthly Revenue', value: '$28,450', subtitle: 'Projected', trend: '+12%' }
-                        ].map((stat, index) => (
-                            <div key={index} className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                                <p className="text-gray-600 text-sm mb-1">{stat.title}</p>
-                                <div className="flex items-baseline space-x-2 mb-1">
-                                    <span className="text-xl sm:text-2xl font-serif text-gray-900">{stat.value}</span>
-                                    <span className="text-sm text-green-600">{stat.trend}</span>
+                    {isLoading ?
+                        <Spinner />
+                        :
+                        <div>
+                            {/* Property Stats */}
+                            {data?.length > 0 ?
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                                    {[
+                                        { title: 'Total Properties', value: '12', subtitle: 'Portfolio size', trend: '+2' },
+                                        { title: 'Occupied', value: '10', subtitle: '83% occupancy', trend: '+1' },
+                                        { title: 'Vacant', value: '2', subtitle: 'Ready to rent', trend: '-1' },
+                                        { title: 'Monthly Revenue', value: '$28,450', subtitle: 'Projected', trend: '+12%' }
+                                    ].map((stat, index) => (
+                                        <div key={index} className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                                            <p className="text-gray-600 text-sm mb-1">{stat.title}</p>
+                                            <div className="flex items-baseline space-x-2 mb-1">
+                                                <span className="text-xl sm:text-2xl font-serif text-gray-900">{stat.value}</span>
+                                                <span className="text-sm text-green-600">{stat.trend}</span>
+                                            </div>
+                                            <p className="text-gray-500 text-xs">{stat.subtitle}</p>
+                                        </div>
+                                    ))}
                                 </div>
-                                <p className="text-gray-500 text-xs">{stat.subtitle}</p>
-                            </div>
-                        ))}
-                    </div>
+                                : null}
 
-                    {/* Properties Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        {properties.map((property) => (
-                            <div key={property.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group">
-                                {/* Property Image */}
-                                <div className="h-48 bg-linear-to-br from-[#876D4A] to-[#9D7F55] rounded-t-2xl flex items-center justify-center text-white">
-                                    <div className="text-center">
-                                        <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-                                            🏠
+                            {/* Properties Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {data?.map((property: any) => (
+                                    <div key={property.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group">
+                                        {/* Property Image */}
+                                        <div className="h-48 bg-linear-to-br from-[#876D4A] to-[#9D7F55] rounded-t-2xl flex items-center justify-center text-white">
+                                            <div className="text-center">
+                                                <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+                                                    🏠
+                                                </div>
+                                                <p className="text-white/80 text-sm">Property Image</p>
+                                            </div>
                                         </div>
-                                        <p className="text-white/80 text-sm">Property Image</p>
+
+                                        <div className="p-4 sm:p-6">
+                                            {/* Property Header */}
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="flex-1">
+                                                    <h3 className="font-serif text-lg sm:text-xl text-gray-900 mb-1 group-hover:text-[#876D4A] transition-colors">
+                                                        {property.name}
+                                                    </h3>
+                                                    <p className="text-gray-600 text-sm">{property.address}</p>
+                                                </div>
+                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${property.status === 'Occupied'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-gray-100 text-gray-800'
+                                                    }`}>
+                                                    {property.status}
+                                                </span>
+                                            </div>
+
+                                            {/* Property Details */}
+                                            <div className="space-y-3 mb-4">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-600 text-sm">Monthly Rent</span>
+                                                    <span className="text-[#876D4A] font-medium">${property.monthlyRent}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-600 text-sm">Current Tenant</span>
+                                                    {/* <span className="text-gray-900 text-sm">{property.tenant || 'Vacant'}</span> */}
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-600 text-sm">Property Type</span>
+                                                    <span className="text-gray-900 text-sm">Residential</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Action Buttons */}
+                                            <div className="flex space-x-3 pt-4 border-t border-gray-100">
+                                                <Link
+                                                    href={`/company/dashboard/properties/single`}
+                                                    className="flex-1 bg-[#876D4A] text-white py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm text-center"
+                                                >
+                                                    View Details
+                                                </Link>
+
+                                                {/* <Link href="/company/dashboard/properties/single/edit"> */}
+                                                <Link
+                                                    href="/company/dashboard/properties/single/edit"
+                                                    className="flex-1 border border-[#876D4A] text-[#876D4A] py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm text-center">
+                                                    Edit
+                                                </Link>
+                                                {/* </Link> */}
+                                            </div>
+                                        </div>
                                     </div>
+                                ))}
+                            </div>
+
+                            {/* Empty State (for when no properties) */}
+                            {data?.length === 0 && (
+                                <div className="text-center py-12">
+                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        🏠
+                                    </div>
+                                    <h3 className="font-serif text-lg text-gray-900 mb-2">No properties yet</h3>
+                                    <p className="text-gray-600 mb-6">Get started by adding your first property</p>
+                                    <button className="bg-[#876D4A] text-white px-6 py-3 rounded-lg hover:bg-[#756045] transition-colors cursor-pointer">
+                                        Add Your First Property
+                                    </button>
                                 </div>
-
-                                <div className="p-4 sm:p-6">
-                                    {/* Property Header */}
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="flex-1">
-                                            <h3 className="font-serif text-lg sm:text-xl text-gray-900 mb-1 group-hover:text-[#876D4A] transition-colors">
-                                                {property.name}
-                                            </h3>
-                                            <p className="text-gray-600 text-sm">{property.address}</p>
-                                        </div>
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${property.status === 'Occupied'
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-gray-100 text-gray-800'
-                                            }`}>
-                                            {property.status}
-                                        </span>
-                                    </div>
-
-                                    {/* Property Details */}
-                                    <div className="space-y-3 mb-4">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-gray-600 text-sm">Monthly Rent</span>
-                                            <span className="text-[#876D4A] font-medium">${property.rent.toLocaleString()}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-gray-600 text-sm">Current Tenant</span>
-                                            <span className="text-gray-900 text-sm">{property.tenant || 'Vacant'}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-gray-600 text-sm">Property Type</span>
-                                            <span className="text-gray-900 text-sm">Residential</span>
-                                        </div>
-                                    </div>
-
-                                    {/* Action Buttons */}
-                                    <div className="flex space-x-3 pt-4 border-t border-gray-100">
-                                        <Link
-                                            href={`/company/dashboard/properties/single`}
-                                            className="flex-1 bg-[#876D4A] text-white py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm text-center"
-                                        >
-                                            View Details
-                                        </Link>
-
-                                        {/* <Link href="/company/dashboard/properties/single/edit"> */}
-                                        <Link
-                                            href="/company/dashboard/properties/single/edit"
-                                            className="flex-1 border border-[#876D4A] text-[#876D4A] py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm text-center">
-                                            Edit
-                                        </Link>
-                                        {/* </Link> */}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Empty State (for when no properties) */}
-                    {properties.length === 0 && (
-                        <div className="text-center py-12">
-                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                🏠
-                            </div>
-                            <h3 className="font-serif text-lg text-gray-900 mb-2">No properties yet</h3>
-                            <p className="text-gray-600 mb-6">Get started by adding your first property</p>
-                            <button className="bg-[#876D4A] text-white px-6 py-3 rounded-lg hover:bg-[#756045] transition-colors cursor-pointer">
-                                Add Your First Property
-                            </button>
+                            )}
                         </div>
-                    )}
+                    }
                 </div>
             </div>
         </div>

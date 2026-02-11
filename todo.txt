@@ -2,7 +2,7 @@
 signup
 state management
 token
-add property
+property - add/edit/viewing/delete
 
 
 

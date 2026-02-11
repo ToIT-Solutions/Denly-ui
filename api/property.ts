@@ -36,7 +36,7 @@ export const addProperty = async(data: PropertyData) => {
 
 export const fetchAllProperties = async(subscriptionId: string) => {
     try {
-        const response = await api.get(`/property/view/${subscriptionId}`);
+        const response = await api.get(`/v1/property/viewAll/${subscriptionId}`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured when fetching properties";
@@ -46,7 +46,7 @@ export const fetchAllProperties = async(subscriptionId: string) => {
 
 export const fetchOneProperty = async(propertyId: string) => {
     try {
-        const response = await api.get(`/property/view/${propertyId}`);
+        const response = await api.get(`/v1/property/viewOne/${propertyId}`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured when fetching property";
@@ -56,7 +56,7 @@ export const fetchOneProperty = async(propertyId: string) => {
 
 export const editProperty = async(propertyId: string , data: PropertyData) => {
     try {
-        const response = await api.put(`/property/edit/${propertyId}`, data);
+        const response = await api.put(`/v1/property/edit/${propertyId}`, data);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured when editing property";
@@ -66,7 +66,7 @@ export const editProperty = async(propertyId: string , data: PropertyData) => {
 
 export const deleteProperty = async(propertyId: string) => {
     try {
-        const response = await api.delete(`/property/delete/${propertyId}`);
+        const response = await api.delete(`/v1/property/delete/${propertyId}`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured trying to delete property";

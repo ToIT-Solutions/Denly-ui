@@ -168,7 +168,7 @@ export default function UserManagementPage() {
 
             {/* Invite User Modal */}
             {isInviteModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black/60 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
                         <div className="text-center">
                             <h3 className="text-lg font-serif text-gray-900 mb-2">Invite User</h3>

@@ -6,44 +6,136 @@ import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { useDeleteProperty, useEditProperty, useFetchOneProperty } from '@/hooks/useProperty'
+import { useEffect, useState } from 'react'
+import { toast } from "sonner"
+import Spinner from '@/components/Spinner'
 
 export default function EditPropertyPage() {
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
     const router = useRouter()
     usePageTitle('Edit Property - Denly')
 
+    const { data, isLoading, error } = useFetchOneProperty("d627a7a4-38bd-4be4-816e-4bbf79ce2731")
+    console.log(data)
+
+    const { mutate, isPending: isEditPending, error: editError } = useEditProperty()
+
+    const { mutate: deleteMutate, isPending: isDeletePending, error: deletePending } = useDeleteProperty()
+
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm({
         defaultValues: {
-            name: 'Downtown Loft',
+            name: '',
             type: 'apartment',
-            address: '123 Main Street',
-            city: 'New York',
-            state: 'NY',
-            zipCode: '10001',
-            monthlyRent: 2400,
-            securityDeposit: 2400,
-            bedrooms: 2,
-            bathrooms: 1,
-            squareFeet: 950,
+            address: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            monthlyRent: 0,
+            securityDeposit: 0,
+            bedrooms: 0,
+            bathrooms: 0,
+            squareMeter: 0,
             status: 'active',
-            description: 'Beautiful downtown loft with great views and modern amenities.'
-        }
+            description: '',
+        },
     })
+
+    useEffect(() => {
+        if (data) {
+            reset({
+                name: data.name,
+                type: data.type,
+                address: data.address,
+                city: data.city,
+                state: data.state,
+                zipCode: data.zipCode,
+                monthlyRent: data.monthlyRent,
+                securityDeposit: data.securityDeposit,
+                bedrooms: data.bedrooms,
+                bathrooms: data.bathrooms,
+                squareMeter: data.squareMeter,
+                status: data.status,
+                description: data.description,
+            })
+        }
+    }, [data, reset])
+
 
     const onSubmit = (data: any) => {
         console.log('Updated property:', data)
+
+        mutate({ propertyId: "d627a7a4-38bd-4be4-816e-4bbf79ce2731", data: data }, {
+            onSuccess: (data) => {
+                console.log(data)
+                router.push('/company/dashboard/properties')
+                toast('Property edited successfully', {
+                    style: {
+                        background: 'green',
+                        border: 'none',
+                        textAlign: "center",
+                        justifyContent: "center",
+                        color: "white"
+                    }
+                })
+            },
+            onError: (error: any) => {
+                console.log(error)
+                toast(error.message, {
+                    style: {
+                        background: 'red',
+                        border: 'none',
+                        textAlign: "center",
+                        justifyContent: "center",
+                        color: "white"
+                    }
+                })
+            }
+        })
     }
 
     const handleDelete = () => {
-        if (confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
-            console.log('Deleting property...')
-            window.location.href = '/app/company-id/properties'
-        }
+        setIsDeleteModalOpen(true)
     }
+
+    const confirmDelete = () => {
+
+        deleteMutate("d627a7a4-38bd-4be4-816e-4bbf79ce2731", {
+            onSuccess: (data) => {
+                console.log(data)
+                router.push('/company/dashboard/properties')
+                toast('Property deleted successfully', {
+                    style: {
+                        background: 'green',
+                        border: 'none',
+                        textAlign: "center",
+                        justifyContent: "center",
+                        color: "white"
+                    }
+                })
+            },
+            onError: (error: any) => {
+                console.log(error)
+                toast(error.message, {
+                    style: {
+                        background: 'red',
+                        border: 'none',
+                        textAlign: "center",
+                        justifyContent: "center",
+                        color: "white"
+                    }
+                })
+            }
+        })
+        setIsDeleteModalOpen(false)
+    }
+
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -240,11 +332,11 @@ export default function EditPropertyPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Square Feet
+                                        Square Meter
                                     </label>
                                     <input
                                         type="number"
-                                        {...register('squareFeet')}
+                                        {...register('squareMeter')}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
                                         placeholder="0"
                                     />
@@ -280,32 +372,67 @@ export default function EditPropertyPage() {
                             </div>
 
                             {/* Form Actions */}
-                            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-                                <button
-                                    type="button"
-                                    onClick={handleDelete}
-                                    className="px-4 py-2 border border-red-300 text-red-700 rounded-2xl hover:bg-red-50 transition-colors text-sm font-medium cursor-pointer"
-                                >
-                                    Delete Property
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => router.back()}
-                                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-50 transition-colors text-sm font-medium cursor-pointer"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-4 py-2 bg-[#876D4A] text-white rounded-2xl hover:bg-[#756045] transition-colors text-sm font-medium cursor-pointer sm:ml-auto"
-                                >
-                                    Update Property
-                                </button>
-                            </div>
+                            {isEditPending ?
+                                <Spinner />
+                                :
+                                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                                    <button
+                                        type="button"
+                                        onClick={handleDelete}
+                                        className="px-4 py-2 border border-red-300 text-red-700 rounded-2xl hover:bg-red-300 transition-colors text-sm font-medium cursor-pointer"
+                                    >
+                                        Delete Property
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => router.back}
+                                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-300 transition-colors text-sm font-medium cursor-pointer"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 bg-[#876D4A] text-white rounded-2xl hover:bg-[#756045] transition-colors text-sm font-medium cursor-pointer sm:ml-auto"
+                                    >
+                                        Update Property
+                                    </button>
+                                </div>
+                            }
                         </form>
                     </div>
                 </div>
             </div>
+
+            {isDeleteModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-50 backdrop-blur-sm">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-[380px]">
+                        <h2 className="text-lg font-semibold mb-2 text-gray-900">
+                            Delete Property
+                        </h2>
+
+                        <p className="text-sm text-gray-600 mb-6">
+                            Are you sure you want to delete this property? This action cannot be undone.
+                        </p>
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setIsDeleteModalOpen(false)}
+                                className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-200 text-gray-700 transition cursor-pointer"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={confirmDelete}
+                                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     )
 }
