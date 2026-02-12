@@ -72,7 +72,7 @@ export default function ViewPaymentPage() {
                 <div className="max-w-6xl mx-auto">
                     {/* Header with Back Button */}
                     <div className="mb-6">
-                        <Link href="/company/dashboard/payments" className="inline-flex items-center text-[#876D4A] hover:text-[#756045] transition-colors mb-4">
+                        <Link href="/dashboard/payments" className="inline-flex items-center text-[#876D4A] hover:text-[#756045] transition-colors mb-4">
                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
@@ -231,7 +231,7 @@ export default function ViewPaymentPage() {
                                         <p className="text-gray-900 text-sm">{payment.tenant.email}</p>
                                     </div>
                                 </div>
-                                <Link href={`/company/dashboard/tenants/${payment.tenant.id}`}>
+                                <Link href={`/dashboard/tenants/${payment.tenant.id}`}>
                                     <button className="w-full mt-4 text-[#876D4A] hover:text-[#756045] transition-colors cursor-pointer text-sm text-center py-2 border border-[#876D4A] rounded-xl hover:bg-[#876D4A]">
                                         View Tenant Profile
                                     </button>

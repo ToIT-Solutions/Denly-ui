@@ -20,10 +20,10 @@ export default function Navbar() {
     const router = useRouter()
 
     const navigation = [
-        { name: 'Properties', href: '/company/dashboard/properties' },
-        { name: 'Tenants', href: '/company/dashboard/tenants' },
-        { name: 'Payments', href: '/company/dashboard/payments' },
-        { name: 'Reports', href: '/company/dashboard/reports' },
+        { name: 'Properties', href: `/dashboard/properties` },
+        { name: 'Tenants', href: `/dashboard/tenants` },
+        { name: 'Payments', href: `/dashboard/payments` },
+        { name: 'Reports', href: `/dashboard/reports` },
     ]
 
     const isActive = (href: string) => pathname === href
@@ -50,7 +50,7 @@ export default function Navbar() {
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                         >
                             <svg
                                 className="w-6 h-6 text-gray-600"
@@ -77,7 +77,7 @@ export default function Navbar() {
                         </button>
 
                         {/* Logo */}
-                        <Link href="/company/dashboard" className="flex items-center space-x-3 cursor-pointer">
+                        <Link href={`/dashboard`} className="flex items-center space-x-3 cursor-pointer">
                             <Image src={logo} alt="denly Logo" className="w-23" />
                         </Link>
                     </div>
@@ -102,13 +102,13 @@ export default function Navbar() {
                     <div className="flex items-center space-x-4 lg:space-x-6">
                         {/* Quick Action Buttons - Hidden on mobile */}
                         <div className="hidden lg:flex items-center space-x-3">
-                            <Link href="/company/dashboard/payments/new">
+                            <Link href={`/dashboard/payments/new`}>
                                 <button className="bg-[#876D4A] text-white px-4 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm">
                                     Record Payment
                                 </button>
                             </Link>
 
-                            <Link href="/company/dashboard/properties/add">
+                            <Link href={`/dashboard/properties/add`}>
                                 <button className="border border-[#876D4A] text-[#876D4A] px-4 py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm">
                                     Add Property
                                 </button>
@@ -136,28 +136,28 @@ export default function Navbar() {
                                     </div>
 
                                     <Link
-                                        href="/company/dashboard/subscription/profile"
+                                        href={`/dashboard/subscription/profile`}
                                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                                         onClick={() => setIsUserMenuOpen(false)}
                                     >
                                         Profile Settings
                                     </Link>
                                     <Link
-                                        href="/company/dashboard/subscription/company"
+                                        href={`/dashboard/subscription/company`}
                                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                                         onClick={() => setIsUserMenuOpen(false)}
                                     >
                                         Company Settings
                                     </Link>
                                     <Link
-                                        href="/company/dashboard/subscription/user-management"
+                                        href={`/dashboard/subscription/user-management`}
                                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                                         onClick={() => setIsUserMenuOpen(false)}
                                     >
                                         User Management
                                     </Link>
                                     <Link
-                                        href="/company/dashboard/subscription/billing"
+                                        href={`/dashboard/subscription/billing`}
                                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
                                         onClick={() => setIsUserMenuOpen(false)}
                                     >
@@ -200,13 +200,13 @@ export default function Navbar() {
                         </div>
 
                         <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 gap-2">
-                            <Link href="/company/dashboard/payments/new">
+                            <Link href={`/dashboard/payments/new`}>
                                 <button className="bg-[#876D4A] text-white px-4 py-3 rounded-lg hover:bg-[#756045] transition-colors cursor-pointer text-sm">
                                     Record Payment
                                 </button>
                             </Link>
 
-                            <Link href="/company/dashboard/properties/add">
+                            <Link href={`/dashboard/properties/add`}>
                                 <button className="border border-[#876D4A] text-[#876D4A] px-4 py-3 rounded-lg hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm">
                                     Add Property
                                 </button>

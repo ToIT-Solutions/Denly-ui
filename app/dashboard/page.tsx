@@ -48,7 +48,7 @@ export default function DashboardPage() {
                         <div className="col-span-2 bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="font-serif text-xl text-gray-900">Recent Activity</h2>
-                                <Link href="/company/dashboard/payments" className="text-[#876D4A] hover:text-[#756045] text-sm transition-colors cursor-pointer">
+                                <Link href="/dashboard/payments" className="text-[#876D4A] hover:text-[#756045] text-sm transition-colors cursor-pointer">
                                     View All
                                 </Link>
                             </div>

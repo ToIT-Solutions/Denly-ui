@@ -62,7 +62,7 @@ export default function EditPropertyPage() {
     const handleDelete = () => {
         if (confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
             console.log('Deleting property...')
-            window.location.href = '/app/company-id/properties'
+            window.location.href = '/app-id/properties'
         }
     }
 
@@ -103,7 +103,7 @@ export default function EditPropertyPage() {
                     {/* Header */}
                     <div className="mb-6">
                         <div className="flex items-center space-x-2 text-sm text-gray-600 mb-3">
-                            <Link href="/company/dashboard/properties" className="hover:text-[#876D4A] transition-colors">Properties</Link>
+                            <Link href="/dashboard/properties" className="hover:text-[#876D4A] transition-colors">Properties</Link>
                             <span>›</span>
                             <span>{data?.name || 'Property Name'}</span>
                             <span>›</span>

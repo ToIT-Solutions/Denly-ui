@@ -4,6 +4,7 @@ import Spinner from '@/components/Spinner'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllProperties } from '@/hooks/useProperty'
 import Link from 'next/link'
+import { useState, useMemo } from 'react'
 
 export default function PropertiesPage() {
     usePageTitle('Properties - Denly')
@@ -16,8 +17,31 @@ export default function PropertiesPage() {
     //     { id: 6, name: 'City Center Studio', address: '303 Urban Ln, Downtown', rent: 1500, status: 'Vacant', tenant: '', image: '/property-6.jpg' },
     // ]
 
-    const { data, isLoading, error } = useFetchAllProperties("7a25216b-20ca-46cf-94f6-d97a24032d77")
+    const { data, isLoading, error } = useFetchAllProperties()
     console.log(data)
+
+    const [searchQuery, setSearchQuery] = useState('')
+
+    const filteredProperties = useMemo(() => {
+        if (!data) return []
+        if (!searchQuery.trim()) return data
+
+        const query = searchQuery.toLowerCase().trim()
+        return data.filter((property: any) => {
+            const searchableFields = [
+                property.name,
+                property.address,
+                property.monthlyRent?.toString(),
+                property.tenants?.firstName,
+                property.tenants?.lastName,
+                property.tenants?.length > 1 ? `${property.tenants?.length} tenants` : '',
+                property.type
+            ]
+            return searchableFields.some(field =>
+                field?.toString().toLowerCase().includes(query)
+            )
+        })
+    }, [data, searchQuery])
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -34,8 +58,10 @@ export default function PropertiesPage() {
                         <div className="flex flex-col sm:flex-row gap-3">
                             <input
                                 type="text"
-                                placeholder="Search properties..."
-                                className="border text-black placeholder-gray-400 outline-0 border-gray-300 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm w-full sm:w-64"
+                                placeholder="Search properties"
+                                className="border text-black placeholder-gray-400 outline-0 border-gray-300 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm w-full sm:w-80"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             {/* <select className="border border-gray-300 text-black outline-0 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm">
                                 <option>All Status</option>
@@ -54,16 +80,15 @@ export default function PropertiesPage() {
                             {data?.length > 0 ?
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
                                     {[
-                                        { title: 'Total Properties', value: '12', subtitle: 'Portfolio size', trend: '+2' },
-                                        { title: 'Occupied', value: '10', subtitle: '83% occupancy', trend: '+1' },
-                                        { title: 'Vacant', value: '2', subtitle: 'Ready to rent', trend: '-1' },
-                                        { title: 'Monthly Revenue', value: '$28,450', subtitle: 'Projected', trend: '+12%' }
+                                        { title: 'Total Properties', value: data?.length || '0', subtitle: 'Portfolio size' },
+                                        { title: 'Occupied', value: data?.filter((p: any) => p.tenants?.length > 0).length || '0', subtitle: `${Math.round((data?.filter((p: any) => p.tenants?.length > 0).length / data?.length) * 100) || 0}% occupancy` },
+                                        { title: 'Vacant', value: data?.filter((p: any) => p.tenants?.length === 0).length || '0', subtitle: 'Ready to rent' },
+                                        // { title: 'Monthly Revenue', value: `$${data?.reduce((acc: number, p: any) => acc + p.monthlyRent, 0) || 0}`, subtitle: 'Projected', trend: '+12%' }
                                     ].map((stat, index) => (
                                         <div key={index} className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                                             <p className="text-gray-600 text-sm mb-1">{stat.title}</p>
                                             <div className="flex items-baseline space-x-2 mb-1">
                                                 <span className="text-xl sm:text-2xl font-serif text-gray-900">{stat.value}</span>
-                                                <span className="text-sm text-green-600">{stat.trend}</span>
                                             </div>
                                             <p className="text-gray-500 text-xs">{stat.subtitle}</p>
                                         </div>
@@ -71,9 +96,16 @@ export default function PropertiesPage() {
                                 </div>
                                 : null}
 
+                            {/* Search Results Info */}
+                            {searchQuery && (
+                                <div className="mb-4 text-sm text-gray-600">
+                                    Found {filteredProperties.length} {filteredProperties.length === 1 ? 'property' : 'properties'} matching "{searchQuery}"
+                                </div>
+                            )}
+
                             {/* Properties Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                {data?.map((property: any) => (
+                                {filteredProperties.map((property: any) => (
                                     <div key={property.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group">
                                         {/* Property Image */}
                                         <div className="h-48 bg-linear-to-br from-[#876D4A] to-[#9D7F55] rounded-t-2xl flex items-center justify-center text-white">
@@ -94,11 +126,11 @@ export default function PropertiesPage() {
                                                     </h3>
                                                     <p className="text-gray-600 text-sm">{property.address}</p>
                                                 </div>
-                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${property.status === 'Occupied'
+                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${property.tenants?.length > 0
                                                     ? 'bg-green-100 text-green-800'
                                                     : 'bg-gray-100 text-gray-800'
                                                     }`}>
-                                                    {property.status}
+                                                    {property.tenants?.length > 0 ? 'Occupied' : 'Vacant'}
                                                 </span>
                                             </div>
 
@@ -109,8 +141,16 @@ export default function PropertiesPage() {
                                                     <span className="text-[#876D4A] font-medium">${property.monthlyRent}</span>
                                                 </div>
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-gray-600 text-sm">Current Tenant</span>
-                                                    {/* <span className="text-gray-900 text-sm">{property.tenant || 'Vacant'}</span> */}
+                                                    <span className="text-gray-600 text-sm">{property.tenants?.length > 1 ? 'Current Tenants' : 'Current Tenant'}</span>
+                                                    <span className="text-gray-900 text-sm">
+                                                        {property.tenants?.length > 1
+                                                            ? property.tenants?.length + ' tenants'
+                                                            : property.tenants?.firstName && property.tenants?.lastName
+                                                                ? property.tenants?.firstName + ' ' + property.tenants?.lastName
+                                                                : property.tenants?.length === 0
+                                                                    ? 'No tenant'
+                                                                    : ''}
+                                                    </span>
                                                 </div>
                                                 <div className="flex justify-between items-center">
                                                     <span className="text-gray-600 text-sm">Property Type</span>
@@ -121,15 +161,15 @@ export default function PropertiesPage() {
                                             {/* Action Buttons */}
                                             <div className="flex space-x-3 pt-4 border-t border-gray-100">
                                                 <Link
-                                                    href={`/company/dashboard/properties/single`}
+                                                    href={`/dashboard/properties/${property.id}`}
                                                     className="flex-1 bg-[#876D4A] text-white py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm text-center"
                                                 >
                                                     View Details
                                                 </Link>
 
-                                                {/* <Link href="/company/dashboard/properties/single/edit"> */}
+                                                {/* <Link href="/dashboard/properties/single/edit"> */}
                                                 <Link
-                                                    href="/company/dashboard/properties/single/edit"
+                                                    href="/dashboard/properties/single/edit"
                                                     className="flex-1 border border-[#876D4A] text-[#876D4A] py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm text-center">
                                                     Edit
                                                 </Link>
@@ -139,6 +179,23 @@ export default function PropertiesPage() {
                                     </div>
                                 ))}
                             </div>
+
+                            {/* No Results State (for when search returns nothing) */}
+                            {filteredProperties.length === 0 && data?.length > 0 && (
+                                <div className="text-center py-12">
+                                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        🔍
+                                    </div>
+                                    <h3 className="font-serif text-lg text-gray-900 mb-2">No properties found</h3>
+                                    <p className="text-gray-600 mb-6">No properties match your search criteria</p>
+                                    <button
+                                        onClick={() => setSearchQuery('')}
+                                        className="bg-[#876D4A] text-white px-6 py-3 rounded-lg hover:bg-[#756045] transition-colors cursor-pointer"
+                                    >
+                                        Clear Search
+                                    </button>
+                                </div>
+                            )}
 
                             {/* Empty State (for when no properties) */}
                             {data?.length === 0 && (

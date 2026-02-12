@@ -1,33 +1,25 @@
 "use client"
 import Navbar from '@/components/Navbar'
 import Spinner from '@/components/Spinner'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchOneProperty } from '@/hooks/useProperty'
 import Link from 'next/link'
+import { useParams, notFound } from 'next/navigation'
 
-export default function SinglePropertyPage({ params }: { params: { id: string } }) {
-    const property = {
-        id: params.id,
-        name: 'Downtown Loft',
-        address: '123 Main Street, San Francisco, CA 94105',
-        type: 'Apartment',
-        bedrooms: 2,
-        bathrooms: 2,
-        squareFeet: 1200,
-        rent: 2400,
-        status: 'Occupied',
-        tenant: {
-            name: 'John Smith',
-            email: 'john.smith@email.com',
-            phone: '+1 (555) 123-4567',
-            leaseStart: '2024-01-01',
-            leaseEnd: '2024-12-31'
-        },
-        features: ['Parking', 'Laundry', 'Gym', 'Pool'],
-        description: 'Beautiful modern loft in the heart of downtown with stunning city views and premium amenities.'
+export default function SinglePropertyPage() {
+
+    const params = useParams()
+    const propertyId = params.propertyId as string
+
+    if (!propertyId) {
+        notFound()
     }
 
-    const { data, isLoading, error } = useFetchOneProperty("d627a7a4-38bd-4be4-816e-4bbf79ce2731")
+    const { data, isLoading, error } = useFetchOneProperty(propertyId)
     console.log(data)
+
+
+    usePageTitle(`${data?.name} - Denly`)
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -39,25 +31,25 @@ export default function SinglePropertyPage({ params }: { params: { id: string } 
 
                 <div className="pt-24 px-4 sm:px-6 lg:px-8 py-6">
                     <div className="max-w-6xl mx-auto">
-                        {/* Header */}
+
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 space-y-4 lg:space-y-0">
                             <div>
                                 <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
-                                    <Link href="/company/dashboard/properties" className="hover:text-[#876D4A] transition-colors">Properties</Link>
+                                    <Link href="/dashboard/properties" className="hover:text-[#876D4A] transition-colors">Properties</Link>
                                     <span>›</span>
-                                    <span>{data.name}</span>
+                                    <span>{data?.name}</span>
                                 </div>
-                                <h1 className="text-2xl sm:text-3xl font-serif text-gray-900 mb-2">{data.name}</h1>
-                                <p className="text-gray-600">{data.address}</p>
+                                <h1 className="text-2xl sm:text-3xl font-serif text-gray-900 mb-2">{data?.name}</h1>
+                                <p className="text-gray-600">{data?.address}</p>
                             </div>
                             <div className="flex space-x-3">
-                                <Link href="/company/dashboard/properties/single/edit">
+                                <Link href={`/dashboard/properties/${data?.id}/edit`}>
                                     <button className="border border-[#876D4A] text-[#876D4A] px-4 py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm">
                                         Edit Property
                                     </button>
                                 </Link>
 
-                                <Link href="/company/dashboard/payments/new">
+                                <Link href="/dashboard/payments/new">
                                     <button className="bg-[#876D4A] text-white px-4 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm">
                                         Record Payment
                                     </button>
@@ -66,38 +58,38 @@ export default function SinglePropertyPage({ params }: { params: { id: string } 
                         </div>
 
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Main Content */}
+
                             <div className="lg:col-span-2 space-y-8">
-                                {/* Property Overview */}
+
                                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                                     <h2 className="font-serif text-xl text-gray-900 mb-6">Property Overview</h2>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
                                         <div>
                                             <p className="text-gray-600 text-sm mb-1">Type</p>
-                                            <p className="font-medium text-gray-900">{data.type}</p>
+                                            <p className="font-medium text-gray-900">{data?.type}</p>
                                         </div>
                                         <div>
                                             <p className="text-gray-600 text-sm mb-1">Bedrooms</p>
-                                            <p className="font-medium text-gray-900">{data.bedrooms}</p>
+                                            <p className="font-medium text-gray-900">{data?.bedrooms}</p>
                                         </div>
                                         <div>
                                             <p className="text-gray-600 text-sm mb-1">Bathrooms</p>
-                                            <p className="font-medium text-gray-900">{data.bathrooms}</p>
+                                            <p className="font-medium text-gray-900">{data?.bathrooms}</p>
                                         </div>
                                         <div>
                                             <p className="text-gray-600 text-sm mb-1">Square Feet</p>
-                                            <p className="font-medium text-gray-900">{data.squareMeter}</p>
+                                            <p className="font-medium text-gray-900">{data?.squareMeter}</p>
                                         </div>
                                     </div>
                                     <div>
                                         <p className="text-gray-600 text-sm mb-2">Description</p>
-                                        <p className="text-gray-900">{data.description}</p>
+                                        <p className="text-gray-900">{data?.description}</p>
                                     </div>
                                     <div className="mt-6">
                                         <p className="text-gray-600 text-sm mb-2">Features</p>
                                         <div className="flex flex-wrap gap-2">
                                             {data?.features.map((feature: any) => (
-                                                <span key={data.id} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                                                <span key={data?.id} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
                                                     {feature}
                                                 </span>
                                             ))}
@@ -105,49 +97,57 @@ export default function SinglePropertyPage({ params }: { params: { id: string } 
                                     </div>
                                 </div>
 
-                                {/* Current Tenant */}
+
                                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                                     <div className="flex items-center justify-between mb-6">
                                         <h2 className="font-serif text-xl text-gray-900">Current Tenant</h2>
-                                        <span className={`px-3 py-1 rounded-full text-sm ${data.status === 'Occupied'
+                                        <span className={`px-3 py-1 rounded-full text-sm ${data?.tenants?.length > 0
                                             ? 'bg-green-100 text-green-800'
                                             : 'bg-gray-100 text-gray-800'
                                             }`}>
-                                            {data.status}
+                                            {data?.tenants?.length > 0 ? 'Occupied' : 'Vacant'}
                                         </span>
                                     </div>
-                                    {property.tenant && (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {data?.tenants.map((tenants: any) => (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 border-b pb-3">
                                             <div>
                                                 <p className="text-gray-600 text-sm mb-1">Tenant Name</p>
-                                                <p className="font-medium text-gray-900">{property.tenant.name}</p>
+                                                <p className="font-medium text-gray-900">{tenants.firstName + ' ' + tenants.lastName}</p>
                                             </div>
                                             <div>
                                                 <p className="text-gray-600 text-sm mb-1">Email</p>
-                                                <p className="font-medium text-gray-900">{property.tenant.email}</p>
+                                                <p className="font-medium text-gray-900">{tenants.email}</p>
                                             </div>
                                             <div>
                                                 <p className="text-gray-600 text-sm mb-1">Phone</p>
-                                                <p className="font-medium text-gray-900">{property.tenant.phone}</p>
+                                                <p className="font-medium text-gray-900">{tenants.phone}</p>
                                             </div>
                                             <div>
                                                 <p className="text-gray-600 text-sm mb-1">Lease Period</p>
-                                                <p className="font-medium text-gray-900">{property.tenant.leaseStart} to {property.tenant.leaseEnd}</p>
+                                                <p className="font-medium text-gray-900">{new Date(tenants.leaseStart).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })} to {new Date(tenants.leaseEnd).toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })}</p>
                                             </div>
                                         </div>
-                                    )}
+                                    ))}
                                 </div>
                             </div>
 
-                            {/* Sidebar */}
+
                             <div className="space-y-6">
-                                {/* Quick Stats */}
+
                                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                                     <h3 className="font-serif text-lg text-gray-900 mb-4">Financial Overview</h3>
                                     <div className="space-y-4">
                                         <div>
                                             <p className="text-gray-600 text-sm mb-1">Monthly Rent</p>
-                                            <p className="text-2xl font-bold text-[#876D4A]">${data.monthlyRent}</p>
+                                            <p className="text-2xl font-bold text-[#876D4A]">${data?.monthlyRent}</p>
                                         </div>
                                         <div>
                                             <p className="text-gray-600 text-sm mb-1">Next Payment Due</p>
@@ -160,7 +160,7 @@ export default function SinglePropertyPage({ params }: { params: { id: string } 
                                     </div>
                                 </div>
 
-                                {/* Recent Activity */}
+
                                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                                     <h3 className="font-serif text-lg text-gray-900 mb-4">Recent Activity</h3>
                                     <div className="space-y-3">
@@ -168,32 +168,8 @@ export default function SinglePropertyPage({ params }: { params: { id: string } 
                                             <span className="text-gray-600">Last Payment</span>
                                             <span className="font-medium text-gray-900">2024-01-15</span>
                                         </div>
-                                        {/* <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-600">Maintenance</span>
-                                        <span className="font-medium text-gray-900">2 open requests</span>
-                                    </div> */}
-                                        {/* <div className="flex items-center justify-between text-sm">
-                                        <span className="text-gray-600">Last Inspection</span>
-                                        <span className="font-medium text-gray-900">2023-12-01</span>
-                                    </div> */}
                                     </div>
                                 </div>
-
-                                {/* Quick Actions */}
-                                {/* <div className="bg-white text-black rounded-2xl border border-gray-200 shadow-sm p-6">
-                                <h3 className="font-serif text-lg text-gray-900 mb-4">Quick Actions</h3>
-                                <div className="space-y-2">
-                                    <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-[#876D4A] hover:bg-[#876D4A]/5 transition-colors cursor-pointer text-sm">
-                                        Send Message to Tenant
-                                    </button>
-                                    <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-[#876D4A] hover:bg-[#876D4A]/5 transition-colors cursor-pointer text-sm">
-                                        Schedule Inspection
-                                    </button>
-                                    <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-[#876D4A] hover:bg-[#876D4A]/5 transition-colors cursor-pointer text-sm">
-                                        Generate Lease Document
-                                    </button>
-                                </div>
-                            </div> */}
                             </div>
                         </div>
                     </div>

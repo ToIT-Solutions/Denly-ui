@@ -11,11 +11,10 @@ export const useAddProperty = () => {
     })
 }
 
-export const useFetchAllProperties = (subscriptionId: string) => {
+export const useFetchAllProperties = () => {
     return useQuery({
         queryKey: ["allProperties"],
-        queryFn: () => fetchAllProperties(subscriptionId),
-        enabled: !!subscriptionId,
+        queryFn: () => fetchAllProperties(),
     })
 }
 

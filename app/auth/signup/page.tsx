@@ -54,7 +54,7 @@ export default function SignupPage() {
             onSuccess: (data) => {
                 console.log(data)
                 setUser(data)
-                router.push('/company/dashboard')
+                router.push(`/dashboard`)
             },
             onError: (error: any) => {
                 console.log(error)

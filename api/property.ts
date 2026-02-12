@@ -34,9 +34,9 @@ export const addProperty = async(data: PropertyData) => {
     }
 }
 
-export const fetchAllProperties = async(subscriptionId: string) => {
+export const fetchAllProperties = async() => {
     try {
-        const response = await api.get(`/v1/property/viewAll/${subscriptionId}`);
+        const response = await api.get(`/v1/property/viewAll`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured when fetching properties";

@@ -127,7 +127,7 @@ export default function BillingPage() {
                             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
                                 <h2 className="font-serif text-xl text-gray-900 mb-4">Quick Links</h2>
                                 <div className="space-y-3">
-                                    <Link href="/company-settings" className="block p-3 rounded-lg border border-gray-200 hover:border-[#876D4A] hover:bg-[#876D4A]/5 transition-colors cursor-pointer">
+                                    <Link href="-settings" className="block p-3 rounded-lg border border-gray-200 hover:border-[#876D4A] hover:bg-[#876D4A]/5 transition-colors cursor-pointer">
                                         <p className="font-medium text-gray-900">Company Settings</p>
                                         <p className="text-gray-600 text-sm">Update company information</p>
                                     </Link>

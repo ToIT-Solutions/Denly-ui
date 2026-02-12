@@ -3,17 +3,23 @@ signup
 state management
 token
 property - add/edit/viewing/delete
-
+improved security and removed the subscription id from the url
+added tenant info to property views
+tenant - add/file upload/view/edit/delete
+payment - add/view all
+document - view/download
 
 
 -----------DOING-------------
-
-
+company
 
 
 
 -----------TODO--------------
-everything else
+OPTION FOR PAYMENT LENGHT FOR MONTHS LIKE 1MONTH OR 12 MONTHS, JSUT A DROPDOWN
+CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
+
+stats cards
 
 kill tokens on expire/logout
 sending and veryfying invites

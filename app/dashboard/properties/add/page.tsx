@@ -484,7 +484,7 @@ export default function AddPropertyPage() {
                                         {isSubmitting ? 'Adding Property...' : 'Add Property'}
                                     </button>
                                     <Link
-                                        href="/company/dashboard/properties"
+                                        href="/dashboard/properties"
                                         className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm text-center font-medium"
                                     >
                                         Cancel

@@ -1,30 +1,37 @@
 import {api} from './axios'
 
 interface TenantData {
-    id: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone: string;
-    emergency_contact_name?: string;
-    emergency_contact_phone?: string;
-    next_of_kin_name?: string;
-    next_of_kin_relationship?: string;
-    next_of_kin_phone?: string;
-    next_of_kin_email?: string;
-    next_of_kin_address?: string;
-    occupation?: string;
-    employer?: string;
-    notes?: string;
-    lease_start?: string; // Date string
-    lease_end?: string; // Date string
-    actual_rent?: number;
-    status?: 'active' | 'pending' | 'inactive';
+    //  Personal Information
+     firstName: string
+     lastName: string
+     email: string
+     phone: string
+     emergencyContactName: string
+     emergencyContactPhone: string
+ 
+     // Next of Kin Information
+     nextOfKinName: string
+     nextOfKinRelationship: string
+     nextOfKinPhone: string
+     nextOfKinEmail: string
+     nextOfKinAddress: string
+ 
+     // Property & Lease (Matches your DB structure)
+     propertyId: string
+     actualRent: number
+     leaseStart: string
+     leaseEnd: string
+     status: 'active' | 'pending'
+ 
+     // Additional Information
+     occupation: string
+     employer: string
+     notes: string
 }
 
 export const addTenant = async(data: TenantData) => {
     try {
-        const response = await api.post(`/tenant/add`, data);
+        const response = await api.post(`/v1/tenant/add`, data);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured trying to create tenant";
@@ -32,9 +39,9 @@ export const addTenant = async(data: TenantData) => {
     }
 }
 
-export const fetchAllTenants = async(subscriptionId: string) => {
+export const fetchAllTenants = async() => {
     try {
-        const response = await api.get(`/tenant/view/${subscriptionId}`);
+        const response = await api.get(`/v1/tenant/viewAll/`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured trying to fetch tenants";
@@ -44,7 +51,7 @@ export const fetchAllTenants = async(subscriptionId: string) => {
 
 export const fetchOneTenant = async(tenantId: string) => {
     try {
-        const response = await api.get(`/tenant/view/${tenantId}`);
+        const response = await api.get(`/v1/tenant/viewOne/${tenantId}`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured trying to fetch tenant";
@@ -54,7 +61,7 @@ export const fetchOneTenant = async(tenantId: string) => {
 
 export const editTenant = async(data: TenantData, tenantId: string) => {
     try {
-        const response = await api.put(`/tenant/edit/${tenantId}`, data);
+        const response = await api.put(`/v1/tenant/edit/${tenantId}`, data);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured trying to edit tenant";
@@ -64,7 +71,7 @@ export const editTenant = async(data: TenantData, tenantId: string) => {
 
 export const deleteTenant = async(tenantId: string) => {
     try {
-        const response = await api.delete(`/tenant/delete/${tenantId}`);
+        const response = await api.delete(`/v1/tenant/delete/${tenantId}`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured trying to delete tenant";

@@ -6,15 +6,48 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllProperties } from '@/hooks/useProperty'
+import { useAddPayment } from '@/hooks/usePayment'
+import Spinner from '@/components/Spinner'
+import { toast } from "sonner"
+
+interface Property {
+    id: string;
+    name: string;
+    address: string;
+    propertyType: string;
+    monthlyRent: string;
+    status: string;
+    tenants?: Tenant[];
+}
+
+interface Tenant {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+}
+
+interface PaymentFormData {
+    propertyId: string;
+    tenantId: string;
+    amount: number;
+    paymentDate: string;
+    paymentMethod: string;
+    notes: string;
+}
 
 export default function RecordPaymentPage() {
     usePageTitle('New Payment - Denly')
     const { data: propertyData, isPending: propertyPending, error: propertyError } = useFetchAllProperties()
-    
+    console.log(propertyData)
+
     const router = useRouter()
     const [selectedProperty, setSelectedProperty] = useState('')
     const [selectedTenant, setSelectedTenant] = useState('')
-    const [availableTenants, setAvailableTenants] = useState([])
+    const [availableTenants, setAvailableTenants] = useState<Tenant[]>([])
+
+    const { mutate, isPending, error } = useAddPayment()
 
     const {
         register,
@@ -22,30 +55,59 @@ export default function RecordPaymentPage() {
         formState: { errors },
         setValue,
         watch
-    } = useForm()
+    } = useForm<PaymentFormData>()
 
     // Watch for property changes to update tenants dropdown
-    const watchedProperty = watch('property')
+    const watchedProperty = watch('propertyId')
 
     // Update available tenants when property is selected
     useEffect(() => {
         if (watchedProperty) {
-            const selectedProp = propertyData?.find(prop => prop.id === watchedProperty)
+            const selectedProp = propertyData?.find((prop: Property) => prop.id === watchedProperty)
             setAvailableTenants(selectedProp?.tenants || [])
             // Clear tenant selection when property changes
-            setValue('tenant', '')
+            setValue('tenantId', '')
             setSelectedTenant('')
         } else {
             setAvailableTenants([])
         }
     }, [watchedProperty, propertyData, setValue])
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: PaymentFormData) => {
         console.log('Payment recorded:', data)
+
+
+        mutate(data, {
+            onSuccess: (data) => {
+                console.log(data)
+                router.push('/dashboard/payments')
+                toast('Payment added successfully', {
+                    style: {
+                        background: 'green',
+                        border: 'none',
+                        textAlign: "center",
+                        justifyContent: "center",
+                        color: "white"
+                    }
+                })
+            },
+            onError: (error: any) => {
+                console.log(error)
+                toast(error.message, {
+                    style: {
+                        background: 'red',
+                        border: 'none',
+                        textAlign: "center",
+                        justifyContent: "center",
+                        color: "white"
+                    }
+                })
+            }
+        })
     }
 
     // Get all unique tenants across all properties for the initial dropdown
-    const allTenants = propertyData?.flatMap(property => property.tenants || []) || []
+    const allTenants = propertyData?.flatMap((property: Property) => property.tenants || []) || []
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -73,18 +135,18 @@ export default function RecordPaymentPage() {
                                     Property *
                                 </label>
                                 <select
-                                    {...register('property', { required: 'Property is required' })}
+                                    {...register('propertyId', { required: 'Property is required' })}
                                     className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"
                                 >
                                     <option value="">Select a property</option>
-                                    {propertyData?.map((property) => (
+                                    {propertyData?.map((property: Property) => (
                                         <option key={property.id} value={property.id}>
                                             {property.name} - {property.address}
                                         </option>
                                     ))}
                                 </select>
-                                {errors.property && (
-                                    <p className="text-red-600 text-xs mt-1">{errors.property.message?.toString()}</p>
+                                {errors.propertyId && (
+                                    <p className="text-red-600 text-xs mt-1">{errors.propertyId.message}</p>
                                 )}
                             </div>
 
@@ -94,19 +156,19 @@ export default function RecordPaymentPage() {
                                     Tenant *
                                 </label>
                                 <select
-                                    {...register('tenant', { required: 'Tenant is required' })}
+                                    {...register('tenantId', { required: 'Tenant is required' })}
                                     className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"
                                     disabled={!watchedProperty}
                                 >
                                     <option value="">{watchedProperty ? 'Select a tenant' : 'Select a property first'}</option>
-                                    {availableTenants.map((tenant) => (
+                                    {availableTenants.map((tenant: Tenant) => (
                                         <option key={tenant.id} value={tenant.id}>
                                             {tenant.firstName} {tenant.lastName}
                                         </option>
                                     ))}
                                 </select>
-                                {errors.tenant && (
-                                    <p className="text-red-600 text-xs mt-1">{errors.tenant.message?.toString()}</p>
+                                {errors.tenantId && (
+                                    <p className="text-red-600 text-xs mt-1">{errors.tenantId.message}</p>
                                 )}
                                 {!watchedProperty && (
                                     <p className="text-gray-500 text-xs mt-1">Please select a property first to see available tenants</p>
@@ -135,7 +197,7 @@ export default function RecordPaymentPage() {
                                     />
                                 </div>
                                 {errors.amount && (
-                                    <p className="text-red-600 text-xs mt-1">{errors.amount.message?.toString()}</p>
+                                    <p className="text-red-600 text-xs mt-1">{errors.amount.message}</p>
                                 )}
                             </div>
 
@@ -151,7 +213,7 @@ export default function RecordPaymentPage() {
                                     defaultValue={new Date().toISOString().split('T')[0]}
                                 />
                                 {errors.paymentDate && (
-                                    <p className="text-red-600 text-xs mt-1">{errors.paymentDate.message?.toString()}</p>
+                                    <p className="text-red-600 text-xs mt-1">{errors.paymentDate.message}</p>
                                 )}
                             </div>
 
@@ -188,21 +250,26 @@ export default function RecordPaymentPage() {
                             </div>
 
                             {/* Form Actions */}
-                            <div className="flex space-x-3 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => router.back()}
-                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm font-medium"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex-1 px-4 py-2 bg-[#876D4A] text-white rounded-2xl hover:bg-[#756045] transition-colors text-sm font-medium"
-                                >
-                                    Record Payment
-                                </button>
-                            </div>
+                            {isPending ?
+                                <Spinner />
+                                :
+
+                                <div className="flex space-x-3 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => router.back()}
+                                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm font-medium"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 px-4 py-2 bg-[#876D4A] text-white rounded-2xl hover:bg-[#756045] transition-colors text-sm font-medium cursor-pointer"
+                                    >
+                                        Record Payment
+                                    </button>
+                                </div>
+                            }
                         </form>
                     </div>
                 </div>
