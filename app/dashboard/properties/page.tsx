@@ -18,7 +18,9 @@ export default function PropertiesPage() {
     // ]
 
     const { data, isLoading, error } = useFetchAllProperties()
-    console.log(data)
+    // console.log(data)
+    console.log(error)
+
 
     const [searchQuery, setSearchQuery] = useState('')
 

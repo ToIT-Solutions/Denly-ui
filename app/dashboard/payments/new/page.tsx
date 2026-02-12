@@ -3,12 +3,11 @@ import { useForm } from 'react-hook-form'
 import { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllProperties } from '@/hooks/useProperty'
 import { useAddPayment } from '@/hooks/usePayment'
 import Spinner from '@/components/Spinner'
-import { toast } from "sonner"
+import { useRouter } from 'next/navigation'
 
 interface Property {
     id: string;
@@ -42,12 +41,12 @@ export default function RecordPaymentPage() {
     const { data: propertyData, isPending: propertyPending, error: propertyError } = useFetchAllProperties()
     console.log(propertyData)
 
-    const router = useRouter()
     const [selectedProperty, setSelectedProperty] = useState('')
     const [selectedTenant, setSelectedTenant] = useState('')
     const [availableTenants, setAvailableTenants] = useState<Tenant[]>([])
 
-    const { mutate, isPending, error } = useAddPayment()
+    const { mutate: paymentMutate, isPending, error } = useAddPayment()
+    const router = useRouter()
 
     const {
         register,
@@ -77,33 +76,7 @@ export default function RecordPaymentPage() {
         console.log('Payment recorded:', data)
 
 
-        mutate(data, {
-            onSuccess: (data) => {
-                console.log(data)
-                router.push('/dashboard/payments')
-                toast('Payment added successfully', {
-                    style: {
-                        background: 'green',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            },
-            onError: (error: any) => {
-                console.log(error)
-                toast(error.message, {
-                    style: {
-                        background: 'red',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            }
-        })
+        paymentMutate(data)
     }
 
     // Get all unique tenants across all properties for the initial dropdown

@@ -6,22 +6,22 @@ import { useParams, useRouter } from 'next/navigation'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useDeleteProperty, useEditProperty, useFetchOneProperty } from '@/hooks/useProperty'
 import { useEffect, useState } from 'react'
-import { toast } from "sonner"
 import Spinner from '@/components/Spinner'
 
 export default function EditPropertyPage() {
+    usePageTitle('Edit Property - Denly')
+
     const params = useParams()
     const propertyId = params.propertyId as string
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
     const router = useRouter()
-    usePageTitle('Edit Property - Denly')
 
     const { data, isLoading, error } = useFetchOneProperty(propertyId)
     console.log(data)
 
-    const { mutate, isPending: isEditPending, error: editError } = useEditProperty()
+    const { mutate: editMutate, isPending: isEditPending, error: editError } = useEditProperty()
 
     const { mutate: deleteMutate, isPending: isDeletePending, error: deletePending } = useDeleteProperty()
 
@@ -72,33 +72,7 @@ export default function EditPropertyPage() {
     const onSubmit = (data: any) => {
         console.log('Updated property:', data)
 
-        mutate({ propertyId, data: data }, {
-            onSuccess: (data) => {
-                console.log(data)
-                router.push('/dashboard/properties')
-                toast('Property edited successfully', {
-                    style: {
-                        background: 'green',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            },
-            onError: (error: any) => {
-                console.log(error)
-                toast(error.message, {
-                    style: {
-                        background: 'red',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            }
-        })
+        editMutate({ propertyId, data: data })
     }
 
     const handleDelete = () => {
@@ -107,33 +81,7 @@ export default function EditPropertyPage() {
 
     const confirmDelete = () => {
 
-        deleteMutate("d627a7a4-38bd-4be4-816e-4bbf79ce2731", {
-            onSuccess: (data) => {
-                console.log(data)
-                router.push('/dashboard/properties')
-                toast('Property deleted successfully', {
-                    style: {
-                        background: 'green',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            },
-            onError: (error: any) => {
-                console.log(error)
-                toast(error.message, {
-                    style: {
-                        background: 'red',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            }
-        })
+        deleteMutate("d627a7a4-38bd-4be4-816e-4bbf79ce2731")
         setIsDeleteModalOpen(false)
     }
 

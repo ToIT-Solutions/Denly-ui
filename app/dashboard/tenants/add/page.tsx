@@ -20,7 +20,7 @@ interface Property {
 }
 
 interface TenantForm {
-    // Personal Information
+    //  Personal Information
     firstName: string
     lastName: string
     email: string
@@ -296,32 +296,7 @@ export default function AddTenantPage() {
             categories
         })
 
-        mutate(formDataToSend, {
-            onSuccess: () => {
-                toast.success('Tenant added successfully!', {
-                    style: {
-                        background: 'green',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-                router.push(`/dashboard/tenants`)
-            },
-            onError: (error: any) => {
-                console.log('Add tenant error:', error)
-                toast.error(error.message || 'Failed to add tenant', {
-                    style: {
-                        background: 'red',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            }
-        })
+        mutate(formDataToSend)
     }
 
     return (

@@ -1,32 +1,32 @@
 import {api} from './axios'
 
 interface TenantData {
-    //  Personal Information
-     firstName: string
-     lastName: string
-     email: string
-     phone: string
-     emergencyContactName: string
-     emergencyContactPhone: string
+    // //  Personal Information
+    //  firstName: string
+    //  lastName: string
+    //  email: string
+    //  phone: string
+    //  emergencyContactName: string
+    //  emergencyContactPhone: string
  
-     // Next of Kin Information
-     nextOfKinName: string
-     nextOfKinRelationship: string
-     nextOfKinPhone: string
-     nextOfKinEmail: string
-     nextOfKinAddress: string
+    //  // Next of Kin Information
+    //  nextOfKinName: string
+    //  nextOfKinRelationship: string
+    //  nextOfKinPhone: string
+    //  nextOfKinEmail: string
+    //  nextOfKinAddress: string
  
-     // Property & Lease (Matches your DB structure)
-     propertyId: string
-     actualRent: number
-     leaseStart: string
-     leaseEnd: string
-     status: 'active' | 'pending'
+    //  // Property & Lease (Matches your DB structure)
+    //  propertyId: string
+    //  actualRent: number
+    //  leaseStart: string
+    //  leaseEnd: string
+    //  status: 'active' | 'pending'
  
-     // Additional Information
-     occupation: string
-     employer: string
-     notes: string
+    //  // Additional Information
+    //  occupation: string
+    //  employer: string
+    //  notes: string
 }
 
 export const addTenant = async(data: TenantData) => {

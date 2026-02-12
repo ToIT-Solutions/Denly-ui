@@ -21,6 +21,12 @@ CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
 
 stats cards
 
+logging out when token expires and alerting the user
+
+REDUCE CLUTTER IN THE TSX AND PUT ALL THE CALLING AND THE SUCCESS/ERROR IN THE HOOKS
+
+error handling
+
 kill tokens on expire/logout
 sending and veryfying invites
 resetpassword

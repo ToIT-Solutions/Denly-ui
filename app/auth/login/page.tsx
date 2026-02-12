@@ -8,9 +8,6 @@ import Image from 'next/image'
 import Spinner from '@/components/Spinner'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useLogin } from '@/hooks/useAuth'
-import { toast } from "sonner"
-import useAuthStore from '@/store/useAuthStore';
-import { useRouter } from 'next/navigation'
 
 interface LoginForm {
     email: string
@@ -31,37 +28,17 @@ export default function LoginPage() {
         reValidateMode: 'onBlur'
     })
 
-    const router = useRouter()
 
-    const setUser = useAuthStore((state) => state.setUser)
 
     const [showAllErrors, setShowAllErrors] = useState(false)
 
-    const { mutate, isPending, error } = useLogin()
+    const { mutate: loginMutate, isPending, error } = useLogin()
 
     const onSubmit = async (data: LoginForm) => {
         console.log('📝 Login form submitted with data:', data)
         setShowAllErrors(true)
 
-        mutate(data, {
-            onSuccess: (data) => {
-                console.log(data)
-                setUser(data)
-                router.push(`/dashboard`)
-            },
-            onError: (error: any) => {
-                console.log(error)
-                toast(error.message, {
-                    style: {
-                        background: 'red',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            }
-        })
+        loginMutate(data)
     }
 
     return (

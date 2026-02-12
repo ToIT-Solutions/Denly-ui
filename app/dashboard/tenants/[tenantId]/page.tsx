@@ -12,6 +12,7 @@ import { api } from '@/api/axios' // Import api for the download endpoint
 
 export default function ViewTenantPage() {
     usePageTitle("Tenant Details - Denly")
+
     const params = useParams()
     const tenantId = params.tenantId as string
 

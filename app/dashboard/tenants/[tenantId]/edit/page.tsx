@@ -7,7 +7,6 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useDeleteTenant, useEditTenant, useFetchOneTenant } from '@/hooks/useTenant'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { toast } from "sonner"
 import Spinner from '@/components/Spinner'
 
 interface TenantForm {
@@ -122,30 +121,8 @@ export default function EditTenantPage() {
         console.log('📝 Tenant form submitted with data:', data)
 
         editMutate({ tenantId, data: data }, {
-            onSuccess: (data) => {
-                console.log(data)
+            onSuccess: () => {
                 router.push(`/dashboard/tenants/${tenantId}`)
-                toast('Tenant edited successfully', {
-                    style: {
-                        background: 'green',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            },
-            onError: (error: any) => {
-                console.log(error)
-                toast(error.message, {
-                    style: {
-                        background: 'red',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
             }
         })
     }
@@ -155,35 +132,8 @@ export default function EditTenantPage() {
     }
 
     const confirmDelete = () => {
-        deleteMutate(tenantId, {
-            onSuccess: (data) => {
-                console.log(data)
-                router.push(`/dashboard/tenants/`)
-                toast('Tenant deleted successfully', {
-                    style: {
-                        background: 'green',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-                setShowDeleteModal(false)
-            },
-            onError: (error: any) => {
-                console.log(error)
-                toast(error.message, {
-                    style: {
-                        background: 'red',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-                setShowDeleteModal(false)
-            }
-        })
+        deleteMutate(tenantId)
+        setShowDeleteModal(false)
     }
 
     const cancelDelete = () => {

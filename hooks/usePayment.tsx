@@ -1,12 +1,22 @@
 import { addPayment, deletePayment, editPayment, fetchAllPayments, fetchOnePayment } from "@/api/payment";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner"
+import { useRouter } from 'next/navigation'
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 
 export const useAddPayment = () => {
+    const router = useRouter()
+
     return useMutation({
         mutationFn: addPayment,
         onSuccess: (data) => {
             console.log(data)
+            router.push('/dashboard/payments')
+            showSuccessToast('Payment added successfully')
+        },
+        onError: (error: any) => {
+            showErrorToast(error)
         }
     })
 }

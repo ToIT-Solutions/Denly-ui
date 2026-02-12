@@ -12,7 +12,6 @@ export default function PaymentsPage() {
     ]
 
     const { data, isLoading, error } = useFetchAllPayments()
-    console.log(data)
 
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState('All Status')
@@ -229,12 +228,12 @@ export default function PaymentsPage() {
                                                     <div className="flex items-center space-x-2 sm:justify-end mt-1">
                                                         <p className="text-gray-600 text-xs sm:text-sm">{paymentDate}</p>
                                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${paymentStatus.toLowerCase() === 'paid'
-                                                                ? 'bg-green-100 text-green-800'
-                                                                : paymentStatus.toLowerCase() === 'overdue'
-                                                                    ? 'bg-red-100 text-red-800'
-                                                                    : paymentStatus.toLowerCase() === 'pending'
-                                                                        ? 'bg-yellow-100 text-yellow-800'
-                                                                        : 'bg-gray-100 text-gray-800'
+                                                            ? 'bg-green-100 text-green-800'
+                                                            : paymentStatus.toLowerCase() === 'overdue'
+                                                                ? 'bg-red-100 text-red-800'
+                                                                : paymentStatus.toLowerCase() === 'pending'
+                                                                    ? 'bg-yellow-100 text-yellow-800'
+                                                                    : 'bg-gray-100 text-gray-800'
                                                             }`}>
                                                             {paymentStatus}
                                                         </span>

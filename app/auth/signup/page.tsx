@@ -9,7 +9,6 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useSignup } from '@/hooks/useAuth'
 import { toast } from "sonner"
 import Spinner from '@/components/Spinner'
-import useAuthStore from '@/store/useAuthStore';
 import { useRouter } from 'next/navigation'
 
 interface SignupForm {
@@ -40,36 +39,14 @@ export default function SignupPage() {
     const [showAllErrors, setShowAllErrors] = useState(false)
     const [serverError, setserverError] = useState<string | null>(null)
 
-    const { mutate, isPending, error } = useSignup()
+    const { mutate: signupMutate, isPending, error } = useSignup()
 
-    const setUser = useAuthStore((state) => state.setUser)
-
-    const router = useRouter()
 
     const onSubmit = async (data: SignupForm) => {
-        console.log('📝 Form submitted with data:', data)
+        // console.log('📝 Form submitted with data:', data)
         setShowAllErrors(true)
 
-        mutate(data, {
-            onSuccess: (data) => {
-                console.log(data)
-                setUser(data)
-                router.push(`/dashboard`)
-            },
-            onError: (error: any) => {
-                console.log(error)
-                console.log(error.message)
-                toast(error.message, {
-                    style: {
-                        background: 'red',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            }
-        })
+        signupMutate(data)
     }
 
     const password = watch('password')

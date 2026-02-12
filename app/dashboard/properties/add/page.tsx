@@ -48,7 +48,7 @@ export default function AddPropertyPage() {
 
     const router = useRouter()
 
-    const { mutate, isPending, error } = useAddProperty()
+    const { mutate: propertyMutate, isPending, error } = useAddProperty()
 
     const propertyType = useWatch({
         control,
@@ -58,33 +58,7 @@ export default function AddPropertyPage() {
     const onSubmit = async (data: PropertyForm) => {
         console.log('📝 Property form submitted with data:', data)
 
-        mutate(data, {
-            onSuccess: (data) => {
-                console.log(data)
-                toast("Property added successfully", {
-                    style: {
-                        background: 'green',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-                router.back()
-            },
-            onError: (error: any) => {
-                console.log(error)
-                toast(error.message, {
-                    style: {
-                        background: 'red',
-                        border: 'none',
-                        textAlign: "center",
-                        justifyContent: "center",
-                        color: "white"
-                    }
-                })
-            }
-        })
+        propertyMutate(data)
     }
 
     const residentialFeatures = ['Parking', 'Laundry', 'Gym', 'Pool', 'Pet Friendly', 'Furnished', 'Air Conditioning', 'Balcony', 'Storage', 'Patio']
