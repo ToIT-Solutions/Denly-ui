@@ -8,6 +8,8 @@ added tenant info to property views
 tenant - add/file upload/view/edit/delete
 payment - add/view all
 document - view/download
+end-to-end hooks to make tsx-ui cleaner
+company - view/edit
 
 
 -----------DOING-------------
@@ -23,7 +25,7 @@ stats cards
 
 logging out when token expires and alerting the user
 
-REDUCE CLUTTER IN THE TSX AND PUT ALL THE CALLING AND THE SUCCESS/ERROR IN THE HOOKS
+CONDITIONAL RENDERING
 
 error handling
 
