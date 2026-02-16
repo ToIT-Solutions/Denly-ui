@@ -63,7 +63,7 @@ export default function DashboardPage() {
                                         title: 'Total Revenue',
                                         value: data?.overview?.totalRevenue ? '$' + data.overview.totalRevenue : '$0',
                                         subtitle: 'Total',
-                                        trend: data?.overview?.totalRevenue ? '+12%' : ''
+                                        // trend: data?.overview?.totalRevenue ? '+12%' : ''
                                     },
                                     {
                                         title: 'Monthly Revenue',
@@ -73,7 +73,7 @@ export default function DashboardPage() {
                                     {
                                         title: 'Active Properties',
                                         value: data?.overview?.activeProperties ?? 0,
-                                        subtitle: (data?.overview?.occupiedProperties ?? 0) + ' occupied'
+                                        subtitle: (data?.overview?.totalProperties ?? 0) + ' occupied'
                                     },
                                     {
                                         title: 'Occupancy Rate',
@@ -85,7 +85,7 @@ export default function DashboardPage() {
                                         <p className="text-gray-600 text-sm mb-1">{stat.title}</p>
                                         <div className="flex items-baseline space-x-2 mb-1">
                                             <span className="text-2xl font-serif text-gray-900">{stat.value}</span>
-                                            {stat.trend && <span className="text-sm text-green-600">{stat.trend}</span>}
+                                            {/* {stat.trend && <span className="text-sm text-green-600">{stat.trend}</span>} */}
                                         </div>
                                         <p className="text-gray-500 text-xs">{stat.subtitle}</p>
                                     </div>

@@ -10,10 +10,13 @@ payment - add/view all
 document - view/download
 end-to-end hooks to make tsx-ui cleaner
 company - view/edit
-
+user - change roles/ delete/ editing
+invite - showing/ processing/ sending
+logs
 
 -----------DOING-------------
-company
+editing user details
+
 
 
 
@@ -30,7 +33,9 @@ CONDITIONAL RENDERING
 error handling
 
 kill tokens on expire/logout
-sending and veryfying invites
+
+DELETION AND CASCADING
+
 resetpassword
 
 get

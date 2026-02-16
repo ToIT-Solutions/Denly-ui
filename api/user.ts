@@ -2,37 +2,27 @@ import {api} from './axios'
 
 interface UserData {
     id: string;
-    first_name?: string;
-    last_name?: string;
+    firstName?: string;
+    lastName?: string;
     email?: string;
     role?: 'owner' | 'manager' | 'agent' | 'viewer';
     status?: 'active' | 'invited' | 'suspended';
-    profile_image_url?: string;
 }
 
-export const addUser = async(data: UserData) => {
-    try {
-        const response = await api.post(`/user/add`, data);
-        return response.data;
-    } catch (error: any) {
-        const message = error.response?.data?.message || error.message || "An error occured trying to create user";
-        throw new Error(message);
-    }
-}
 
-export const fetchAllUsers = async(subscriptionId: string) => {
+export const fetchAllUsers = async() => {
     try {
-        const response = await api.get(`/user/view/${subscriptionId}`);
+        const response = await api.get(`/v1/user/viewAll`);
         return response.data;
     } catch (error: any) {
-        const message = error.response?.data?.message || error.message || "An error occured trying to fetch users";
+        const message = error.response?.data?.message || error.message || "An error occured trying to fetch all users";
         throw new Error(message);
     }
 }
 
 export const fetchOneUser = async(userId: string) => {
     try {
-        const response = await api.get(`/user/view/${userId}`);
+        const response = await api.get(`/v1/user/viewOne/${userId}`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured trying to fetch user";
@@ -40,9 +30,9 @@ export const fetchOneUser = async(userId: string) => {
     }
 }
 
-export const editUser = async(data: UserData, userId: string) => {
+export const editUser = async(userId: string , data: UserData) => {
     try {
-        const response = await api.put(`/user/edit/${userId}`, data);
+        const response = await api.put(`/v1/user/edit/${userId}`, data);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured trying to edit user";
@@ -50,9 +40,19 @@ export const editUser = async(data: UserData, userId: string) => {
     }
 }
 
+export const editUserRole = async(userId: string , data: UserData) => {
+    try {
+        const response = await api.patch(`/v1/user/role/${userId}`, data);
+        return response.data;
+    } catch (error: any) {
+        const message = error.response?.data?.message || error.message || "An error occured trying to edit user role";
+        throw new Error(message);
+    }
+}
+
 export const deleteUser = async(userId: string) => {
     try {
-        const response = await api.delete(`/user/delete/${userId}`);
+        const response = await api.delete(`/v1/user/delete/${userId}`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured trying to delete user";

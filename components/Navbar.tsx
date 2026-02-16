@@ -163,6 +163,13 @@ export default function Navbar() {
                                     >
                                         Billing & Subscription
                                     </Link>
+                                    <Link
+                                        href={`/dashboard/subscription/logs`}
+                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                                        onClick={() => setIsUserMenuOpen(false)}
+                                    >
+                                        Logs Activity
+                                    </Link>
 
                                     <div className="border-t border-gray-200 my-1"></div>
                                     <button
