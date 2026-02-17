@@ -12,10 +12,12 @@ end-to-end hooks to make tsx-ui cleaner
 company - view/edit
 user - change roles/ delete/ editing
 invite - showing/ processing/ sending
-logs
+logs - pagination
+basic error handling and toasts
+401 error handling & logging out
 
 -----------DOING-------------
-editing user details
+
 
 
 
@@ -26,21 +28,15 @@ CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
 
 stats cards
 
-logging out when token expires and alerting the user
-
 CONDITIONAL RENDERING
 
-error handling
-
-kill tokens on expire/logout
+--kill tokens on expire/logout
 
 DELETION AND CASCADING
 
 resetpassword
 
-get
-create
-put
-delete
----routes
+MAX TENANTS PER PROPERTY 
+CHANGING PROPERTY EITHER TO ANOTHER OR TO NOTHING
+RESENDING AND DELETING INVITES
 

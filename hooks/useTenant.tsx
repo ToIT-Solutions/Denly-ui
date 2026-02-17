@@ -4,7 +4,6 @@ import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
-
 export const useAddTenant = () => {
     const router = useRouter()
     return useMutation({

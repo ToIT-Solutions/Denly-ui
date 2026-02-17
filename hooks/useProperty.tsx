@@ -4,7 +4,6 @@ import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
-
 export const useAddProperty = () => {
     const router = useRouter()
 
@@ -49,7 +48,6 @@ export const useEditProperty = () => {
             queryClient.invalidateQueries({ queryKey: ["Property", propertyId] });
         },
         onError: (error: any) => {
-            console.log(error)
             showErrorToast(error)
         }
     })
@@ -68,7 +66,6 @@ export const useDeleteProperty = () => {
             queryClient.invalidateQueries({ queryKey: ["allProperties"] });
         },
         onError: (error: any) => {
-            console.log(error)
             showErrorToast(error)
         }
     })

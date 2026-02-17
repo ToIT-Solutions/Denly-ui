@@ -4,7 +4,6 @@ import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
-
 export const useAddPayment = () => {
     const router = useRouter()
 
@@ -36,20 +35,20 @@ export const useFetchOnePayment = (paymentId: string) => {
     })
 }
 
-export const useEditPayment = () => {
-    return useMutation({
-        mutationFn: ({ paymentId, data }: { paymentId: string; data: any }) => editPayment(paymentId, data),
-        onSuccess: (data) => {
-            console.log(data)
-        }
-    })
-}
+// export const useEditPayment = () => {
+//     return useMutation({
+//         mutationFn: ({ paymentId, data }: { paymentId: string; data: any }) => editPayment(paymentId, data),
+//         onSuccess: (data) => {
+//             console.log(data)
+//         }
+//     })
+// }
 
-export const useDeletePayment = () => {
-    return useMutation({
-        mutationFn: (paymentId: string) => deletePayment(paymentId),
-        onSuccess: (data) => {
-            console.log(data)
-        }
-    })
-}
+// export const useDeletePayment = () => {
+//     return useMutation({
+//         mutationFn: (paymentId: string) => deletePayment(paymentId),
+//         onSuccess: (data) => {
+//             console.log(data)
+//         }
+//     })
+// }

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
-import { Toaster } from 'sonner'
 import "./globals.css";
 import Providers from "./providers";
 import SplashScreen from "@/components/SplitScreen";
+import { RedirectHandler } from "@/components/RedirectHandler";
 
 const font = Raleway({
   variable: "--font-denly",
@@ -26,9 +26,10 @@ export default function RootLayout({
     <html lang="en" className={font.variable}>
       <body className="antialiased font-(--font-denly)">
         <Providers>
-          <Toaster position="bottom-center" richColors />
-          <SplashScreen />
-          {children}
+          <RedirectHandler>
+            <SplashScreen />
+            {children}
+          </RedirectHandler>
         </Providers>
       </body>
     </html>

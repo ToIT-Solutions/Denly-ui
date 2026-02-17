@@ -8,6 +8,7 @@ import {
 } from "@/api/document";
 import { api } from '@/api/axios'
 
+
 // ✅ For fetching document METADATA (what you were originally using)
 export const useFetchOneDocument = (documentId: string) => {
     return useQuery({

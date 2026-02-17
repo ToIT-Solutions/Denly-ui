@@ -18,7 +18,7 @@ export default function PropertiesPage() {
     // ]
 
     const { data, isLoading, error } = useFetchAllProperties()
-    // console.log(data)
+    console.log(data)
     console.log(error)
 
 
@@ -145,13 +145,12 @@ export default function PropertiesPage() {
                                                 <div className="flex justify-between items-center">
                                                     <span className="text-gray-600 text-sm">{property.tenants?.length > 1 ? 'Current Tenants' : 'Current Tenant'}</span>
                                                     <span className="text-gray-900 text-sm">
-                                                        {property.tenants?.length > 1
-                                                            ? property.tenants?.length + ' tenants'
-                                                            : property.tenants?.firstName && property.tenants?.lastName
-                                                                ? property.tenants?.firstName + ' ' + property.tenants?.lastName
-                                                                : property.tenants?.length === 0
-                                                                    ? 'No tenant'
-                                                                    : ''}
+                                                        {property.tenants?.length > 1 ?
+                                                            property.tenants?.length + ' tenants' :
+                                                            property.tenants?.length === 1 ?
+                                                                property.tenants[0].firstName + ' ' + property.tenants[0].lastName :
+                                                                property.tenants?.length === 0 ?
+                                                                    'No tenant' : ''}
                                                     </span>
                                                 </div>
                                                 <div className="flex justify-between items-center">
@@ -207,9 +206,11 @@ export default function PropertiesPage() {
                                     </div>
                                     <h3 className="font-serif text-lg text-gray-900 mb-2">No properties yet</h3>
                                     <p className="text-gray-600 mb-6">Get started by adding your first property</p>
-                                    <button className="bg-[#876D4A] text-white px-6 py-3 rounded-lg hover:bg-[#756045] transition-colors cursor-pointer">
-                                        Add Your First Property
-                                    </button>
+                                    <Link href={'/dashboard/properties/add'}>
+                                        <button className="bg-[#876D4A] text-white px-6 py-3 rounded-lg hover:bg-[#756045] transition-colors cursor-pointer">
+                                            Add Your First Property
+                                        </button>
+                                    </Link>
                                 </div>
                             )}
                         </div>

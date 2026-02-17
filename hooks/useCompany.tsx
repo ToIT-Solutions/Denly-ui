@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 import { editCompanyData, fetchCompanyData, fetchCompanyStats } from "@/api/company";
 
+
 interface CompanyData {
     name: string
     email: string
@@ -21,6 +22,7 @@ export const useFetchCompanyData = () => {
     return useQuery({
         queryKey: ["companyData"],
         queryFn: () => fetchCompanyData(),
+
     })
 }
 

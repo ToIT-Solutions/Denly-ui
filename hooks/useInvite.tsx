@@ -4,6 +4,7 @@ import useAuthStore from '@/store/useAuthStore';
 import { showErrorToast, showSuccessToast } from '@/lib/toast';
 import { deleteInvite, fetchAllInvites, inviteUser, processInvite, resendInvite } from "@/api/invite";
 
+
 export const useFetchAllInvites = () => {
     return useQuery({
         queryKey: ["allInvites"],
@@ -24,7 +25,6 @@ export const useProcessInvite = () => {
             router.push(`/dashboard`)
         },
         onError: (error: any) => {
-            console.log(error)
             showErrorToast(error)
         }
     })
@@ -42,7 +42,6 @@ export const useInviteUser = () => {
             queryClient.invalidateQueries({ queryKey: ["allInvites"] });
         },
         onError: (error: any) => {
-            console.log(error)
             showErrorToast(error)
         }
     })
@@ -60,7 +59,6 @@ export const useResendInvite = () => {
             queryClient.invalidateQueries({ queryKey: ["allInvites"] });
         },
         onError: (error: any) => {
-            console.log(error)
             showErrorToast(error)
         }
     })
@@ -78,7 +76,6 @@ export const useDeleteInvite = () => {
             queryClient.invalidateQueries({ queryKey: ["allInvites"] });
         },
         onError: (error: any) => {
-            console.log(error)
             showErrorToast(error)
         }
     })

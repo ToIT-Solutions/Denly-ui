@@ -165,7 +165,7 @@ export default function TenantsPage() {
                         </div>
                     ) : (
                         /* No Results State */
-                        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-12 text-center">
+                        <div className="rounded-2xl p-12 text-center">
                             {data?.length === 0 ? (
                                 <>
                                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

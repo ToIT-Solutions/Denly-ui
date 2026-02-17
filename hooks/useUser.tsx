@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation'
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 import { deleteUser, editUser, editUserRole, fetchAllUsers, fetchOneUser } from "@/api/user";
 
-
 export const useFetchAllUsers = () => {
     return useQuery({
         queryKey: ["allUsers"],
@@ -23,6 +22,7 @@ export const useEditUser = () => {
     const queryClient = useQueryClient();
     const router = useRouter()
 
+
     return useMutation({
         mutationFn: ({ userId, data }: { userId: string; data: any }) => editUser(userId, data),
         onSuccess: (data, userId) => {
@@ -32,7 +32,6 @@ export const useEditUser = () => {
             queryClient.invalidateQueries({ queryKey: ["user", userId] });
         },
         onError: (error: any) => {
-            console.log(error)
             showErrorToast(error)
         }
     })
@@ -52,7 +51,6 @@ export const useEditUserRole = () => {
             queryClient.invalidateQueries({ queryKey: ["user", userId] });
         },
         onError: (error: any) => {
-            console.log(error)
             showErrorToast(error)
         }
     })
@@ -72,7 +70,6 @@ export const useDeleteUser = () => {
             queryClient.invalidateQueries({ queryKey: ["allUsers"] });
         },
         onError: (error: any) => {
-            console.log(error)
             showErrorToast(error)
         }
     })
