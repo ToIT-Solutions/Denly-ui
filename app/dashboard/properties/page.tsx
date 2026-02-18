@@ -3,23 +3,18 @@ import Navbar from '@/components/Navbar'
 import Spinner from '@/components/Spinner'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllProperties } from '@/hooks/useProperty'
+import { CAN_EDIT } from '@/lib/roles'
+import useAuthStore from '@/store/useAuthStore'
 import Link from 'next/link'
 import { useState, useMemo } from 'react'
 
 export default function PropertiesPage() {
     usePageTitle('Properties - Denly')
-    // const properties = [
-    //     { id: 1, name: 'Downtown Loft', address: '123 Main St, City', rent: 2400, status: 'Occupied', tenant: 'John Smith', image: '/property-1.jpg' },
-    //     { id: 2, name: 'Garden Villa', address: '456 Oak Ave, Town', rent: 3200, status: 'Occupied', tenant: 'Sarah Johnson', image: '/property-2.jpg' },
-    //     { id: 3, name: 'Urban Suite', address: '789 Pine Rd, Metro', rent: 1800, status: 'Vacant', tenant: '', image: '/property-3.jpg' },
-    //     { id: 4, name: 'Riverside Apartment', address: '101 River Dr, Valley', rent: 2750, status: 'Occupied', tenant: 'Mike Chen', image: '/property-4.jpg' },
-    //     { id: 5, name: 'Mountain View Condo', address: '202 Hilltop Blvd, Heights', rent: 2200, status: 'Occupied', tenant: 'Lisa Wang', image: '/property-5.jpg' },
-    //     { id: 6, name: 'City Center Studio', address: '303 Urban Ln, Downtown', rent: 1500, status: 'Vacant', tenant: '', image: '/property-6.jpg' },
-    // ]
+
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
 
     const { data, isLoading, error } = useFetchAllProperties()
-    console.log(data)
-    console.log(error)
 
 
     const [searchQuery, setSearchQuery] = useState('')
@@ -168,13 +163,15 @@ export default function PropertiesPage() {
                                                     View Details
                                                 </Link>
 
-                                                {/* <Link href="/dashboard/properties/single/edit"> */}
-                                                <Link
-                                                    href="/dashboard/properties/single/edit"
-                                                    className="flex-1 border border-[#876D4A] text-[#876D4A] py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm text-center">
-                                                    Edit
-                                                </Link>
-                                                {/* </Link> */}
+                                                {CAN_EDIT.includes(userRole) ?
+                                                    <Link
+                                                        href={`/dashboard/properties/${property.id}/edit`}
+                                                        className="flex-1 border border-[#876D4A] text-[#876D4A] py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm text-center">
+                                                        Edit
+                                                    </Link>
+                                                    :
+                                                    null}
+
                                             </div>
                                         </div>
                                     </div>

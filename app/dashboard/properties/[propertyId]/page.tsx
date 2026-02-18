@@ -5,8 +5,12 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchOneProperty } from '@/hooks/useProperty'
 import Link from 'next/link'
 import { useParams, notFound } from 'next/navigation'
+import useAuthStore from '@/store/useAuthStore'
+import { CAN_EDIT, CAN_INTERACT } from '@/lib/roles'
 
 export default function SinglePropertyPage() {
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
 
     const params = useParams()
     const propertyId = params.propertyId as string
@@ -18,8 +22,8 @@ export default function SinglePropertyPage() {
     const { data, isLoading, error } = useFetchOneProperty(propertyId)
     console.log(data)
 
-
     usePageTitle(`${data?.name} - Denly`)
+
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -43,17 +47,23 @@ export default function SinglePropertyPage() {
                                 <p className="text-gray-600">{data?.address}</p>
                             </div>
                             <div className="flex space-x-3">
-                                <Link href={`/dashboard/properties/${data?.id}/edit`}>
-                                    <button className="border border-[#876D4A] text-[#876D4A] px-4 py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm">
-                                        Edit Property
-                                    </button>
-                                </Link>
+                                {CAN_EDIT.includes(userRole) ?
+                                    <Link href={`/dashboard/properties/${data?.id}/edit`}>
+                                        <button className="border border-[#876D4A] text-[#876D4A] px-4 py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm">
+                                            Edit Property
+                                        </button>
+                                    </Link>
+                                    :
+                                    null}
 
-                                <Link href="/dashboard/payments/new">
-                                    <button className="bg-[#876D4A] text-white px-4 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm">
-                                        Record Payment
-                                    </button>
-                                </Link>
+                                {CAN_INTERACT.includes(userRole) ?
+                                    <Link href="/dashboard/payments/new">
+                                        <button className="bg-[#876D4A] text-white px-4 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm">
+                                            Record Payment
+                                        </button>
+                                    </Link>
+                                    :
+                                    null}
                             </div>
                         </div>
 

@@ -8,6 +8,9 @@ import { useAddProperty } from '@/hooks/useProperty'
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import Spinner from '@/components/Spinner'
+import useAuthStore from '@/store/useAuthStore'
+import { useEffect } from 'react'
+import { CAN_INTERACT } from '@/lib/roles'
 
 interface PropertyForm {
     name: string
@@ -34,6 +37,10 @@ interface PropertyForm {
 
 export default function AddPropertyPage() {
     usePageTitle('Add Property - Denly')
+
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
+
     const {
         register,
         handleSubmit,
@@ -47,6 +54,13 @@ export default function AddPropertyPage() {
     })
 
     const router = useRouter()
+
+    useEffect(() => {
+        if (CAN_INTERACT.includes(userRole)) {
+            return router.back()
+        }
+    }, [userRole])
+
 
     const { mutate: propertyMutate, isPending, error } = useAddProperty()
 

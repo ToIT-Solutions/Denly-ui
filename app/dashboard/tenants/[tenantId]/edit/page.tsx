@@ -8,6 +8,8 @@ import { useDeleteTenant, useEditTenant, useFetchOneTenant } from '@/hooks/useTe
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Spinner from '@/components/Spinner'
+import useAuthStore from '@/store/useAuthStore'
+import { CAN_EDIT } from '@/lib/roles'
 
 interface TenantForm {
     // Personal Information
@@ -40,6 +42,10 @@ interface TenantForm {
 
 export default function EditTenantPage() {
     usePageTitle('Edit Tenant - Denly')
+
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
+
     const params = useParams()
     const tenantId = params.tenantId as string
 
@@ -81,6 +87,11 @@ export default function EditTenantPage() {
     })
 
     useEffect(() => {
+
+        if (!CAN_EDIT.includes(userRole)) {
+            return router.back()
+        }
+
         if (data) {
             // Format dates to YYYY-MM-DD for date picker
             const formatDateForInput = (dateString: string) => {

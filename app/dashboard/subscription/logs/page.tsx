@@ -4,6 +4,9 @@ import Navbar from '@/components/Navbar'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import Spinner from '@/components/Spinner'
 import { useFetchAllLogs } from '@/hooks/useLogs'
+import { showErrorToast } from '@/lib/toast'
+import { useRouter } from 'next/navigation'
+import useAuthStore from '@/store/useAuthStore'
 
 export default function LogsPage() {
     usePageTitle('Activity Logs - Denly')
@@ -14,8 +17,13 @@ export default function LogsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [currentPage, setCurrentPage] = useState(1)
 
-    const { data, isLoading, error } = useFetchAllLogs(currentPage)
-    // console.log(data)
+    const router = useRouter()
+
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
+
+    const { data, isLoading, error, isError } = useFetchAllLogs(currentPage)
+    // console.log(error?.message)
     const logs = data?.logs || []
     const totalLogs = data?.total || 0
     const totalPages = data?.totalPages || 1
@@ -23,10 +31,18 @@ export default function LogsPage() {
 
     // Sync current page with server response
     useEffect(() => {
+        if (userRole !== 'Owner') {
+            router.back()
+        }
+
+        if (error) {
+            showErrorToast(error?.message || error)
+        }
+
         if (currentPageFromServer !== currentPage) {
             setCurrentPage(currentPageFromServer)
         }
-    }, [currentPageFromServer])
+    }, [currentPageFromServer, error])
 
     console.log(logs)
 

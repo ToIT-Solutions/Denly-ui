@@ -4,11 +4,20 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllProperties } from '@/hooks/useProperty'
 import { useFetchAllTenants } from '@/hooks/useTenant'
 import { useFetchAllPayments } from '@/hooks/usePayment'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
+import Spinner from '@/components/Spinner'
+import useAuthStore from '@/store/useAuthStore'
+import { CAN_VIEW_REPORTS } from '@/lib/roles'
+import { useRouter } from 'next/navigation'
 
 export default function ReportsPage() {
     usePageTitle('Reports & Analytics - Denly')
+
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
+
+    const router = useRouter()
 
     // Fetch real data
     const { data: properties, isLoading: propertiesLoading } = useFetchAllProperties()
@@ -19,6 +28,13 @@ export default function ReportsPage() {
 
     const [selectedReportType, setSelectedReportType] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
+
+    useEffect(() => {
+        if (!CAN_VIEW_REPORTS.includes(userRole)) {
+            return router.back()
+        }
+    }, [userRole])
+
 
     // ============= CONSOLIDATED DATA =============
     // First, let's consolidate all our data to ensure accurate relationships
@@ -602,580 +618,568 @@ export default function ReportsPage() {
         return categories.length > 0 ? categories : ['all']
     }, [searchQuery])
 
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
-                <Navbar />
-                <div className="pt-24 px-8 py-6">
-                    <div className="max-w-6xl mx-auto flex justify-center items-center h-64">
-                        <div className="text-center">
-                            <div className="w-12 h-12 border-4 border-[#876D4A] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                            <p className="text-gray-600">Loading reports data...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
             <Navbar />
 
             <div className="pt-24 px-4 sm:px-6 lg:px-8 py-6">
-                <div className="max-w-7xl mx-auto">
-                    {/* Header */}
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 space-y-4 lg:space-y-0">
-                        <div>
-                            <h1 className="text-2xl sm:text-3xl font-serif text-gray-900 mb-2">Reports & Analytics</h1>
-                            <p className="text-gray-600">Comprehensive insights into your property portfolio</p>
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-3">
-                            <select
-                                className="border border-gray-300 text-black outline-0 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm"
-                                value={selectedReportType}
-                                onChange={(e) => setSelectedReportType(e.target.value)}
-                            >
-                                <option value="all">All Reports</option>
-                                <option value="property">Property Reports</option>
-                                <option value="tenant">Tenant Reports</option>
-                                <option value="financial">Financial Reports</option>
-                                <option value="cross">Cross-Cutting Reports</option>
-                            </select>
-                            <input
-                                type="text"
-                                placeholder="Search reports..."
-                                className="border border-gray-300 text-black outline-0 placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm w-full sm:w-64"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Quick Stats Summary */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
-                            <p className="text-gray-600 text-sm mb-1">Properties</p>
-                            <div className="text-xl sm:text-2xl font-serif text-gray-900 mb-1">{propertyReports?.summary?.totalProperties || 0}</div>
-                            <p className="text-gray-500 text-xs">{propertyReports?.summary?.occupancyRate || 0}% occupied</p>
-                        </div>
-                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
-                            <p className="text-gray-600 text-sm mb-1">Tenants</p>
-                            <div className="text-xl sm:text-2xl font-serif text-gray-900 mb-1">{tenantReports?.summary?.totalTenants || 0}</div>
-                            <p className="text-gray-500 text-xs">{tenantReports?.summary?.activeTenants || 0} active</p>
-                        </div>
-                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
-                            <p className="text-gray-600 text-sm mb-1">Total Revenue</p>
-                            <div className="text-xl sm:text-2xl font-serif text-gray-900 mb-1">${financialReports?.summary?.totalRevenue?.toLocaleString() || 0}</div>
-                            <p className="text-gray-500 text-xs">{financialReports?.summary?.paymentCount || 0} payments</p>
-                        </div>
-                        <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
-                            <p className="text-gray-600 text-sm mb-1">Outstanding</p>
-                            <div className="text-xl sm:text-2xl font-serif text-amber-600 mb-1">${tenantReports?.summary?.totalOutstandingBalance?.toLocaleString() || 0}</div>
-                            <p className="text-gray-500 text-xs">{tenantReports?.summary?.tenantsWithOutstandingBalance || 0} tenants</p>
-                        </div>
-                    </div>
-
-                    {/* Report Categories */}
-                    <div className="space-y-8">
-                        {/* PROPERTY-LEVEL REPORTS */}
-                        {(selectedReportType === 'all' || selectedReportType === 'property' || filteredReportCategories.includes('property')) && (
-                            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                                <div className="p-6 border-b border-gray-200 bg-gray-50">
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-2xl">🏢</span>
-                                        <h2 className="font-serif text-xl text-gray-900">Property-Level Reports</h2>
-                                    </div>
-                                    <p className="text-gray-600 text-sm mt-1">Occupancy, revenue, and lease analytics per property</p>
-                                </div>
-
-                                <div className="p-6">
-                                    {/* Occupancy & Vacancy Stats */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                                        <div className="bg-blue-50 rounded-xl p-4">
-                                            <p className="text-blue-600 text-sm font-medium">Occupancy Rate</p>
-                                            <p className="text-2xl font-serif text-gray-900 mt-1">{propertyReports?.summary?.occupancyRate || 0}%</p>
-                                            <p className="text-xs text-gray-600 mt-1">{propertyReports?.summary?.occupiedProperties || 0} occupied / {propertyReports?.summary?.totalProperties || 0} total</p>
-                                        </div>
-                                        <div className="bg-amber-50 rounded-xl p-4">
-                                            <p className="text-amber-600 text-sm font-medium">Vacancy Rate</p>
-                                            <p className="text-2xl font-serif text-gray-900 mt-1">{propertyReports?.summary?.vacancyRate || 0}%</p>
-                                            <p className="text-xs text-gray-600 mt-1">{propertyReports?.summary?.vacantProperties || 0} vacant properties</p>
-                                        </div>
-                                        <div className="bg-green-50 rounded-xl p-4">
-                                            <p className="text-green-600 text-sm font-medium">Monthly Rent Potential</p>
-                                            <p className="text-2xl font-serif text-gray-900 mt-1">
-                                                ${propertyReports?.summary?.totalMonthlyRentPotential?.toLocaleString() || 0}
-                                            </p>
-                                            <p className="text-xs text-gray-600 mt-1">Based on {propertyReports?.summary?.occupiedProperties || 0} occupied properties</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Top Revenue Properties */}
-                                    {propertyReports?.propertyRevenue && propertyReports.propertyRevenue.length > 0 && (
-                                        <div className="mb-6">
-                                            <h3 className="font-medium text-gray-900 mb-3">🏆 Top Revenue Properties</h3>
-                                            <div className="overflow-x-auto">
-                                                <table className="w-full">
-                                                    <thead className="bg-gray-50">
-                                                        <tr>
-                                                            <th className="text-left p-3 text-xs font-medium text-gray-600">Property</th>
-                                                            <th className="text-left p-3 text-xs font-medium text-gray-600">Address</th>
-                                                            <th className="text-right p-3 text-xs font-medium text-gray-600">Tenants</th>
-                                                            <th className="text-right p-3 text-xs font-medium text-gray-600">Monthly Potential</th>
-                                                            <th className="text-right p-3 text-xs font-medium text-gray-600">Total Revenue</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {propertyReports.propertyRevenue.slice(0, 5).map((prop: any) => (
-                                                            <tr key={prop.propertyId} className="border-b border-gray-100">
-                                                                <td className="p-3 text-sm text-gray-900">{prop.propertyName}</td>
-                                                                <td className="p-3 text-sm text-gray-600">{prop.address}</td>
-                                                                <td className="p-3 text-sm text-right text-gray-900">{prop.tenantCount}</td>
-                                                                <td className="p-3 text-sm text-right text-gray-900">${prop.monthlyRentPotential?.toLocaleString()}</td>
-                                                                <td className="p-3 text-sm text-right text-[#876D4A] font-medium">${prop.totalRevenue?.toLocaleString()}</td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Lease Expirations */}
-                                    {propertyReports?.leaseExpirations && propertyReports.leaseExpirations.length > 0 && (
-                                        <div>
-                                            <h3 className="font-medium text-gray-900 mb-3">⚠️ Upcoming Lease Expirations (Next 90 Days)</h3>
-                                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                                                {propertyReports.leaseExpirations.slice(0, 5).map((expiry: any) => (
-                                                    <div key={expiry.tenantId} className="flex justify-between items-center py-2 border-b border-amber-200 last:border-0">
-                                                        <div>
-                                                            <p className="text-sm font-medium text-gray-900">{expiry.tenantName}</p>
-                                                            <p className="text-xs text-gray-600">{expiry.propertyName} • ${expiry.rentAmount.toLocaleString()}/mo</p>
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <p className="text-sm font-medium text-amber-600">{expiry.daysUntilExpiry} days</p>
-                                                            <p className="text-xs text-gray-600">Ends: {new Date(expiry.leaseEnd).toLocaleDateString()}</p>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                {isLoading ?
+                    <Spinner />
+                    :
+                    <div className="max-w-7xl mx-auto">
+                        {/* Header */}
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 space-y-4 lg:space-y-0">
+                            <div>
+                                <h1 className="text-2xl sm:text-3xl font-serif text-gray-900 mb-2">Reports & Analytics</h1>
+                                <p className="text-gray-600">Comprehensive insights into your property portfolio</p>
                             </div>
-                        )}
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <select
+                                    className="border border-gray-300 text-black outline-0 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm"
+                                    value={selectedReportType}
+                                    onChange={(e) => setSelectedReportType(e.target.value)}
+                                >
+                                    <option value="all">All Reports</option>
+                                    <option value="property">Property Reports</option>
+                                    <option value="tenant">Tenant Reports</option>
+                                    <option value="financial">Financial Reports</option>
+                                    <option value="cross">Cross-Cutting Reports</option>
+                                </select>
+                                <input
+                                    type="text"
+                                    placeholder="Search reports..."
+                                    className="border border-gray-300 text-black outline-0 placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm w-full sm:w-64"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                        </div>
 
-                        {/* TENANT-LEVEL REPORTS */}
-                        {(selectedReportType === 'all' || selectedReportType === 'tenant' || filteredReportCategories.includes('tenant')) && (
-                            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                                <div className="p-6 border-b border-gray-200 bg-gray-50">
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-2xl">👤</span>
-                                        <h2 className="font-serif text-xl text-gray-900">Tenant-Level Reports</h2>
+                        {/* Quick Stats Summary */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                                <p className="text-gray-600 text-sm mb-1">Properties</p>
+                                <div className="text-xl sm:text-2xl font-serif text-gray-900 mb-1">{propertyReports?.summary?.totalProperties || 0}</div>
+                                <p className="text-gray-500 text-xs">{propertyReports?.summary?.occupancyRate || 0}% occupied</p>
+                            </div>
+                            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                                <p className="text-gray-600 text-sm mb-1">Tenants</p>
+                                <div className="text-xl sm:text-2xl font-serif text-gray-900 mb-1">{tenantReports?.summary?.totalTenants || 0}</div>
+                                <p className="text-gray-500 text-xs">{tenantReports?.summary?.activeTenants || 0} active</p>
+                            </div>
+                            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                                <p className="text-gray-600 text-sm mb-1">Total Revenue</p>
+                                <div className="text-xl sm:text-2xl font-serif text-gray-900 mb-1">${financialReports?.summary?.totalRevenue?.toLocaleString() || 0}</div>
+                                <p className="text-gray-500 text-xs">{financialReports?.summary?.paymentCount || 0} payments</p>
+                            </div>
+                            <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
+                                <p className="text-gray-600 text-sm mb-1">Outstanding</p>
+                                <div className="text-xl sm:text-2xl font-serif text-amber-600 mb-1">${tenantReports?.summary?.totalOutstandingBalance?.toLocaleString() || 0}</div>
+                                <p className="text-gray-500 text-xs">{tenantReports?.summary?.tenantsWithOutstandingBalance || 0} tenants</p>
+                            </div>
+                        </div>
+
+                        {/* Report Categories */}
+                        <div className="space-y-8">
+                            {/* PROPERTY-LEVEL REPORTS */}
+                            {(selectedReportType === 'all' || selectedReportType === 'property' || filteredReportCategories.includes('property')) && (
+                                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                                    <div className="p-6 border-b border-gray-200 bg-gray-50">
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-2xl">🏢</span>
+                                            <h2 className="font-serif text-xl text-gray-900">Property-Level Reports</h2>
+                                        </div>
+                                        <p className="text-gray-600 text-sm mt-1">Occupancy, revenue, and lease analytics per property</p>
                                     </div>
-                                    <p className="text-gray-600 text-sm mt-1">Payment history, lease duration, and document compliance</p>
-                                </div>
 
-                                <div className="p-6">
-                                    {/* Tenant Summary Stats */}
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                                        <div className="bg-gray-50 rounded-xl p-3">
-                                            <p className="text-gray-600 text-xs">Total Tenants</p>
-                                            <p className="text-xl font-serif text-gray-900">{tenantReports?.summary?.totalTenants || 0}</p>
+                                    <div className="p-6">
+                                        {/* Occupancy & Vacancy Stats */}
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                            <div className="bg-blue-50 rounded-xl p-4">
+                                                <p className="text-blue-600 text-sm font-medium">Occupancy Rate</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">{propertyReports?.summary?.occupancyRate || 0}%</p>
+                                                <p className="text-xs text-gray-600 mt-1">{propertyReports?.summary?.occupiedProperties || 0} occupied / {propertyReports?.summary?.totalProperties || 0} total</p>
+                                            </div>
+                                            <div className="bg-amber-50 rounded-xl p-4">
+                                                <p className="text-amber-600 text-sm font-medium">Vacancy Rate</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">{propertyReports?.summary?.vacancyRate || 0}%</p>
+                                                <p className="text-xs text-gray-600 mt-1">{propertyReports?.summary?.vacantProperties || 0} vacant properties</p>
+                                            </div>
+                                            <div className="bg-green-50 rounded-xl p-4">
+                                                <p className="text-green-600 text-sm font-medium">Monthly Rent Potential</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">
+                                                    ${propertyReports?.summary?.totalMonthlyRentPotential?.toLocaleString() || 0}
+                                                </p>
+                                                <p className="text-xs text-gray-600 mt-1">Based on {propertyReports?.summary?.occupiedProperties || 0} occupied properties</p>
+                                            </div>
                                         </div>
-                                        <div className="bg-gray-50 rounded-xl p-3">
-                                            <p className="text-gray-600 text-xs">Active Tenants</p>
-                                            <p className="text-xl font-serif text-gray-900">{tenantReports?.summary?.activeTenants || 0}</p>
-                                        </div>
-                                        <div className="bg-gray-50 rounded-xl p-3">
-                                            <p className="text-gray-600 text-xs">Outstanding Balance</p>
-                                            <p className="text-xl font-serif text-amber-600">${tenantReports?.summary?.totalOutstandingBalance?.toLocaleString() || 0}</p>
-                                        </div>
-                                        <div className="bg-gray-50 rounded-xl p-3">
-                                            <p className="text-gray-600 text-xs">Avg. Lease Duration</p>
-                                            <p className="text-xl font-serif text-gray-900">
-                                                {tenantReports?.leaseDurationReport && tenantReports.leaseDurationReport.length > 0
-                                                    ? Math.round(tenantReports.leaseDurationReport.reduce((sum: number, t: any) => sum + t.durationMonths, 0) / tenantReports.leaseDurationReport.length)
-                                                    : 0} months
-                                            </p>
-                                        </div>
-                                    </div>
 
-                                    {/* Tenants with Outstanding Balance */}
-                                    {tenantReports?.tenantPaymentHistory && tenantReports.tenantPaymentHistory.filter((t: any) => t.paymentSummary.outstandingBalance > 0).length > 0 && (
-                                        <div className="mb-6">
-                                            <h3 className="font-medium text-gray-900 mb-3">💰 Tenants with Outstanding Balance</h3>
-                                            <div className="overflow-x-auto">
-                                                <table className="w-full">
-                                                    <thead className="bg-gray-50">
-                                                        <tr>
-                                                            <th className="text-left p-3 text-xs font-medium text-gray-600">Tenant</th>
-                                                            <th className="text-left p-3 text-xs font-medium text-gray-600">Property</th>
-                                                            <th className="text-right p-3 text-xs font-medium text-gray-600">Monthly Rent</th>
-                                                            <th className="text-right p-3 text-xs font-medium text-gray-600">Paid</th>
-                                                            <th className="text-right p-3 text-xs font-medium text-gray-600">Outstanding</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {tenantReports.tenantPaymentHistory
-                                                            .filter((t: any) => t.paymentSummary.outstandingBalance > 0)
-                                                            .slice(0, 5)
-                                                            .map((tenant: any) => (
-                                                                <tr key={tenant.tenantId} className="border-b border-gray-100">
-                                                                    <td className="p-3 text-sm text-gray-900">{tenant.tenantName}</td>
-                                                                    <td className="p-3 text-sm text-gray-600">{tenant.propertyName}</td>
-                                                                    <td className="p-3 text-sm text-right text-gray-900">${tenant.monthlyRent?.toLocaleString()}</td>
-                                                                    <td className="p-3 text-sm text-right text-green-600">${tenant.paymentSummary.totalPaid?.toLocaleString()}</td>
-                                                                    <td className="p-3 text-sm text-right text-red-600 font-medium">${tenant.paymentSummary.outstandingBalance?.toLocaleString()}</td>
+                                        {/* Top Revenue Properties */}
+                                        {propertyReports?.propertyRevenue && propertyReports.propertyRevenue.length > 0 && (
+                                            <div className="mb-6">
+                                                <h3 className="font-medium text-gray-900 mb-3">🏆 Top Revenue Properties</h3>
+                                                <div className="overflow-x-auto">
+                                                    <table className="w-full">
+                                                        <thead className="bg-gray-50">
+                                                            <tr>
+                                                                <th className="text-left p-3 text-xs font-medium text-gray-600">Property</th>
+                                                                <th className="text-left p-3 text-xs font-medium text-gray-600">Address</th>
+                                                                <th className="text-right p-3 text-xs font-medium text-gray-600">Tenants</th>
+                                                                <th className="text-right p-3 text-xs font-medium text-gray-600">Monthly Potential</th>
+                                                                <th className="text-right p-3 text-xs font-medium text-gray-600">Total Revenue</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {propertyReports.propertyRevenue.slice(0, 5).map((prop: any) => (
+                                                                <tr key={prop.propertyId} className="border-b border-gray-100">
+                                                                    <td className="p-3 text-sm text-gray-900">{prop.propertyName}</td>
+                                                                    <td className="p-3 text-sm text-gray-600">{prop.address}</td>
+                                                                    <td className="p-3 text-sm text-right text-gray-900">{prop.tenantCount}</td>
+                                                                    <td className="p-3 text-sm text-right text-gray-900">${prop.monthlyRentPotential?.toLocaleString()}</td>
+                                                                    <td className="p-3 text-sm text-right text-[#876D4A] font-medium">${prop.totalRevenue?.toLocaleString()}</td>
                                                                 </tr>
                                                             ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Document Compliance */}
-                                    <div>
-                                        <h3 className="font-medium text-gray-900 mb-3">📋 Document Compliance</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="bg-gray-50 rounded-xl p-4">
-                                                <p className="text-sm text-gray-600 mb-2">Overall Compliance Rate</p>
-                                                <p className="text-3xl font-serif text-gray-900">{crossCuttingReports?.complianceRate || 0}%</p>
-                                                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-3">
-                                                    <div
-                                                        className="bg-green-600 h-2.5 rounded-full"
-                                                        style={{ width: `${crossCuttingReports?.complianceRate || 0}%` }}
-                                                    ></div>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </div>
-                                            <div className="bg-gray-50 rounded-xl p-4">
-                                                <p className="text-sm text-gray-600 mb-3">Document Status</p>
-                                                <div className="space-y-3">
-                                                    {tenantReports?.documentCompliance && (
-                                                        <>
-                                                            <div className="flex justify-between items-center">
-                                                                <span className="text-xs text-gray-600">ID Verification</span>
-                                                                <span className="text-xs font-medium">
-                                                                    {tenantReports.documentCompliance.filter((t: any) => t.documents.id).length} / {tenantReports.documentCompliance.length}
-                                                                </span>
+                                        )}
+
+                                        {/* Lease Expirations */}
+                                        {propertyReports?.leaseExpirations && propertyReports.leaseExpirations.length > 0 && (
+                                            <div>
+                                                <h3 className="font-medium text-gray-900 mb-3">⚠️ Upcoming Lease Expirations (Next 90 Days)</h3>
+                                                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                                    {propertyReports.leaseExpirations.slice(0, 5).map((expiry: any) => (
+                                                        <div key={expiry.tenantId} className="flex justify-between items-center py-2 border-b border-amber-200 last:border-0">
+                                                            <div>
+                                                                <p className="text-sm font-medium text-gray-900">{expiry.tenantName}</p>
+                                                                <p className="text-xs text-gray-600">{expiry.propertyName} • ${expiry.rentAmount.toLocaleString()}/mo</p>
                                                             </div>
-                                                            <div className="flex justify-between items-center">
-                                                                <span className="text-xs text-gray-600">Lease Agreement</span>
-                                                                <span className="text-xs font-medium">
-                                                                    {tenantReports.documentCompliance.filter((t: any) => t.documents.leaseAgreement).length} / {tenantReports.documentCompliance.length}
-                                                                </span>
+                                                            <div className="text-right">
+                                                                <p className="text-sm font-medium text-amber-600">{expiry.daysUntilExpiry} days</p>
+                                                                <p className="text-xs text-gray-600">Ends: {new Date(expiry.leaseEnd).toLocaleDateString()}</p>
                                                             </div>
-                                                            <div className="flex justify-between items-center">
-                                                                <span className="text-xs text-gray-600">Income Proof</span>
-                                                                <span className="text-xs font-medium">
-                                                                    {tenantReports.documentCompliance.filter((t: any) => t.documents.incomeProof).length} / {tenantReports.documentCompliance.length}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex justify-between items-center">
-                                                                <span className="text-xs text-gray-600">Emergency Contact</span>
-                                                                <span className="text-xs font-medium">
-                                                                    {tenantReports.documentCompliance.filter((t: any) => t.documents.emergencyContact).length} / {tenantReports.documentCompliance.length}
-                                                                </span>
-                                                            </div>
-                                                        </>
-                                                    )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* TENANT-LEVEL REPORTS */}
+                            {(selectedReportType === 'all' || selectedReportType === 'tenant' || filteredReportCategories.includes('tenant')) && (
+                                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                                    <div className="p-6 border-b border-gray-200 bg-gray-50">
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-2xl">👤</span>
+                                            <h2 className="font-serif text-xl text-gray-900">Tenant-Level Reports</h2>
+                                        </div>
+                                        <p className="text-gray-600 text-sm mt-1">Payment history, lease duration, and document compliance</p>
+                                    </div>
+
+                                    <div className="p-6">
+                                        {/* Tenant Summary Stats */}
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                            <div className="bg-gray-50 rounded-xl p-3">
+                                                <p className="text-gray-600 text-xs">Total Tenants</p>
+                                                <p className="text-xl font-serif text-gray-900">{tenantReports?.summary?.totalTenants || 0}</p>
+                                            </div>
+                                            <div className="bg-gray-50 rounded-xl p-3">
+                                                <p className="text-gray-600 text-xs">Active Tenants</p>
+                                                <p className="text-xl font-serif text-gray-900">{tenantReports?.summary?.activeTenants || 0}</p>
+                                            </div>
+                                            <div className="bg-gray-50 rounded-xl p-3">
+                                                <p className="text-gray-600 text-xs">Outstanding Balance</p>
+                                                <p className="text-xl font-serif text-amber-600">${tenantReports?.summary?.totalOutstandingBalance?.toLocaleString() || 0}</p>
+                                            </div>
+                                            <div className="bg-gray-50 rounded-xl p-3">
+                                                <p className="text-gray-600 text-xs">Avg. Lease Duration</p>
+                                                <p className="text-xl font-serif text-gray-900">
+                                                    {tenantReports?.leaseDurationReport && tenantReports.leaseDurationReport.length > 0
+                                                        ? Math.round(tenantReports.leaseDurationReport.reduce((sum: number, t: any) => sum + t.durationMonths, 0) / tenantReports.leaseDurationReport.length)
+                                                        : 0} months
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Tenants with Outstanding Balance */}
+                                        {tenantReports?.tenantPaymentHistory && tenantReports.tenantPaymentHistory.filter((t: any) => t.paymentSummary.outstandingBalance > 0).length > 0 && (
+                                            <div className="mb-6">
+                                                <h3 className="font-medium text-gray-900 mb-3">💰 Tenants with Outstanding Balance</h3>
+                                                <div className="overflow-x-auto">
+                                                    <table className="w-full">
+                                                        <thead className="bg-gray-50">
+                                                            <tr>
+                                                                <th className="text-left p-3 text-xs font-medium text-gray-600">Tenant</th>
+                                                                <th className="text-left p-3 text-xs font-medium text-gray-600">Property</th>
+                                                                <th className="text-right p-3 text-xs font-medium text-gray-600">Monthly Rent</th>
+                                                                <th className="text-right p-3 text-xs font-medium text-gray-600">Paid</th>
+                                                                <th className="text-right p-3 text-xs font-medium text-gray-600">Outstanding</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {tenantReports.tenantPaymentHistory
+                                                                .filter((t: any) => t.paymentSummary.outstandingBalance > 0)
+                                                                .slice(0, 5)
+                                                                .map((tenant: any) => (
+                                                                    <tr key={tenant.tenantId} className="border-b border-gray-100">
+                                                                        <td className="p-3 text-sm text-gray-900">{tenant.tenantName}</td>
+                                                                        <td className="p-3 text-sm text-gray-600">{tenant.propertyName}</td>
+                                                                        <td className="p-3 text-sm text-right text-gray-900">${tenant.monthlyRent?.toLocaleString()}</td>
+                                                                        <td className="p-3 text-sm text-right text-green-600">${tenant.paymentSummary.totalPaid?.toLocaleString()}</td>
+                                                                        <td className="p-3 text-sm text-right text-red-600 font-medium">${tenant.paymentSummary.outstandingBalance?.toLocaleString()}</td>
+                                                                    </tr>
+                                                                ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Document Compliance */}
+                                        <div>
+                                            <h3 className="font-medium text-gray-900 mb-3">📋 Document Compliance</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="bg-gray-50 rounded-xl p-4">
+                                                    <p className="text-sm text-gray-600 mb-2">Overall Compliance Rate</p>
+                                                    <p className="text-3xl font-serif text-gray-900">{crossCuttingReports?.complianceRate || 0}%</p>
+                                                    <div className="w-full bg-gray-200 rounded-full h-2.5 mt-3">
+                                                        <div
+                                                            className="bg-green-600 h-2.5 rounded-full"
+                                                            style={{ width: `${crossCuttingReports?.complianceRate || 0}%` }}
+                                                        ></div>
+                                                    </div>
+                                                </div>
+                                                <div className="bg-gray-50 rounded-xl p-4">
+                                                    <p className="text-sm text-gray-600 mb-3">Document Status</p>
+                                                    <div className="space-y-3">
+                                                        {tenantReports?.documentCompliance && (
+                                                            <>
+                                                                <div className="flex justify-between items-center">
+                                                                    <span className="text-xs text-gray-600">ID Verification</span>
+                                                                    <span className="text-xs font-medium">
+                                                                        {tenantReports.documentCompliance.filter((t: any) => t.documents.id).length} / {tenantReports.documentCompliance.length}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-between items-center">
+                                                                    <span className="text-xs text-gray-600">Lease Agreement</span>
+                                                                    <span className="text-xs font-medium">
+                                                                        {tenantReports.documentCompliance.filter((t: any) => t.documents.leaseAgreement).length} / {tenantReports.documentCompliance.length}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-between items-center">
+                                                                    <span className="text-xs text-gray-600">Income Proof</span>
+                                                                    <span className="text-xs font-medium">
+                                                                        {tenantReports.documentCompliance.filter((t: any) => t.documents.incomeProof).length} / {tenantReports.documentCompliance.length}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex justify-between items-center">
+                                                                    <span className="text-xs text-gray-600">Emergency Contact</span>
+                                                                    <span className="text-xs font-medium">
+                                                                        {tenantReports.documentCompliance.filter((t: any) => t.documents.emergencyContact).length} / {tenantReports.documentCompliance.length}
+                                                                    </span>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {/* FINANCIAL REPORTS */}
-                        {(selectedReportType === 'all' || selectedReportType === 'financial' || filteredReportCategories.includes('financial')) && (
-                            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                                <div className="p-6 border-b border-gray-200 bg-gray-50">
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-2xl">💰</span>
-                                        <h2 className="font-serif text-xl text-gray-900">Financial Reports</h2>
-                                    </div>
-                                    <p className="text-gray-600 text-sm mt-1">Revenue tracking, payment methods, and late payments</p>
-                                </div>
-
-                                <div className="p-6">
-                                    {/* Financial Summary */}
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                                        <div className="bg-green-50 rounded-xl p-4">
-                                            <p className="text-green-600 text-xs font-medium">Total Revenue</p>
-                                            <p className="text-2xl font-serif text-gray-900 mt-1">${financialReports?.summary?.totalRevenue?.toLocaleString() || 0}</p>
-                                            <p className="text-xs text-gray-600 mt-1">From {consolidatedData.payments?.filter((p: any) => p.status?.toLowerCase() === 'paid').length || 0} payments</p>
+                            {/* FINANCIAL REPORTS */}
+                            {(selectedReportType === 'all' || selectedReportType === 'financial' || filteredReportCategories.includes('financial')) && (
+                                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                                    <div className="p-6 border-b border-gray-200 bg-gray-50">
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-2xl">💰</span>
+                                            <h2 className="font-serif text-xl text-gray-900">Financial Reports</h2>
                                         </div>
-                                        <div className="bg-yellow-50 rounded-xl p-4">
-                                            <p className="text-yellow-600 text-xs font-medium">Pending</p>
-                                            <p className="text-2xl font-serif text-gray-900 mt-1">${financialReports?.summary?.totalPending?.toLocaleString() || 0}</p>
-                                            <p className="text-xs text-gray-600 mt-1">Awaiting payment</p>
-                                        </div>
-                                        <div className="bg-red-50 rounded-xl p-4">
-                                            <p className="text-red-600 text-xs font-medium">Outstanding</p>
-                                            <p className="text-2xl font-serif text-gray-900 mt-1">${financialReports?.summary?.totalOverdue?.toLocaleString() || 0}</p>
-                                            <p className="text-xs text-gray-600 mt-1">{financialReports?.summary?.latePaymentCount || 0} tenants behind</p>
-                                        </div>
-                                        <div className="bg-blue-50 rounded-xl p-4">
-                                            <p className="text-blue-600 text-xs font-medium">Monthly Potential</p>
-                                            <p className="text-2xl font-serif text-gray-900 mt-1">${propertyReports?.summary?.totalMonthlyRentPotential?.toLocaleString() || 0}</p>
-                                            <p className="text-xs text-gray-600 mt-1">Expected monthly revenue</p>
-                                        </div>
+                                        <p className="text-gray-600 text-sm mt-1">Revenue tracking, payment methods, and late payments</p>
                                     </div>
 
-                                    {/* Monthly Revenue Trend */}
-                                    {financialReports?.monthlyRevenue && financialReports.monthlyRevenue.length > 0 && (
-                                        <div className="mb-6">
-                                            <h3 className="font-medium text-gray-900 mb-3">📊 Monthly Revenue Trend</h3>
-                                            <div className="overflow-x-auto">
-                                                <div className="flex items-end space-x-6 min-w-max p-4 bg-gray-50 rounded-xl">
-                                                    {financialReports.monthlyRevenue.map((month: any) => {
-                                                        const maxRevenue = Math.max(...financialReports.monthlyRevenue.map((m: any) => m.paid))
-                                                        const barHeight = maxRevenue > 0 ? (month.paid / maxRevenue) * 120 : 0
+                                    <div className="p-6">
+                                        {/* Financial Summary */}
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                                            <div className="bg-green-50 rounded-xl p-4">
+                                                <p className="text-green-600 text-xs font-medium">Total Revenue</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">${financialReports?.summary?.totalRevenue?.toLocaleString() || 0}</p>
+                                                <p className="text-xs text-gray-600 mt-1">From {consolidatedData.payments?.filter((p: any) => p.status?.toLowerCase() === 'paid').length || 0} payments</p>
+                                            </div>
+                                            <div className="bg-yellow-50 rounded-xl p-4">
+                                                <p className="text-yellow-600 text-xs font-medium">Pending</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">${financialReports?.summary?.totalPending?.toLocaleString() || 0}</p>
+                                                <p className="text-xs text-gray-600 mt-1">Awaiting payment</p>
+                                            </div>
+                                            <div className="bg-red-50 rounded-xl p-4">
+                                                <p className="text-red-600 text-xs font-medium">Outstanding</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">${financialReports?.summary?.totalOverdue?.toLocaleString() || 0}</p>
+                                                <p className="text-xs text-gray-600 mt-1">{financialReports?.summary?.latePaymentCount || 0} tenants behind</p>
+                                            </div>
+                                            <div className="bg-blue-50 rounded-xl p-4">
+                                                <p className="text-blue-600 text-xs font-medium">Monthly Potential</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">${propertyReports?.summary?.totalMonthlyRentPotential?.toLocaleString() || 0}</p>
+                                                <p className="text-xs text-gray-600 mt-1">Expected monthly revenue</p>
+                                            </div>
+                                        </div>
 
-                                                        return (
-                                                            <div key={month.month} className="flex flex-col items-center">
-                                                                <div className="relative flex items-end h-32">
-                                                                    <div
-                                                                        className="w-12 bg-[#876D4A] rounded-t-lg transition-all duration-500"
-                                                                        style={{
-                                                                            height: `${Math.max(20, barHeight)}px`,
-                                                                            opacity: 0.9
-                                                                        }}
-                                                                    >
-                                                                        <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-900 whitespace-nowrap">
-                                                                            ${month.paid.toLocaleString()}
+                                        {/* Monthly Revenue Trend */}
+                                        {financialReports?.monthlyRevenue && financialReports.monthlyRevenue.length > 0 && (
+                                            <div className="mb-6">
+                                                <h3 className="font-medium text-gray-900 mb-3">📊 Monthly Revenue Trend</h3>
+                                                <div className="overflow-x-auto">
+                                                    <div className="flex items-end space-x-6 min-w-max p-4 bg-gray-50 rounded-xl">
+                                                        {financialReports.monthlyRevenue.map((month: any) => {
+                                                            const maxRevenue = Math.max(...financialReports.monthlyRevenue.map((m: any) => m.paid))
+                                                            const barHeight = maxRevenue > 0 ? (month.paid / maxRevenue) * 120 : 0
+
+                                                            return (
+                                                                <div key={month.month} className="flex flex-col items-center">
+                                                                    <div className="relative flex items-end h-32">
+                                                                        <div
+                                                                            className="w-12 bg-[#876D4A] rounded-t-lg transition-all duration-500"
+                                                                            style={{
+                                                                                height: `${Math.max(20, barHeight)}px`,
+                                                                                opacity: 0.9
+                                                                            }}
+                                                                        >
+                                                                            <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-900 whitespace-nowrap">
+                                                                                ${month.paid.toLocaleString()}
+                                                                            </div>
                                                                         </div>
                                                                     </div>
+                                                                    <p className="text-xs font-medium text-gray-700 mt-4">{month.month}</p>
+                                                                    <p className="text-[10px] text-gray-500">{month.count} payments</p>
                                                                 </div>
-                                                                <p className="text-xs font-medium text-gray-700 mt-4">{month.month}</p>
-                                                                <p className="text-[10px] text-gray-500">{month.count} payments</p>
-                                                            </div>
-                                                        )
-                                                    })}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Payment Method Usage & Late Payments */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {financialReports?.paymentMethodUsage && financialReports.paymentMethodUsage.length > 0 && (
-                                            <div>
-                                                <h3 className="font-medium text-gray-900 mb-3">💳 Payment Method Usage</h3>
-                                                <div className="space-y-3 bg-gray-50 p-4 rounded-xl">
-                                                    {financialReports.paymentMethodUsage.map((method: any) => (
-                                                        <div key={method.method} className="flex items-center">
-                                                            <span className="text-sm text-gray-700 w-32 font-medium">{method.method}</span>
-                                                            <div className="flex-1 mx-4">
-                                                                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                                                    <div
-                                                                        className="bg-[#876D4A] h-2.5 rounded-full"
-                                                                        style={{ width: `${method.percentage}%` }}
-                                                                    ></div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <span className="text-sm font-semibold text-gray-900">{method.percentage}%</span>
-                                                                <span className="text-xs text-gray-500 ml-1">({method.count})</span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
+                                                            )
+                                                        })}
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
 
-                                        {financialReports?.latePayments && financialReports.latePayments.length > 0 && (
-                                            <div>
-                                                <h3 className="font-medium text-gray-900 mb-3">⚠️ Outstanding Balances</h3>
-                                                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                                                    {financialReports.latePayments.slice(0, 5).map((payment: any) => (
-                                                        <div key={payment.id} className="flex justify-between items-center py-3 border-b border-red-200 last:border-0">
-                                                            <div>
-                                                                <p className="text-sm font-medium text-gray-900">{payment.tenantName}</p>
-                                                                <p className="text-xs text-gray-600">{payment.propertyName} • ${payment.monthlyRent.toLocaleString()}/mo</p>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <p className="text-sm font-bold text-red-600">${payment.amount.toLocaleString()}</p>
-                                                                <p className="text-xs text-gray-600">Outstanding balance</p>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* CROSS-CUTTING REPORTS */}
-                        {(selectedReportType === 'all' || selectedReportType === 'cross' || filteredReportCategories.includes('cross')) && (
-                            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                                <div className="p-6 border-b border-gray-200 bg-gray-50">
-                                    <div className="flex items-center space-x-2">
-                                        <span className="text-2xl">🔄</span>
-                                        <h2 className="font-serif text-xl text-gray-900">Cross-Cutting Reports</h2>
-                                    </div>
-                                    <p className="text-gray-600 text-sm mt-1">Integrated analytics across properties, tenants, and payments</p>
-                                </div>
-
-                                <div className="p-6">
-                                    {/* Top Revenue Properties & Forecast */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                        {crossCuttingReports?.topRevenueProperties && crossCuttingReports.topRevenueProperties.length > 0 && (
-                                            <div>
-                                                <h3 className="font-medium text-gray-900 mb-3">🏆 Top Revenue Properties</h3>
-                                                <div className="space-y-3">
-                                                    {crossCuttingReports.topRevenueProperties.slice(0, 5).map((property: any, index: number) => (
-                                                        <div key={property.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                                            <div className="flex items-center space-x-3">
-                                                                <span className={`text-sm font-bold ${index === 0 ? 'text-yellow-600' :
-                                                                    index === 1 ? 'text-gray-500' :
-                                                                        index === 2 ? 'text-amber-700' : 'text-gray-600'
-                                                                    }`}>
-                                                                    #{index + 1}
-                                                                </span>
-                                                                <div>
-                                                                    <p className="text-sm font-medium text-gray-900">{property.name}</p>
-                                                                    <p className="text-xs text-gray-600">{property.tenants} tenants • ${property.monthlyRentPotential.toLocaleString()}/mo potential</p>
-                                                                </div>
-                                                            </div>
-                                                            <p className="text-sm font-bold text-[#876D4A]">${property.revenue?.toLocaleString()}</p>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {crossCuttingReports?.revenueForecast && crossCuttingReports.revenueForecast.length > 0 && (
-                                            <div>
-                                                <h3 className="font-medium text-gray-900 mb-3">📈 Revenue Forecast</h3>
-                                                <div className="space-y-4">
-                                                    {crossCuttingReports.revenueForecast.map((forecast: any) => (
-                                                        <div key={forecast.month} className="p-4 bg-gray-50 rounded-lg">
-                                                            <div className="flex justify-between items-center mb-2">
-                                                                <p className="text-sm font-semibold text-gray-900">{forecast.month}</p>
-                                                                <p className="text-sm font-bold text-[#876D4A]">${forecast.expected?.toLocaleString()}</p>
-                                                            </div>
-                                                            <div className="flex items-center">
-                                                                <span className="text-xs text-gray-600 mr-2 w-16">Confidence:</span>
-                                                                <div className="flex-1">
-                                                                    <div className="w-full bg-gray-200 rounded-full h-2">
+                                        {/* Payment Method Usage & Late Payments */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {financialReports?.paymentMethodUsage && financialReports.paymentMethodUsage.length > 0 && (
+                                                <div>
+                                                    <h3 className="font-medium text-gray-900 mb-3">💳 Payment Method Usage</h3>
+                                                    <div className="space-y-3 bg-gray-50 p-4 rounded-xl">
+                                                        {financialReports.paymentMethodUsage.map((method: any) => (
+                                                            <div key={method.method} className="flex items-center">
+                                                                <span className="text-sm text-gray-700 w-32 font-medium">{method.method}</span>
+                                                                <div className="flex-1 mx-4">
+                                                                    <div className="w-full bg-gray-200 rounded-full h-2.5">
                                                                         <div
-                                                                            className="bg-green-600 h-2 rounded-full"
-                                                                            style={{ width: `${forecast.confidence}%` }}
+                                                                            className="bg-[#876D4A] h-2.5 rounded-full"
+                                                                            style={{ width: `${method.percentage}%` }}
                                                                         ></div>
                                                                     </div>
                                                                 </div>
-                                                                <span className="text-xs font-medium text-gray-700 ml-2">{forecast.confidence}%</span>
+                                                                <div className="text-right">
+                                                                    <span className="text-sm font-semibold text-gray-900">{method.percentage}%</span>
+                                                                    <span className="text-xs text-gray-500 ml-1">({method.count})</span>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    ))}
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
-                                    </div>
+                                            )}
 
-                                    {/* Lease Expiration Alerts */}
-                                    {crossCuttingReports?.expiringLeases && crossCuttingReports.expiringLeases.length > 0 && (
-                                        <div className="mt-6">
-                                            <h3 className="font-medium text-gray-900 mb-3">🔔 Lease Expiration Alerts (Next 30 Days)</h3>
-                                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    {crossCuttingReports.expiringLeases.map((lease: any, index: number) => (
-                                                        <div key={index} className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
-                                                            <div>
-                                                                <p className="text-sm font-medium text-gray-900">{lease.tenantName}</p>
-                                                                <p className="text-xs text-gray-600">{lease.propertyName}</p>
-                                                            </div>
-                                                            <div className="text-right">
-                                                                <p className="text-sm font-bold text-amber-600">{lease.daysRemaining} days</p>
-                                                                <p className="text-xs text-gray-500">Ends {new Date(lease.leaseEnd).toLocaleDateString()}</p>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Document Compliance Summary */}
-                                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="bg-gradient-to-br from-[#f8f6f2] to-[#f0ede6] rounded-xl p-5 border border-gray-200">
-                                            <h3 className="font-medium text-gray-900 mb-3">📄 Tenant Document Compliance</h3>
-                                            <div className="flex items-end justify-between">
+                                            {financialReports?.latePayments && financialReports.latePayments.length > 0 && (
                                                 <div>
-                                                    <p className="text-4xl font-serif text-gray-900 mb-1">{crossCuttingReports?.complianceRate || 0}%</p>
-                                                    <p className="text-sm text-gray-600">Overall compliance rate</p>
+                                                    <h3 className="font-medium text-gray-900 mb-3">⚠️ Outstanding Balances</h3>
+                                                    <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                                        {financialReports.latePayments.slice(0, 5).map((payment: any) => (
+                                                            <div key={payment.id} className="flex justify-between items-center py-3 border-b border-red-200 last:border-0">
+                                                                <div>
+                                                                    <p className="text-sm font-medium text-gray-900">{payment.tenantName}</p>
+                                                                    <p className="text-xs text-gray-600">{payment.propertyName} • ${payment.monthlyRent.toLocaleString()}/mo</p>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <p className="text-sm font-bold text-red-600">${payment.amount.toLocaleString()}</p>
+                                                                    <p className="text-xs text-gray-600">Outstanding balance</p>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="text-xs text-gray-500">
-                                                        {tenantReports?.documentCompliance?.filter((t: any) => t.complianceScore >= 100).length || 0} fully compliant
-                                                    </p>
-                                                    <p className="text-xs text-gray-500">
-                                                        {tenantReports?.documentCompliance?.filter((t: any) => t.complianceScore < 100 && t.complianceScore > 0).length || 0} partially compliant
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="mt-4">
-                                                <Link href="/dashboard/reports/compliance" className="text-sm text-[#876D4A] hover:text-[#756045] font-medium transition-colors">
-                                                    View detailed compliance report →
-                                                </Link>
-                                            </div>
+                                            )}
                                         </div>
-
-                                        {crossCuttingReports?.topRevenueProperties && crossCuttingReports.topRevenueProperties.length > 0 && (
-                                            <div className="bg-gradient-to-br from-[#f8f6f2] to-[#f0ede6] rounded-xl p-5 border border-gray-200">
-                                                <h3 className="font-medium text-gray-900 mb-2">📊 Portfolio Performance</h3>
-                                                <p className="text-sm text-gray-600 mb-2">Top performing property</p>
-                                                <p className="text-lg font-semibold text-gray-900">{crossCuttingReports.topRevenueProperties[0]?.name || 'N/A'}</p>
-                                                <div className="flex justify-between items-center mt-2">
-                                                    <p className="text-sm text-gray-600">Total revenue</p>
-                                                    <p className="text-lg font-bold text-[#876D4A]">
-                                                        ${crossCuttingReports.topRevenueProperties[0]?.revenue?.toLocaleString() || 0}
-                                                    </p>
-                                                </div>
-                                                <div className="flex justify-between items-center mt-1">
-                                                    <p className="text-sm text-gray-600">Monthly potential</p>
-                                                    <p className="text-sm font-medium text-gray-900">
-                                                        ${crossCuttingReports.topRevenueProperties[0]?.monthlyRentPotential?.toLocaleString() || 0}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
+                            )}
 
-                    {/* Quick Generate Reports */}
-                    <div className="mt-8 bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                        <h3 className="font-serif text-lg text-gray-900 mb-4">⚡ Quick Generate Reports</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {[
-                                'Monthly Income Statement',
-                                'Occupancy Report',
-                                'Expense Breakdown',
-                                'Tenant Payment History',
-                                'Lease Expiration Report',
-                                'Tax Preparation Summary',
-                                'Portfolio Performance',
-                                'Document Compliance'
-                            ].map((report, index) => (
-                                <button
-                                    key={index}
-                                    className="border border-[#876D4A] text-[#876D4A] py-3 px-2 rounded-lg hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm font-medium"
-                                >
-                                    {report}
-                                </button>
-                            ))}
+                            {/* CROSS-CUTTING REPORTS */}
+                            {(selectedReportType === 'all' || selectedReportType === 'cross' || filteredReportCategories.includes('cross')) && (
+                                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                                    <div className="p-6 border-b border-gray-200 bg-gray-50">
+                                        <div className="flex items-center space-x-2">
+                                            <span className="text-2xl">🔄</span>
+                                            <h2 className="font-serif text-xl text-gray-900">Cross-Cutting Reports</h2>
+                                        </div>
+                                        <p className="text-gray-600 text-sm mt-1">Integrated analytics across properties, tenants, and payments</p>
+                                    </div>
+
+                                    <div className="p-6">
+                                        {/* Top Revenue Properties & Forecast */}
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                            {crossCuttingReports?.topRevenueProperties && crossCuttingReports.topRevenueProperties.length > 0 && (
+                                                <div>
+                                                    <h3 className="font-medium text-gray-900 mb-3">🏆 Top Revenue Properties</h3>
+                                                    <div className="space-y-3">
+                                                        {crossCuttingReports.topRevenueProperties.slice(0, 5).map((property: any, index: number) => (
+                                                            <div key={property.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                                <div className="flex items-center space-x-3">
+                                                                    <span className={`text-sm font-bold ${index === 0 ? 'text-yellow-600' :
+                                                                        index === 1 ? 'text-gray-500' :
+                                                                            index === 2 ? 'text-amber-700' : 'text-gray-600'
+                                                                        }`}>
+                                                                        #{index + 1}
+                                                                    </span>
+                                                                    <div>
+                                                                        <p className="text-sm font-medium text-gray-900">{property.name}</p>
+                                                                        <p className="text-xs text-gray-600">{property.tenants} tenants • ${property.monthlyRentPotential.toLocaleString()}/mo potential</p>
+                                                                    </div>
+                                                                </div>
+                                                                <p className="text-sm font-bold text-[#876D4A]">${property.revenue?.toLocaleString()}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {crossCuttingReports?.revenueForecast && crossCuttingReports.revenueForecast.length > 0 && (
+                                                <div>
+                                                    <h3 className="font-medium text-gray-900 mb-3">📈 Revenue Forecast</h3>
+                                                    <div className="space-y-4">
+                                                        {crossCuttingReports.revenueForecast.map((forecast: any) => (
+                                                            <div key={forecast.month} className="p-4 bg-gray-50 rounded-lg">
+                                                                <div className="flex justify-between items-center mb-2">
+                                                                    <p className="text-sm font-semibold text-gray-900">{forecast.month}</p>
+                                                                    <p className="text-sm font-bold text-[#876D4A]">${forecast.expected?.toLocaleString()}</p>
+                                                                </div>
+                                                                <div className="flex items-center">
+                                                                    <span className="text-xs text-gray-600 mr-2 w-16">Confidence:</span>
+                                                                    <div className="flex-1">
+                                                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                                                            <div
+                                                                                className="bg-green-600 h-2 rounded-full"
+                                                                                style={{ width: `${forecast.confidence}%` }}
+                                                                            ></div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <span className="text-xs font-medium text-gray-700 ml-2">{forecast.confidence}%</span>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Lease Expiration Alerts */}
+                                        {crossCuttingReports?.expiringLeases && crossCuttingReports.expiringLeases.length > 0 && (
+                                            <div className="mt-6">
+                                                <h3 className="font-medium text-gray-900 mb-3">🔔 Lease Expiration Alerts (Next 30 Days)</h3>
+                                                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        {crossCuttingReports.expiringLeases.map((lease: any, index: number) => (
+                                                            <div key={index} className="flex justify-between items-center p-4 bg-white rounded-lg shadow-sm">
+                                                                <div>
+                                                                    <p className="text-sm font-medium text-gray-900">{lease.tenantName}</p>
+                                                                    <p className="text-xs text-gray-600">{lease.propertyName}</p>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <p className="text-sm font-bold text-amber-600">{lease.daysRemaining} days</p>
+                                                                    <p className="text-xs text-gray-500">Ends {new Date(lease.leaseEnd).toLocaleDateString()}</p>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Document Compliance Summary */}
+                                        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            <div className="bg-gradient-to-br from-[#f8f6f2] to-[#f0ede6] rounded-xl p-5 border border-gray-200">
+                                                <h3 className="font-medium text-gray-900 mb-3">📄 Tenant Document Compliance</h3>
+                                                <div className="flex items-end justify-between">
+                                                    <div>
+                                                        <p className="text-4xl font-serif text-gray-900 mb-1">{crossCuttingReports?.complianceRate || 0}%</p>
+                                                        <p className="text-sm text-gray-600">Overall compliance rate</p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-xs text-gray-500">
+                                                            {tenantReports?.documentCompliance?.filter((t: any) => t.complianceScore >= 100).length || 0} fully compliant
+                                                        </p>
+                                                        <p className="text-xs text-gray-500">
+                                                            {tenantReports?.documentCompliance?.filter((t: any) => t.complianceScore < 100 && t.complianceScore > 0).length || 0} partially compliant
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-4">
+                                                    <Link href="/dashboard/reports/compliance" className="text-sm text-[#876D4A] hover:text-[#756045] font-medium transition-colors">
+                                                        View detailed compliance report →
+                                                    </Link>
+                                                </div>
+                                            </div>
+
+                                            {crossCuttingReports?.topRevenueProperties && crossCuttingReports.topRevenueProperties.length > 0 && (
+                                                <div className="bg-gradient-to-br from-[#f8f6f2] to-[#f0ede6] rounded-xl p-5 border border-gray-200">
+                                                    <h3 className="font-medium text-gray-900 mb-2">📊 Portfolio Performance</h3>
+                                                    <p className="text-sm text-gray-600 mb-2">Top performing property</p>
+                                                    <p className="text-lg font-semibold text-gray-900">{crossCuttingReports.topRevenueProperties[0]?.name || 'N/A'}</p>
+                                                    <div className="flex justify-between items-center mt-2">
+                                                        <p className="text-sm text-gray-600">Total revenue</p>
+                                                        <p className="text-lg font-bold text-[#876D4A]">
+                                                            ${crossCuttingReports.topRevenueProperties[0]?.revenue?.toLocaleString() || 0}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex justify-between items-center mt-1">
+                                                        <p className="text-sm text-gray-600">Monthly potential</p>
+                                                        <p className="text-sm font-medium text-gray-900">
+                                                            ${crossCuttingReports.topRevenueProperties[0]?.monthlyRentPotential?.toLocaleString() || 0}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Quick Generate Reports */}
+                        <div className="mt-8 bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                            <h3 className="font-serif text-lg text-gray-900 mb-4">⚡ Quick Generate Reports</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {[
+                                    'Monthly Income Statement',
+                                    'Occupancy Report',
+                                    'Expense Breakdown',
+                                    'Tenant Payment History',
+                                    'Lease Expiration Report',
+                                    'Tax Preparation Summary',
+                                    'Portfolio Performance',
+                                    'Document Compliance'
+                                ].map((report, index) => (
+                                    <button
+                                        key={index}
+                                        className="border border-[#876D4A] text-[#876D4A] py-3 px-2 rounded-lg hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm font-medium"
+                                    >
+                                        {report}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             </div>
         </div>
     )

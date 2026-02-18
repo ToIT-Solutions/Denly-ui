@@ -40,9 +40,9 @@ export const resendInvite = async(data: any) => {
     }
 }
 
-export const deleteInvite = async() => {
+export const deleteInvite = async(inviteId: any) => {
     try {
-        const response = await api.post("/v1/invitation/resend");
+        const response = await api.delete(`/v1/invitation/delete/${inviteId}`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured trying to delete the invite";

@@ -69,7 +69,7 @@ export const useDeleteInvite = () => {
     const router = useRouter()
 
     return useMutation({
-        mutationFn: () => deleteInvite(),
+        mutationFn: (inviteId: any) => deleteInvite(inviteId),
         onSuccess: (data) => {
             console.log(data)
             showSuccessToast('Invitation removed successfully')

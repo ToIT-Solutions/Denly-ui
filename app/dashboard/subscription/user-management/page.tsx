@@ -5,9 +5,14 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllUsers, useEditUserRole, useDeleteUser } from '@/hooks/useUser'
 import { useDeleteInvite, useFetchAllInvites, useInviteUser, useResendInvite } from '@/hooks/useInvite'
 import Spinner from '@/components/Spinner'
+import useAuthStore from '@/store/useAuthStore'
+import { CAN_CHANGE_ROLES, CAN_DELETE, CAN_MANAGE_USERS } from '@/lib/roles'
 
 export default function UserManagementPage() {
     usePageTitle('User Management - Denly')
+
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
 
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false)
     const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false)
@@ -24,6 +29,7 @@ export default function UserManagementPage() {
 
     const { data, isLoading: isLoadingUsers } = useFetchAllUsers()
     const { data: invites, isLoading: isLoadingInvites } = useFetchAllInvites()
+    console.log(invites)
 
     const { mutate: updateRole, isPending: isUpdatingRole } = useEditUserRole()
     const { mutate: sendInvite, isPending: isSendingInvite } = useInviteUser()
@@ -86,7 +92,9 @@ export default function UserManagementPage() {
     }
 
     const handleResendInvite = (inviteEmail: string) => {
-        resendInvite(inviteEmail)
+        const data = { email: inviteEmail }
+        resendInvite(data)
+        console.log(data)
     }
 
     const startRoleEdit = (userId: string, currentRole: string) => {
@@ -116,12 +124,24 @@ export default function UserManagementPage() {
                             <h1 className="text-2xl font-serif text-gray-900 mb-2">User Management</h1>
                             <p className="text-gray-600 text-sm">Manage team members and their permissions</p>
                         </div>
-                        <button
-                            onClick={openInviteModal}
-                            className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm w-fit font-medium"
-                        >
-                            Invite User
-                        </button>
+
+                        {CAN_MANAGE_USERS.includes(userRole) ?
+
+                            isSendingInvite ?
+                                <div className='px-9 py-2'>
+                                    <Spinner />
+                                </div>
+                                :
+
+                                <button
+                                    onClick={openInviteModal}
+                                    className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm w-fit font-medium"
+                                >
+                                    Invite User
+                                </button>
+                            :
+                            null
+                        }
                     </div>
 
                     {isLoadingUsers ?
@@ -191,15 +211,19 @@ export default function UserManagementPage() {
                                                             /* View Mode - Role and Edit Pencil (right-aligned) */
                                                             <div className="flex items-center space-x-2">
                                                                 <p className="font-medium text-gray-900 text-sm">{user.role}</p>
-                                                                <button
-                                                                    onClick={() => startRoleEdit(user.id, user.role)}
-                                                                    className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-1 rounded-full hover:bg-gray-100"
-                                                                    title="Edit role"
-                                                                >
-                                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                                    </svg>
-                                                                </button>
+
+                                                                {CAN_CHANGE_ROLES.includes(userRole) ?
+                                                                    <button
+                                                                        onClick={() => startRoleEdit(user.id, user.role)}
+                                                                        className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-1 rounded-full hover:bg-gray-100"
+                                                                        title="Edit role"
+                                                                    >
+                                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                                        </svg>
+                                                                    </button>
+                                                                    :
+                                                                    null}
                                                             </div>
                                                         )}
 
@@ -219,16 +243,21 @@ export default function UserManagementPage() {
                                                 </div>
 
                                                 {/* Action Buttons - Separated below */}
-                                                <div className="flex space-x-3 mt-4 pt-3 border-t border-gray-100">
-                                                    <button className="text-[#876D4A] hover:text-[#756045] transition-colors cursor-pointer text-xs font-medium">
+                                                <div className="flex space-x-3 mt-4 border-gray-100">
+                                                    {/* <button className="text-[#876D4A] hover:text-[#756045] transition-colors cursor-pointer text-xs font-medium">
                                                         Edit Profile
-                                                    </button>
-                                                    <button
-                                                        onClick={() => openRemoveModal(user)}
-                                                        className="text-red-600 hover:text-red-800 transition-colors cursor-pointer text-xs font-medium ml-auto"
-                                                    >
-                                                        Remove
-                                                    </button>
+                                                    </button> */}
+
+                                                    {CAN_DELETE.includes(userRole) ?
+
+                                                        <button
+                                                            onClick={() => openRemoveModal(user)}
+                                                            className="text-red-600 hover:text-red-800 transition-colors cursor-pointer text-xs font-medium ml-auto"
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                        :
+                                                        null}
                                                 </div>
                                             </div>
                                         ))}
@@ -236,7 +265,7 @@ export default function UserManagementPage() {
                                 </div>
 
                                 {
-                                    invites ?
+                                    invites?.invites?.length > 0 ?
                                         isLoadingInvites ?
                                             <Spinner /> :
                                             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-8">

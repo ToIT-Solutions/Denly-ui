@@ -9,9 +9,14 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { api } from '@/api/axios' // Import api for the download endpoint
+import useAuthStore from '@/store/useAuthStore'
+import { CAN_EDIT } from '@/lib/roles'
 
 export default function ViewTenantPage() {
     usePageTitle("Tenant Details - Denly")
+
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
 
     const params = useParams()
     const tenantId = params.tenantId as string
@@ -120,13 +125,16 @@ export default function ViewTenantPage() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col sm:flex-row gap-3">
-                                    <Link href={`/dashboard/tenants/${tenantId}/edit`}>
-                                        <button className="bg-white border border-[#876D4A] text-[#876D4A] px-5 py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm w-full sm:w-auto font-medium">
-                                            Edit Tenant
-                                        </button>
-                                    </Link>
-                                </div>
+                                {CAN_EDIT.includes(userRole) ?
+                                    <div className="flex flex-col sm:flex-row gap-3">
+                                        <Link href={`/dashboard/tenants/${tenantId}/edit`}>
+                                            <button className="bg-white border border-[#876D4A] text-[#876D4A] px-5 py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm w-full sm:w-auto font-medium">
+                                                Edit Tenant
+                                            </button>
+                                        </Link>
+                                    </div>
+                                    :
+                                    null}
                             </div>
                         </div>
 

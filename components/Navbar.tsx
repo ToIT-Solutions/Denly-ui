@@ -7,6 +7,7 @@ import Image from 'next/image'
 import useAuthStore from '@/store/useAuthStore'
 import { useRouter } from 'next/navigation'
 import logo from '@/public/img/logo.png'
+import { CAN_INTERACT, CAN_VIEW_LOGS, CAN_VIEW_REPORTS } from '@/lib/roles'
 
 export default function Navbar() {
     const pathname = usePathname()
@@ -15,6 +16,7 @@ export default function Navbar() {
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
     const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
     // console.log(user)
     const clearUser = useAuthStore((state) => state.clearUser)
     const router = useRouter()
@@ -101,19 +103,23 @@ export default function Navbar() {
                     {/* User & Actions */}
                     <div className="flex items-center space-x-4 lg:space-x-6">
                         {/* Quick Action Buttons - Hidden on mobile */}
-                        <div className="hidden lg:flex items-center space-x-3">
-                            <Link href={`/dashboard/payments/new`}>
-                                <button className="bg-[#876D4A] text-white px-4 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm">
-                                    Record Payment
-                                </button>
-                            </Link>
 
-                            <Link href={`/dashboard/properties/add`}>
-                                <button className="border border-[#876D4A] text-[#876D4A] px-4 py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm">
-                                    Add Property
-                                </button>
-                            </Link>
-                        </div>
+                        {CAN_INTERACT.includes(userRole) ?
+                            <div className="hidden lg:flex items-center space-x-3">
+                                <Link href={`/dashboard/payments/new`}>
+                                    <button className="bg-[#876D4A] text-white px-4 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm">
+                                        Record Payment
+                                    </button>
+                                </Link>
+
+                                <Link href={`/dashboard/properties/add`}>
+                                    <button className="border border-[#876D4A] text-[#876D4A] px-4 py-2 rounded-2xl hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-sm">
+                                        Add Property
+                                    </button>
+                                </Link>
+                            </div>
+                            :
+                            null}
 
                         {/* User Dropdown */}
                         <div className="relative">
@@ -163,13 +169,17 @@ export default function Navbar() {
                                     >
                                         Billing & Subscription
                                     </Link>
-                                    <Link
-                                        href={`/dashboard/subscription/logs`}
-                                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-                                        onClick={() => setIsUserMenuOpen(false)}
-                                    >
-                                        Logs Activity
-                                    </Link>
+
+                                    {CAN_VIEW_LOGS.includes(userRole) ?
+                                        <Link
+                                            href={`/dashboard/subscription/logs`}
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                                            onClick={() => setIsUserMenuOpen(false)}
+                                        >
+                                            Logs Activity
+                                        </Link>
+                                        :
+                                        null}
 
                                     <div className="border-t border-gray-200 my-1"></div>
                                     <button

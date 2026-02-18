@@ -7,9 +7,13 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useDeleteProperty, useEditProperty, useFetchOneProperty } from '@/hooks/useProperty'
 import { useEffect, useState } from 'react'
 import Spinner from '@/components/Spinner'
+import useAuthStore from '@/store/useAuthStore'
 
 export default function EditPropertyPage() {
     usePageTitle('Edit Property - Denly')
+
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
 
     const params = useParams()
     const propertyId = params.propertyId as string
@@ -19,7 +23,7 @@ export default function EditPropertyPage() {
     const router = useRouter()
 
     const { data, isLoading, error } = useFetchOneProperty(propertyId)
-    console.log(data)
+    // console.log(data)
 
     const { mutate: editMutate, isPending: isEditPending, error: editError } = useEditProperty()
 
@@ -49,6 +53,10 @@ export default function EditPropertyPage() {
     })
 
     useEffect(() => {
+        if (userRole !== 'Owner' && userRole !== 'Manager') {
+            return router.back()
+        }
+
         if (data) {
             reset({
                 name: data.name,
