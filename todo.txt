@@ -16,6 +16,7 @@ logs - pagination
 basic error handling and toasts
 401 error handling & logging out
 access control - logs/ user management/ property/ tenant/ reports
+forgot/ reset password
 
 
 -----------DOING-------------
@@ -34,13 +35,16 @@ stats cards
 
 DELETION AND CASCADING
 
-resetpassword
-
 MAX TENANTS PER PROPERTY 
 CHANGING PROPERTY EITHER TO ANOTHER OR TO NOTHING
 
 
+updatedAt should only change when details of the user change
+
+invited user doesnt have subID
+
 PAYEMNTS PAYMENTS PAYEMNTS PAYEMNTS PAYEMNTS PAYEMNTS
+
 
 
 

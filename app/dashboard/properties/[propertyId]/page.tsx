@@ -134,11 +134,11 @@ export default function SinglePropertyPage() {
                                             </div>
                                             <div>
                                                 <p className="text-gray-600 text-sm mb-1">Lease Period</p>
-                                                <p className="font-medium text-gray-900">{new Date(tenants.leaseStart).toLocaleDateString('en-US', {
+                                                <p className="font-medium text-gray-900">{new Date(tenants.leaseStart).toLocaleDateString('en-GB', {
                                                     year: 'numeric',
                                                     month: 'long',
                                                     day: 'numeric'
-                                                })} to {new Date(tenants.leaseEnd).toLocaleDateString('en-US', {
+                                                })} to {new Date(tenants.leaseEnd).toLocaleDateString('en-GB', {
                                                     year: 'numeric',
                                                     month: 'long',
                                                     day: 'numeric'

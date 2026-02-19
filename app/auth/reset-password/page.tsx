@@ -1,5 +1,6 @@
-// app/auth/login/page.jsx
+// app/auth/reset-password/page.tsx
 'use client'
+
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
@@ -7,50 +8,54 @@ import logo from '@/public/img/logoWhite.png'
 import Image from 'next/image'
 import Spinner from '@/components/Spinner'
 import { usePageTitle } from '@/hooks/usePageTitle'
-import { useLogin } from '@/hooks/useAuth'
+import { useParams, useSearchParams } from 'next/navigation'
+import { useResetPassword } from '@/hooks/useAuth'
 
-interface LoginForm {
-    email: string
+type ResetPasswordForm = {
     password: string
-    rememberMe: boolean
+    confirmPassword: string
 }
-export default function LoginPage() {
 
-    usePageTitle('Login - Denly')
+export default function ResetPasswordPage() {
+
+    usePageTitle('Reset Password - Denly')
+
+    const params = useSearchParams()
+    const token = params.get('token')
 
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-        trigger
-    } = useForm<LoginForm>({
+        trigger,
+        watch
+    } = useForm<ResetPasswordForm>({
         mode: 'onBlur',
         reValidateMode: 'onBlur'
     })
 
-
-
     const [showAllErrors, setShowAllErrors] = useState(false)
+    const password = watch('password')
 
-    const { mutate: loginMutate, isPending, error } = useLogin()
+    const { mutate, isPending } = useResetPassword()
 
-    const onSubmit = async (data: LoginForm) => {
-        console.log('📝 Login form submitted with data:', data)
+    const onSubmit = async (data: ResetPasswordForm) => {
+        console.log('📝 Reset password form submitted with data:', data)
         setShowAllErrors(true)
+        // Add your logic here
 
-        loginMutate(data)
+        const payload = { ...data, token }
+        console.log(payload)
+
+        mutate(payload)
     }
 
     return (
         <>
-
             <div className="min-h-screen relative overflow-hidden">
                 {/* Background Image with Darker Overlay */}
                 <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                    style={{
-                        backgroundImage: 'url("https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2058&q=80")',
-                    }}
                 >
                     <div className="absolute inset-0 bg-[#876D4A]/70 backdrop-blur-[1px]"></div>
                 </div>
@@ -66,42 +71,15 @@ export default function LoginPage() {
                                 <div className="flex items-center justify-center space-x-3 mb-3">
                                     <Image src={logo} alt='Denly Logo' className='w-29' />
                                 </div>
-                                <h1 className="text-2xl text-white mb-1 drop-shadow-sm">Welcome Back</h1>
-                                <p className="text-white/80 text-sm drop-shadow-sm">Sign in to your Denly account</p>
+                                <h1 className="text-2xl text-white mb-1 drop-shadow-sm">Reset Password</h1>
+                                <p className="text-white/80 text-sm drop-shadow-sm">Enter your new password</p>
                             </div>
 
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-                                {/* Email */}
-                                <div>
-                                    <label htmlFor="email" className="block text-sm font-medium text-white mb-1 drop-shadow-sm">
-                                        Email Address *
-                                    </label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        {...register('email', {
-                                            required: 'Email is required',
-                                            pattern: {
-                                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                                message: 'Invalid email address'
-                                            }
-                                        })}
-                                        onBlur={() => trigger('email')}
-                                        className={`w-full px-3 py-2 bg-white/90 border rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-all text-sm outline-0 ${errors.email ? 'border-red-600' : 'border-gray-300'
-                                            }`}
-                                        placeholder="Enter your email address"
-                                    />
-                                    {errors.email && (
-                                        <p className="mt-1 text-xs text-red-600 drop-shadow-sm">
-                                            {errors.email.message as string}
-                                        </p>
-                                    )}
-                                </div>
-
                                 {/* Password */}
                                 <div>
                                     <label htmlFor="password" className="block text-sm font-medium text-white mb-1 drop-shadow-sm">
-                                        Password *
+                                        New Password *
                                     </label>
                                     <input
                                         type="password"
@@ -116,7 +94,7 @@ export default function LoginPage() {
                                         onBlur={() => trigger('password')}
                                         className={`w-full px-3 py-2 bg-white/90 border rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-all text-sm outline-0 ${errors.password ? 'border-red-600' : 'border-gray-300'
                                             }`}
-                                        placeholder="Enter your password"
+                                        placeholder="Enter new password"
                                     />
                                     {errors.password && (
                                         <p className="mt-1 text-xs text-red-600 drop-shadow-sm">
@@ -125,22 +103,31 @@ export default function LoginPage() {
                                     )}
                                 </div>
 
-                                {/* Remember Me & Forgot Password */}
-                                <div className="flex items-center justify-between text-sm">
-                                    <label className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            {...register('rememberMe')}
-                                            className="rounded border-gray-300 bg-white text-[#876D4A] focus:ring-[#876D4A] w-3 h-3"
-                                        />
-                                        <span className="ml-2 text-white/80 drop-shadow-sm">Remember me</span>
+                                {/* Confirm Password */}
+                                <div>
+                                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-1 drop-shadow-sm">
+                                        Confirm Password *
                                     </label>
-                                    <Link href="/auth/forgot-password" className="text-white/80 hover:text-[#876D4A] hover:underline transition-colors drop-shadow-sm">
-                                        Forgot password?
-                                    </Link>
+                                    <input
+                                        type="password"
+                                        id="confirmPassword"
+                                        {...register('confirmPassword', {
+                                            required: 'Please confirm your password',
+                                            validate: value => value === password || 'Passwords do not match'
+                                        })}
+                                        onBlur={() => trigger('confirmPassword')}
+                                        className={`w-full px-3 py-2 bg-white/90 border rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-all text-sm outline-0 ${errors.confirmPassword ? 'border-red-600' : 'border-gray-300'
+                                            }`}
+                                        placeholder="Confirm new password"
+                                    />
+                                    {errors.confirmPassword && (
+                                        <p className="mt-1 text-xs text-red-600 drop-shadow-sm">
+                                            {errors.confirmPassword.message as string}
+                                        </p>
+                                    )}
                                 </div>
 
-                                {isPending ?
+                                {isSubmitting ?
                                     <Spinner />
                                     :
                                     <button
@@ -148,17 +135,16 @@ export default function LoginPage() {
                                         disabled={isSubmitting}
                                         className="w-full bg-[#876D4A] text-white py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium shadow-lg text-sm cursor-pointer"
                                     >
-                                        Log in
+                                        Reset Password
                                     </button>
                                 }
-
                             </form>
 
                             <div className="mt-4 text-center">
                                 <p className="text-white/80 text-sm drop-shadow-sm">
-                                    Don't have an account?{' '}
-                                    <Link href="/auth/signup" className="text-white hover:text-[#876D4A] hover:underline font-medium transition-colors drop-shadow-sm">
-                                        Sign up
+                                    Remember your password?{' '}
+                                    <Link href="/auth/login" className="text-white hover:text-[#876D4A] hover:underline font-medium transition-colors drop-shadow-sm">
+                                        Log in
                                     </Link>
                                 </p>
                             </div>
@@ -167,6 +153,5 @@ export default function LoginPage() {
                 </div>
             </div>
         </>
-
     )
 }

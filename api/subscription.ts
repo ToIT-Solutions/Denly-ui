@@ -1,3 +1,5 @@
+import {api} from './axios'
+
 interface Subscription {
     id: string;
     company_id: string;
@@ -22,5 +24,26 @@ interface SubscriptionPlan {
     is_popular: boolean;
     is_active: boolean;
     created_at: string; // Timestamp
+}
+
+
+export const getSubscriptionData = async() => {
+    try {
+        const response = await api.get("/v1/subscription/viewAll");
+        return response.data;
+    } catch (error: any) {
+        const message = error.response?.data?.message || error.message || "An error occured when fetching subscriptions";
+        throw new Error(message);
+    }
+}
+
+export const getSubscriptionPlans = async() => {
+    try {
+        const response = await api.get("/v1/subscription/viewAll/plans");
+        return response.data;
+    } catch (error: any) {
+        const message = error.response?.data?.message || error.message || "An error occured when fetching subscription plans";
+        throw new Error(message);
+    }
 }
 

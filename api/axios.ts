@@ -36,6 +36,19 @@ api.interceptors.response.use(
             // Redirect to login
             window.location.href = '/auth/login'
         }
+
+        
+
+        if (error.response?.status === 402) {
+            
+            console.log('no sub')
+            showErrorToast('Your subscription has expired')
+            
+            redirect('/dashboard/subscription/billing?state=no-sub')
+            
+            // Redirect to login
+            window.location.href = '/dashboard/subscription/billing?state=no-sub'
+        }
         return Promise.reject(error)
     }
 )

@@ -44,3 +44,23 @@ export const logout = async() => {
         throw new Error(message);
     }
 }
+
+export const forgotPassword = async(data: any) => {
+    try {
+         const response = await api.post("/v1/auth/forgot", data);
+        return response.data;
+    } catch (error: any) {
+        const message = error.response?.data?.message || error.message || "An error occured trying to send the forgot password request";
+        throw new Error(message);
+    }
+}
+
+export const resetPassword = async(data: any) => {
+    try {
+         const response = await api.post("/v1/auth/reset", data);
+        return response.data;
+    } catch (error: any) {
+        const message = error.response?.data?.message || error.message || "An error occured trying reset your password";
+        throw new Error(message);
+    }
+}
