@@ -17,7 +17,11 @@ basic error handling and toasts
 401 error handling & logging out
 access control - logs/ user management/ property/ tenant/ reports
 forgot/ reset password
-
+payment length between 1-12 months
+expected payment
+changing property for tenants
+max tenants
+date formatting
 
 -----------DOING-------------
 hiding reports in navbar for other users
@@ -26,7 +30,6 @@ hiding reports in navbar for other users
 
 
 -----------TODO--------------
-OPTION FOR PAYMENT LENGHT FOR MONTHS LIKE 1MONTH OR 12 MONTHS, JSUT A DROPDOWN
 CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
 
 stats cards
@@ -36,8 +39,6 @@ stats cards
 DELETION AND CASCADING
 
 MAX TENANTS PER PROPERTY 
-CHANGING PROPERTY EITHER TO ANOTHER OR TO NOTHING
-
 
 updatedAt should only change when details of the user change
 

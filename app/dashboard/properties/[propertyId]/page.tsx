@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useParams, notFound } from 'next/navigation'
 import useAuthStore from '@/store/useAuthStore'
 import { CAN_EDIT, CAN_INTERACT } from '@/lib/roles'
+import { formatDate } from '@/lib/dateFormatter'
 
 export default function SinglePropertyPage() {
     const user = useAuthStore((state) => state.user)
@@ -90,6 +91,10 @@ export default function SinglePropertyPage() {
                                             <p className="text-gray-600 text-sm mb-1">Square Feet</p>
                                             <p className="font-medium text-gray-900">{data?.squareMeter}</p>
                                         </div>
+                                        <div>
+                                            <p className="text-gray-600 text-sm mb-1">Max. Tenants</p>
+                                            <p className="font-medium text-gray-900">{data?.maxTenants}</p>
+                                        </div>
                                     </div>
                                     <div>
                                         <p className="text-gray-600 text-sm mb-2">Description</p>
@@ -98,8 +103,8 @@ export default function SinglePropertyPage() {
                                     <div className="mt-6">
                                         <p className="text-gray-600 text-sm mb-2">Features</p>
                                         <div className="flex flex-wrap gap-2">
-                                            {data?.features.map((feature: any) => (
-                                                <span key={data?.id} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
+                                            {data?.features.map((feature: any, index: any) => (
+                                                <span key={index} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
                                                     {feature}
                                                 </span>
                                             ))}
@@ -119,7 +124,7 @@ export default function SinglePropertyPage() {
                                         </span>
                                     </div>
                                     {data?.tenants.map((tenants: any) => (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 border-b pb-3">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4 border-b pb-3" key={tenants.id}>
                                             <div>
                                                 <p className="text-gray-600 text-sm mb-1">Tenant Name</p>
                                                 <p className="font-medium text-gray-900">{tenants.firstName + ' ' + tenants.lastName}</p>
@@ -134,15 +139,7 @@ export default function SinglePropertyPage() {
                                             </div>
                                             <div>
                                                 <p className="text-gray-600 text-sm mb-1">Lease Period</p>
-                                                <p className="font-medium text-gray-900">{new Date(tenants.leaseStart).toLocaleDateString('en-GB', {
-                                                    year: 'numeric',
-                                                    month: 'long',
-                                                    day: 'numeric'
-                                                })} to {new Date(tenants.leaseEnd).toLocaleDateString('en-GB', {
-                                                    year: 'numeric',
-                                                    month: 'long',
-                                                    day: 'numeric'
-                                                })}</p>
+                                                <p className="font-medium text-gray-900">{formatDate(tenants.leaseStart)} to {formatDate(tenants.leaseEnd)}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -176,7 +173,7 @@ export default function SinglePropertyPage() {
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between text-sm">
                                             <span className="text-gray-600">Last Payment</span>
-                                            <span className="font-medium text-gray-900">2024-01-15</span>
+                                            <span className="font-medium text-gray-900">{formatDate(data?.lastPayment.createdAt)} { }</span>
                                         </div>
                                     </div>
                                 </div>

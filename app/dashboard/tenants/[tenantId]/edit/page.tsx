@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import Spinner from '@/components/Spinner'
 import useAuthStore from '@/store/useAuthStore'
 import { CAN_EDIT } from '@/lib/roles'
+import { useFetchAllProperties } from '@/hooks/useProperty'
 
 interface TenantForm {
     // Personal Information
@@ -28,11 +29,11 @@ interface TenantForm {
     nextOfKinAddress: string
 
     // Property & Lease (Matches your DB structure)
-    propertyId: string
+    propertyId: string | null // Allow null for no property
     actualRent: number
     leaseStart: string
     leaseEnd: string
-    status: 'active' | 'pending'
+    status: 'active' | 'pending' | 'inactive'
 
     // Additional Information
     occupation: string
@@ -52,7 +53,8 @@ export default function EditTenantPage() {
     const [showDeleteModal, setShowDeleteModal] = useState(false)
 
     const { data, isLoading } = useFetchOneTenant(tenantId)
-    console.log(data)
+    const { data: properties, isLoading: propertiesLoading } = useFetchAllProperties()
+    // console.log(data)
 
     const { mutate: editMutate, isPending: isEditPending, error: editError } = useEditTenant()
 
@@ -64,6 +66,8 @@ export default function EditTenantPage() {
         register,
         handleSubmit,
         reset,
+        watch,
+        setValue,
         formState: { errors, isSubmitting }
     } = useForm<TenantForm>({
         defaultValues: {
@@ -77,6 +81,7 @@ export default function EditTenantPage() {
             leaseEnd: '',
             actualRent: 0,
             status: 'pending',
+            propertyId: null,
             // Next of Kin defaults
             nextOfKinName: '',
             nextOfKinRelationship: '',
@@ -85,6 +90,23 @@ export default function EditTenantPage() {
             nextOfKinAddress: ''
         }
     })
+
+    // Watch propertyId to update when it changes
+    const selectedPropertyId = watch('propertyId')
+
+    // Update actualRent when property changes (only if a property is selected)
+    useEffect(() => {
+        if (selectedPropertyId && properties) {
+            const selectedProperty = properties.find((p: any) => p.id === selectedPropertyId)
+            if (selectedProperty) {
+                // Set the actualRent to the property's monthly rent
+                setValue('actualRent', parseFloat(selectedProperty.monthlyRent) || 0)
+            }
+        } else if (selectedPropertyId === null) {
+            // If "No Property" is selected, clear the rent
+            setValue('actualRent', 0)
+        }
+    }, [selectedPropertyId, properties, setValue])
 
     useEffect(() => {
 
@@ -118,6 +140,7 @@ export default function EditTenantPage() {
                 leaseEnd: formatDateForInput(data.leaseEnd),
                 actualRent: data.actualRent || 0,
                 status: data.status || 'pending',
+                propertyId: data.property?.id || null, // Will be null if no property
                 // Next of Kin defaults
                 nextOfKinName: data.nextOfKinName || '',
                 nextOfKinRelationship: data.nextOfKinRelationship || '',
@@ -129,9 +152,14 @@ export default function EditTenantPage() {
     }, [data, reset]);
 
     const onSubmit = async (data: TenantForm) => {
-        console.log('📝 Tenant form submitted with data:', data)
+        const formattedData = {
+            ...data,
+            propertyId: data.propertyId === "null" ? null : data.propertyId
+        }
 
-        editMutate({ tenantId, data: data }, {
+        console.log('📝 Tenant form submitted with data:', formattedData)
+
+        editMutate({ tenantId, data: formattedData }, {
             onSuccess: () => {
                 router.push(`/dashboard/tenants/${tenantId}`)
             }
@@ -388,15 +416,42 @@ export default function EditTenantPage() {
                                         </div>
                                     </div>
 
-                                    {/* Lease Information */}
+                                    {/* Property & Lease Information */}
                                     <div>
-                                        <h2 className="font-medium text-gray-900 mb-4">Lease Information</h2>
+                                        <h2 className="font-medium text-gray-900 mb-4">Property & Lease Information</h2>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {/* Property Selection with "No Property" option */}
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Property {!selectedPropertyId && <span className="text-gray-500 text-xs ml-1">(No property assigned)</span>}
+                                                </label>
+                                                <select
+                                                    {...register('propertyId')} // Removed required validation
+                                                    className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm `}
+                                                // ${errors.propertyId ? 'border-red-600' : 'border-gray-300'}
+                                                >
+                                                    <option value="null">No Property (Tenant not in any property)</option>
+                                                    {properties?.map((property: any) => (
+                                                        <option key={property.id} value={property.id}>
+                                                            {property.name} - {property.address} (${property.monthlyRent}/month)
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                {/* {errors.propertyId && (
+                                                    <p className="mt-1 text-xs text-red-600">{errors.propertyId.message}</p>
+                                                )} */}
+                                                <p className="mt-1 text-xs text-gray-500">
+                                                    Select "No Property" if the tenant is moving out or hasn't been assigned yet
+                                                </p>
+                                            </div>
+
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Lease Start Date *</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Lease Start Date {selectedPropertyId && '*'}</label>
                                                 <input
                                                     type="date"
-                                                    {...register('leaseStart', { required: 'Lease start date is required' })}
+                                                    {...register('leaseStart', {
+                                                        required: selectedPropertyId ? 'Lease start date is required when a property is assigned' : false
+                                                    })}
                                                     className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm ${errors.leaseStart ? 'border-red-600' : 'border-gray-300'
                                                         }`}
                                                 />
@@ -405,10 +460,12 @@ export default function EditTenantPage() {
                                                 )}
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Lease End Date *</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Lease End Date {selectedPropertyId && '*'}</label>
                                                 <input
                                                     type="date"
-                                                    {...register('leaseEnd', { required: 'Lease end date is required' })}
+                                                    {...register('leaseEnd', {
+                                                        required: selectedPropertyId ? 'Lease end date is required when a property is assigned' : false
+                                                    })}
                                                     className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm ${errors.leaseEnd ? 'border-red-600' : 'border-gray-300'
                                                         }`}
                                                 />
@@ -417,21 +474,32 @@ export default function EditTenantPage() {
                                                 )}
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) {selectedPropertyId && '*'}</label>
                                                 <input
                                                     type="number"
                                                     step="0.01"
                                                     {...register('actualRent', {
-                                                        required: 'Monthly rent is required',
+                                                        required: selectedPropertyId ? 'Monthly rent is required when a property is assigned' : false,
                                                         min: { value: 0, message: 'Rent must be positive' },
                                                         valueAsNumber: true
                                                     })}
                                                     className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.actualRent ? 'border-red-600' : 'border-gray-300'
                                                         }`}
-                                                    placeholder="0.00"
+                                                    placeholder={selectedPropertyId ? "0.00" : "No property selected"}
+                                                    disabled={!selectedPropertyId}
                                                 />
                                                 {errors.actualRent && (
                                                     <p className="mt-1 text-xs text-red-600">{errors.actualRent.message}</p>
+                                                )}
+                                                {selectedPropertyId && (
+                                                    <p className="mt-1 text-xs text-gray-500">
+                                                        Auto-filled from selected property
+                                                    </p>
+                                                )}
+                                                {!selectedPropertyId && (
+                                                    <p className="mt-1 text-xs text-gray-500">
+                                                        Rent disabled - no property selected
+                                                    </p>
                                                 )}
                                             </div>
                                             <div>
@@ -449,37 +517,31 @@ export default function EditTenantPage() {
                                     </div>
 
                                     {/* Actions */}
-                                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-                                        <button
-                                            type="submit"
-                                            disabled={isEditPending || deletePending}
-                                            className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 transition-colors cursor-pointer text-sm font-medium"
-                                        >
-                                            {isEditPending ? (
-                                                <span className="flex items-center justify-center">
-                                                    <svg className="animate-spin h-4 w-4 mr-2" viewBox="0 0 24 24">
-                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                                    </svg>
-                                                    Saving...
-                                                </span>
-                                            ) : 'Save Changes'}
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={handleDelete}
-                                            disabled={isEditPending || deletePending}
-                                            className="border border-red-300 text-red-700 px-5 py-2 rounded-2xl hover:bg-red-50 disabled:opacity-50 transition-colors cursor-pointer text-sm font-medium"
-                                        >
-                                            Delete Tenant
-                                        </button>
-                                        <div
-                                            onClick={() => router.back()}
-                                            className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm text-center font-medium"
-                                        >
-                                            Cancel
+                                    {isEditPending || deletePending ?
+                                        <Spinner />
+                                        :
+                                        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                                            <button
+                                                type="submit"
+                                                className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 transition-colors cursor-pointer text-sm font-medium"
+                                            >
+                                                Save Changes
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={handleDelete}
+                                                className="border border-red-300 text-red-700 px-5 py-2 rounded-2xl hover:bg-red-50 disabled:opacity-50 transition-colors cursor-pointer text-sm font-medium"
+                                            >
+                                                Delete Tenant
+                                            </button>
+                                            <div
+                                                onClick={() => router.back()}
+                                                className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm text-center font-medium"
+                                            >
+                                                Cancel
+                                            </div>
                                         </div>
-                                    </div>
+                                    }
                                 </form>
                             </div>
                         </div>
@@ -488,21 +550,28 @@ export default function EditTenantPage() {
                         <div className="space-y-4">
                             {/* Property Information */}
                             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
-                                <h3 className="font-medium text-gray-900 mb-3">Property Information</h3>
+                                <h3 className="font-medium text-gray-900 mb-3">Current Property Information</h3>
                                 <div className="space-y-2">
                                     <div>
                                         <p className="text-xs text-gray-600">Current Property</p>
-                                        <p className="font-medium text-gray-900 text-sm">{data?.property?.name}</p>
+                                        <p className="font-medium text-gray-900 text-sm">{data?.property?.name || 'Not assigned'}</p>
                                     </div>
-                                    <div>
-                                        <p className="text-xs text-gray-600">Property Rent</p>
-                                        <p className="font-medium text-gray-900 text-sm">${data?.property?.monthlyRent}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-600">Property Type</p>
-                                        <p className="font-medium text-gray-900 text-sm">{data?.property?.type}</p>
-                                    </div>
+                                    {data?.property && (
+                                        <>
+                                            <div>
+                                                <p className="text-xs text-gray-600">Property Rent</p>
+                                                <p className="font-medium text-gray-900 text-sm">${data?.property?.monthlyRent}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-600">Property Type</p>
+                                                <p className="font-medium text-gray-900 text-sm">{data?.property?.type}</p>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
+                                <p className="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-100">
+                                    Select "No Property" above to remove the tenant from their current property
+                                </p>
                             </div>
                         </div>
                     </div>

@@ -39,7 +39,7 @@ export default function TermsPage() {
                 <div className="bg-white rounded-3xl border border-gray-200 p-12 shadow-sm">
                     <div className="text-center mb-12">
                         <h1 className="text-4xl font-serif text-gray-800 mb-4">Terms of Service</h1>
-                        <p className="text-gray-600">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</p>
+                        <p className="text-gray-600">Last updated: {new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</p>
                     </div>
 
                     <div className="prose prose-lg max-w-none text-gray-700 space-y-8">

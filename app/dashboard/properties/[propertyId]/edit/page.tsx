@@ -33,6 +33,7 @@ export default function EditPropertyPage() {
         register,
         handleSubmit,
         reset,
+        watch,
         formState: { errors },
     } = useForm({
         defaultValues: {
@@ -49,8 +50,12 @@ export default function EditPropertyPage() {
             squareMeter: 0,
             status: 'active',
             description: '',
+            maxTenants: 1, // Add maxTenants default
         },
     })
+
+    // Watch property type to conditionally show different maxTenants limits
+    const propertyType = watch('type')
 
     useEffect(() => {
         if (userRole !== 'Owner' && userRole !== 'Manager') {
@@ -72,6 +77,7 @@ export default function EditPropertyPage() {
                 squareMeter: data.squareMeter,
                 status: data.status,
                 description: data.description,
+                maxTenants: data.maxTenants || 1, // Pull maxTenants from data, default to 1 if not set
             })
         }
     }, [data, reset])
@@ -88,9 +94,16 @@ export default function EditPropertyPage() {
     }
 
     const confirmDelete = () => {
-
         deleteMutate("d627a7a4-38bd-4be4-816e-4bbf79ce2731")
         setIsDeleteModalOpen(false)
+    }
+
+    // Determine max tenants limit based on property type
+    const getMaxTenantsLimit = () => {
+        if (propertyType === 'commercial') {
+            return 50
+        }
+        return 20 // residential properties
     }
 
 
@@ -303,6 +316,36 @@ export default function EditPropertyPage() {
                                     </div>
                                 </div>
 
+                                {/* Max Tenants Field */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Maximum Number of Tenants *
+                                    </label>
+                                    <input
+                                        type="number"
+                                        {...register('maxTenants', {
+                                            required: 'Maximum tenants is required',
+                                            min: { value: 1, message: 'Must allow at least 1 tenant' },
+                                            max: {
+                                                value: getMaxTenantsLimit(),
+                                                message: `Maximum tenants cannot exceed ${getMaxTenantsLimit()} for ${propertyType === 'commercial' ? 'commercial' : 'residential'} properties`
+                                            },
+                                            valueAsNumber: true
+                                        })}
+                                        className={`w-full px-3 py-2 border rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
+                                            }`}
+                                        placeholder={propertyType === 'commercial' ? "e.g., 10" : "e.g., 4"}
+                                    />
+                                    {errors.maxTenants && (
+                                        <p className="text-red-600 text-xs mt-1">{errors.maxTenants.message?.toString()}</p>
+                                    )}
+                                    <p className="mt-1 text-xs text-gray-500">
+                                        {propertyType === 'commercial'
+                                            ? 'Maximum number of tenants/occupants for this commercial space'
+                                            : 'Maximum number of tenants that can occupy this residential property'}
+                                    </p>
+                                </div>
+
                                 {/* Status */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -345,7 +388,7 @@ export default function EditPropertyPage() {
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => router.back}
+                                            onClick={() => router.back()}
                                             className="px-4 py-2 border border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-300 transition-colors text-sm font-medium cursor-pointer"
                                         >
                                             Cancel

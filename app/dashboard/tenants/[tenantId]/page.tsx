@@ -11,6 +11,8 @@ import { useState } from 'react'
 import { api } from '@/api/axios' // Import api for the download endpoint
 import useAuthStore from '@/store/useAuthStore'
 import { CAN_EDIT } from '@/lib/roles'
+import { useFetchAllProperties } from '@/hooks/useProperty'
+import { formatDate } from '@/lib/dateFormatter'
 
 export default function ViewTenantPage() {
     usePageTitle("Tenant Details - Denly")
@@ -22,6 +24,9 @@ export default function ViewTenantPage() {
     const tenantId = params.tenantId as string
 
     const { data, isLoading } = useFetchOneTenant(tenantId)
+    console.log(data)
+    // const { data: properties, isLoading: propertyLoading } = useFetchAllProperties()
+    // console.log(properties)
 
     // Use the combined hook for document actions
     const {
@@ -183,11 +188,7 @@ export default function ViewTenantPage() {
                                             <label className="text-xs text-gray-600">Rent Due Date</label>
                                             <p className="text-gray-900 text-sm">
                                                 {data?.payments?.[0]?.dueDate
-                                                    ? new Date(data.payments[0].dueDate).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
-                                                    })
+                                                    ? formatDate(data.payments[0].dueDate)
                                                     : 'Not set'
                                                 }
                                             </p>
@@ -196,11 +197,7 @@ export default function ViewTenantPage() {
                                             <label className="text-xs text-gray-600">Lease Start</label>
                                             <p className="text-gray-900 text-sm">
                                                 {data?.leaseStart
-                                                    ? new Date(data.leaseStart).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
-                                                    })
+                                                    ? formatDate(data.leaseStart)
                                                     : 'Not set'
                                                 }
                                             </p>
@@ -209,11 +206,7 @@ export default function ViewTenantPage() {
                                             <label className="text-xs text-gray-600">Lease End</label>
                                             <p className="text-gray-900 text-sm">
                                                 {data?.leaseEnd
-                                                    ? new Date(data.leaseEnd).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric'
-                                                    })
+                                                    ? formatDate(data.leaseEnd)
                                                     : 'Not set'
                                                 }
                                             </p>
@@ -231,11 +224,7 @@ export default function ViewTenantPage() {
                                                     <div>
                                                         <p className="font-medium text-gray-900 text-sm">${payment.amount}</p>
                                                         <p className="text-xs text-gray-600">
-                                                            {new Date(payment.createdAt).toLocaleDateString('en-US', {
-                                                                year: 'numeric',
-                                                                month: 'short',
-                                                                day: 'numeric'
-                                                            })}
+                                                            {formatDate(payment.createdAt, 'long')}
                                                         </p>
                                                     </div>
                                                     <div className="text-right">

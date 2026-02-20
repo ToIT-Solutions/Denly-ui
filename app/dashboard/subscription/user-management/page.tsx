@@ -7,6 +7,7 @@ import { useDeleteInvite, useFetchAllInvites, useInviteUser, useResendInvite } f
 import Spinner from '@/components/Spinner'
 import useAuthStore from '@/store/useAuthStore'
 import { CAN_CHANGE_ROLES, CAN_DELETE, CAN_MANAGE_USERS } from '@/lib/roles'
+import { formatDate } from '@/lib/dateFormatter'
 
 export default function UserManagementPage() {
     usePageTitle('User Management - Denly')
@@ -231,12 +232,7 @@ export default function UserManagementPage() {
                                                         <div className="flex items-center space-x-1 mt-1">
                                                             <span className="text-gray-400 text-[10px]">Last login:</span>
                                                             <p className="text-gray-500 text-[10px]">
-                                                                {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString('en-Gb', {
-                                                                    month: 'short',
-                                                                    day: 'numeric',
-                                                                    hour: '2-digit',
-                                                                    minute: '2-digit'
-                                                                }) : 'Never'}
+                                                                {user.lastLogin ? formatDate(user.lastLogin, 'long') : 'Never'}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -294,24 +290,14 @@ export default function UserManagementPage() {
                                                                     <div className="flex items-center space-x-1 mt-1">
                                                                         <span className="text-gray-400 text-[10px]">Invitation Sent:</span>
                                                                         <p className="text-gray-500 text-[10px]">
-                                                                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-Gb', {
-                                                                                month: 'short',
-                                                                                day: 'numeric',
-                                                                                hour: '2-digit',
-                                                                                minute: '2-digit'
-                                                                            }) : 'Never'}
+                                                                            {user.createdAt ? formatDate(user.createdAt, 'long') : 'Never'}
                                                                         </p>
                                                                     </div>
 
                                                                     <div className="flex items-center space-x-1 mt-1">
                                                                         <span className="text-gray-400 text-[10px]">Invitation Expires:</span>
                                                                         <p className="text-gray-500 text-[10px]">
-                                                                            {user.expiresAt ? new Date(user.expiresAt).toLocaleDateString('en-Gb', {
-                                                                                month: 'short',
-                                                                                day: 'numeric',
-                                                                                hour: '2-digit',
-                                                                                minute: '2-digit'
-                                                                            }) : 'Never'}
+                                                                            {user.expiresAt ? formatDate(user.expiresAt, 'long') : 'Never'}
                                                                         </p>
                                                                     </div>
                                                                 </div>

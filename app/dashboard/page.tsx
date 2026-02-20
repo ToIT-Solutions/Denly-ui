@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar'
 import Spinner from '@/components/Spinner'
 import { useFetchCompanyStats } from '@/hooks/useCompany'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { formatDate } from '@/lib/dateFormatter'
 import useAuthStore from '@/store/useAuthStore'
 import Link from 'next/link'
 
@@ -113,7 +114,7 @@ export default function DashboardPage() {
                                                     <div className="flex-1">
                                                         <p className="text-gray-900 font-medium">Payment received for {payment.property?.name || 'Unknown Property'}</p>
                                                         <p className="text-gray-500 text-sm">
-                                                            {payment.createdAt ? new Date(payment.createdAt).toLocaleDateString() : 'Recent'} •
+                                                            {payment.createdAt ? formatDate(payment.createdAt, 'short') : 'Recent'} •
                                                             Tenant: {payment.tenant?.firstName || 'Unknown'} {payment.tenant?.lastName || ''}
                                                         </p>
                                                     </div>

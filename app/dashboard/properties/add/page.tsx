@@ -25,6 +25,7 @@ interface PropertyForm {
     monthlyRent: number
     features: string[]
     description: string
+    maxTenants: number // Add maxTenants field
 
     // Conditional fields - only required based on propertyType
     bedrooms?: number
@@ -49,14 +50,15 @@ export default function AddPropertyPage() {
     } = useForm<PropertyForm>({
         defaultValues: {
             features: [],
-            propertyType: 'residential'
+            propertyType: 'residential',
+            maxTenants: 1 // Default to 1 tenant
         }
     })
 
     const router = useRouter()
 
     useEffect(() => {
-        if (CAN_INTERACT.includes(userRole)) {
+        if (!CAN_INTERACT.includes(userRole)) {
             return router.back()
         }
     }, [userRole])
@@ -71,7 +73,6 @@ export default function AddPropertyPage() {
 
     const onSubmit = async (data: PropertyForm) => {
         console.log('📝 Property form submitted with data:', data)
-
         propertyMutate(data)
     }
 
@@ -332,6 +333,30 @@ export default function AddPropertyPage() {
                                                 <p className="mt-1 text-xs text-red-600">{errors.monthlyRent.message}</p>
                                             )}
                                         </div>
+                                        {/* Max Tenants Field - Residential */}
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Maximum Number of Tenants *
+                                            </label>
+                                            <input
+                                                type="number"
+                                                {...register('maxTenants', {
+                                                    required: 'Maximum tenants is required',
+                                                    min: { value: 1, message: 'Must allow at least 1 tenant' },
+                                                    max: { value: 20, message: 'Maximum tenants cannot exceed 20' },
+                                                    valueAsNumber: true
+                                                })}
+                                                placeholder="e.g., 4"
+                                                className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                            />
+                                            {errors.maxTenants && (
+                                                <p className="mt-1 text-xs text-red-600">{errors.maxTenants.message}</p>
+                                            )}
+                                            <p className="mt-1 text-xs text-gray-500">
+                                                Maximum number of tenants that can occupy this residential property
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -404,6 +429,30 @@ export default function AddPropertyPage() {
                                                 placeholder="0"
                                                 className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
                                             />
+                                        </div>
+                                        {/* Max Tenants Field - Commercial */}
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Maximum Number of Tenants *
+                                            </label>
+                                            <input
+                                                type="number"
+                                                {...register('maxTenants', {
+                                                    required: 'Maximum tenants is required',
+                                                    min: { value: 1, message: 'Must allow at least 1 tenant' },
+                                                    max: { value: 50, message: 'Maximum tenants cannot exceed 50' },
+                                                    valueAsNumber: true
+                                                })}
+                                                placeholder="e.g., 10"
+                                                className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                            />
+                                            {errors.maxTenants && (
+                                                <p className="mt-1 text-xs text-red-600">{errors.maxTenants.message}</p>
+                                            )}
+                                            <p className="mt-1 text-xs text-gray-500">
+                                                Maximum number of tenants/occupants for this commercial space
+                                            </p>
                                         </div>
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>

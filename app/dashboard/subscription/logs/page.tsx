@@ -157,11 +157,11 @@ export default function LogsPage() {
         yesterday.setDate(yesterday.getDate() - 1)
 
         if (date.toDateString() === today.toDateString()) {
-            return `Today at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`
+            return `Today at ${date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
         } else if (date.toDateString() === yesterday.toDateString()) {
-            return `Yesterday at ${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`
+            return `Yesterday at ${date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
         } else {
-            return date.toLocaleDateString('en-US', {
+            return date.toLocaleDateString('en-GB', {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',
@@ -173,7 +173,7 @@ export default function LogsPage() {
 
     // Format date for modal
     const formatFullDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+        return new Date(dateString).toLocaleDateString('en-GB', {
             weekday: 'long',
             year: 'numeric',
             month: 'long',

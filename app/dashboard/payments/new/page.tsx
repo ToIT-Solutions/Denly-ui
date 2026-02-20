@@ -34,16 +34,17 @@ interface PaymentFormData {
     paymentDate: string;
     paymentMethod: string;
     notes: string;
+    duration: number;
 }
 
 export default function RecordPaymentPage() {
     usePageTitle('New Payment - Denly')
     const { data: propertyData, isPending: propertyPending, error: propertyError } = useFetchAllProperties()
-    console.log(propertyData)
 
     const [selectedProperty, setSelectedProperty] = useState('')
     const [selectedTenant, setSelectedTenant] = useState('')
     const [availableTenants, setAvailableTenants] = useState<Tenant[]>([])
+    const [expectedAmount, setExpectedAmount] = useState<number | null>(null)
 
     const { mutate: paymentMutate, isPending, error } = useAddPayment()
     const router = useRouter()
@@ -53,11 +54,27 @@ export default function RecordPaymentPage() {
         handleSubmit,
         formState: { errors },
         setValue,
-        watch
+        watch,
+        getValues
     } = useForm<PaymentFormData>()
 
-    // Watch for property changes to update tenants dropdown
+    // Watch for property and duration changes
     const watchedProperty = watch('propertyId')
+    const watchedDuration = watch('duration')
+
+    // Calculate expected amount whenever property or duration changes
+    useEffect(() => {
+        if (watchedProperty && watchedDuration) {
+            const selectedProp = propertyData?.find((prop: Property) => prop.id === watchedProperty)
+            if (selectedProp) {
+                const monthlyRent = parseFloat(selectedProp.monthlyRent) || 0
+                const calculatedAmount = monthlyRent * watchedDuration
+                setExpectedAmount(calculatedAmount)
+            }
+        } else {
+            setExpectedAmount(null)
+        }
+    }, [watchedProperty, watchedDuration, propertyData])
 
     // Update available tenants when property is selected
     useEffect(() => {
@@ -74,13 +91,11 @@ export default function RecordPaymentPage() {
 
     const onSubmit = (data: PaymentFormData) => {
         console.log('Payment recorded:', data)
-
-
         paymentMutate(data)
     }
 
-    // Get all unique tenants across all properties for the initial dropdown
-    const allTenants = propertyData?.flatMap((property: Property) => property.tenants || []) || []
+    // Generate array of months from 1 to 12
+    const months = Array.from({ length: 12 }, (_, i) => i + 1)
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -114,7 +129,7 @@ export default function RecordPaymentPage() {
                                     <option value="">Select a property</option>
                                     {propertyData?.map((property: Property) => (
                                         <option key={property.id} value={property.id}>
-                                            {property.name} - {property.address}
+                                            {property.name} - {property.address} | (${property.monthlyRent}/month)
                                         </option>
                                     ))}
                                 </select>
@@ -151,6 +166,31 @@ export default function RecordPaymentPage() {
                                 )}
                             </div>
 
+                            {/* Payment Duration */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Payment Duration (Months) *
+                                </label>
+                                <select
+                                    {...register('duration', {
+                                        required: 'Payment duration is required',
+                                        min: { value: 1, message: 'Duration must be at least 1 month' },
+                                        max: { value: 12, message: 'Duration cannot exceed 12 months' }
+                                    })}
+                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"
+                                >
+                                    <option value="">Select duration</option>
+                                    {months.map((month) => (
+                                        <option key={month} value={month}>
+                                            {month} {month === 1 ? 'month' : 'months'}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.duration && (
+                                    <p className="text-red-600 text-xs mt-1">{errors.duration.message}</p>
+                                )}
+                            </div>
+
                             {/* Amount */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -173,6 +213,19 @@ export default function RecordPaymentPage() {
                                     <p className="text-red-600 text-xs mt-1">{errors.amount.message}</p>
                                 )}
                             </div>
+
+                            {/* Expected Amount Display - Updates in real-time */}
+                            {expectedAmount !== null && (
+                                <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 ">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm font-medium text-orange-800">Expected Amount:</span>
+                                        <span className="text-lg font-semibold text-orange-900">${expectedAmount.toFixed(2)}</span>
+                                    </div>
+                                    <p className="text-xs text-orange-600 mt-1">
+                                        Based on ${propertyData?.find((p: Property) => p.id === watchedProperty)?.monthlyRent} monthly rent × {watchedDuration} {watchedDuration === 1 ? 'month' : 'months'}
+                                    </p>
+                                </div>
+                            )}
 
                             {/* Payment Date */}
                             <div>
@@ -226,7 +279,6 @@ export default function RecordPaymentPage() {
                             {isPending ?
                                 <Spinner />
                                 :
-
                                 <div className="flex space-x-3 pt-4">
                                     <button
                                         type="button"

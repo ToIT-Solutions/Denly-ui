@@ -3,6 +3,7 @@ import { getSubscriptionData } from '@/api/subscription'
 import Navbar from '@/components/Navbar'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchSubscriptionData, useFetchSubscriptionPlans } from '@/hooks/useSubscription'
+import { formatDate } from '@/lib/dateFormatter'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
@@ -142,11 +143,7 @@ export default function BillingPage() {
                                             <span className="text-base text-gray-600">/{currentPlan.period}</span>
                                         </div>
                                         <p className="text-xs text-gray-600">Next billing:
-                                            {new Date(refinedData?.currentPeriodEnd).toLocaleDateString('en-GB', {
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric'
-                                            })}</p>
+                                            {formatDate(refinedData?.currentPeriodEnd)}</p>
                                     </div>
                                 </div>
 
@@ -275,8 +272,8 @@ export default function BillingPage() {
                                         ))}
                                     </div>
 
-                                    <button className={`w-full py-2 rounded-lg transition-colors text-xs font-medium ${plan.isPopular
-                                        ? 'bg-[#876D4A] text-white hover:bg-[#756045]'
+                                    <button className={`w-full py-2 rounded-lg transition-colors text-xs font-medium cursor-pointer ${refinedData?.planId === plan.id
+                                        ? 'bg-[#876D4A] text-white hover:bg-[#584935]'
                                         : 'border border-[#876D4A] text-[#876D4A] hover:bg-[#876D4A] hover:text-white'
                                         }`}>
                                         {refinedData?.planId === plan.id ? 'Current Plan' : 'Switch to ' + plan.name}
