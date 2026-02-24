@@ -23,6 +23,9 @@ changing property for tenants
 max tenants per property
 date formatting
 property change warning
+marketing pages responsiveness
+fixed number inputs which were changing the number values
+Block deletion of properties with active tenants
 
 -----------DOING-------------
 
@@ -45,9 +48,7 @@ PAYEMNTS PAYMENTS PAYEMNTS PAYEMNTS PAYEMNTS PAYEMNTS
 
 RESPONSIVENESS
 
-route user to company page after signup
-
-Block deletion of properties with active tenants
+reset password when already logged in
 
 
 ------------CONTROLS----------------------

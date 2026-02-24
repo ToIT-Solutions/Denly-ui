@@ -3,13 +3,14 @@
 
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import logo from '@/public/img/logoWhite.png'
 import Image from 'next/image'
 import Spinner from '@/components/Spinner'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useResetPassword } from '@/hooks/useAuth'
+import { showErrorToast } from '@/lib/toast'
 
 type ResetPasswordForm = {
     password: string
@@ -22,6 +23,13 @@ export default function ResetPasswordPage() {
 
     const params = useSearchParams()
     const token = params.get('token')
+
+    useEffect(() => {
+        if (token?.length === 0) {
+            showErrorToast('You will not be able to reset your password')
+        }
+    }, [token])
+
 
     const {
         register,
@@ -57,7 +65,7 @@ export default function ResetPasswordPage() {
                 <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                 >
-                    <div className="absolute inset-0 bg-[#876D4A]/70 backdrop-blur-[1px]"></div>
+                    <div className="absolute inset-0 bg-[#876D4A]/40 backdrop-blur-[1px]"></div>
                 </div>
 
                 {/* Glass Morphism Container */}

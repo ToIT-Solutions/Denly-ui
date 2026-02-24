@@ -16,26 +16,27 @@ export default function PrivacyPage() {
             <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-linear-to-tr from-[#876D4A]/5 to-transparent rounded-full blur-3xl"></div>
 
             {/* Navigation */}
-            <nav className="relative z-10 max-w-6xl mx-auto px-6 py-8">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <Link href="/">
-                            <Image src={logo} alt='Denly Logo' className='w-29 cursor-pointer' />
-                        </Link>
-                    </div>
-                    <div className="flex items-center space-x-8">
-                        <Link href="/features" className="text-gray-600 hover:text-[#876D4A] transition-colors">Features</Link>
-                        <Link href="/pricing" className="text-gray-600 hover:text-[#876D4A] transition-colors">Pricing</Link>
-                        <Link href="/auth/login" className="text-gray-600 hover:text-[#876D4A] transition-colors">Login</Link>
-                        <Link href="/auth/signup" className="border border-[#876D4A] text-[#876D4A] px-6 py-2 rounded-full hover:bg-[#876D4A] hover:text-white transition-colors">
-                            Get Started
-                        </Link>
+            <nav className="relative z-10 max-w-6xl pt-5 mx-auto px-4 sm:px-6 py-4 sm:py-6">
+                <div className="flex items-center justify-between flex-wrap">
+                    {/* Logo */}
+                    <Link href="/" className="shrink-0">
+                        <Image src={logo} alt="denly Logo" className="w-24 sm:w-28" />
+                    </Link>
+
+                    {/* Links */}
+                    <div className="flex space-x-4 sm:space-x-6 lg:space-x-8 items-center sm:mt-0">
+                        <Link href="/features" className="text-gray-600 hover:text-[#876D4A] transition-colors text-sm sm:text-base">Features</Link>
+                        <Link href="/pricing" className="text-gray-600 text-sm sm:text-base">Pricing</Link>
+                        <Link href="/auth/login" className="text-gray-600 hover:text-[#876D4A] transition-colors text-sm sm:text-base">Login</Link>
+                        {/* <Link href="/auth/signup" className="border border-[#876D4A] text-[#876D4A] px-3 sm:px-6 py-1.5 sm:py-2 rounded-full hover:bg-[#876D4A] hover:text-white transition-colors text-sm sm:text-base">
+              Get Started
+            </Link> */}
                     </div>
                 </div>
             </nav>
 
             {/* Privacy Content */}
-            <section className="relative z-10 max-w-4xl mx-auto px-6 py-12">
+            <section className="relative z-10 max-w-5xl mx-auto py-6">
                 <div className="bg-white rounded-3xl border border-gray-200 p-12 shadow-sm">
                     <div className="text-center mb-12">
                         <h1 className="text-4xl font-serif text-gray-800 mb-4">Privacy Policy</h1>
@@ -196,7 +197,7 @@ export default function PrivacyPage() {
                             </p>
                             <div className="bg-gray-50 rounded-lg p-4">
                                 <p className="text-gray-700">Email: privacy@denly.com</p>
-                                <p className="text-gray-700">Address: 123 Property Management Lane, Suite 100, San Francisco, CA 94102</p>
+                                <p className="text-gray-700">Address: 123 Property Management Lane, Harare, Zimbabwe</p>
                                 <p className="text-gray-700">Data Protection Officer: dpo@denly.com</p>
                             </div>
                         </div>

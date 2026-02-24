@@ -91,7 +91,13 @@ export default function RecordPaymentPage() {
 
     const onSubmit = (data: PaymentFormData) => {
         console.log('Payment recorded:', data)
-        paymentMutate(data)
+
+        const payload = {
+            ...data,
+            amount: Number(data.amount)
+        }
+
+        paymentMutate(payload)
     }
 
     // Generate array of months from 1 to 12
@@ -199,10 +205,13 @@ export default function RecordPaymentPage() {
                                 <div className="relative">
                                     <span className="absolute left-3 top-2 text-gray-500 text-sm">$</span>
                                     <input
-                                        type="number"
-                                        step="0.01"
+                                        type="text"
                                         {...register('amount', {
                                             required: 'Amount is required',
+                                            pattern: {
+                                                value: /^\d+$/,
+                                                message: 'Please enter a valid number'
+                                            },
                                             min: { value: 0, message: 'Amount must be positive' }
                                         })}
                                         className="w-full pl-8 pr-3 py-2 border border-gray-300 text-black placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"

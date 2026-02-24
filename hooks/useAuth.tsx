@@ -15,7 +15,7 @@ export const useSignup = () => {
             console.log(data)
             setUser(data)
             showSuccessToast('Account created successfully')
-            router.push(`/dashboard`)
+            router.push(`/dashboard/subscription/company`)
         },
         onError: (error: any) => {
             console.log(error)

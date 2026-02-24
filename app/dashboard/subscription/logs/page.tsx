@@ -449,7 +449,7 @@ export default function LogsPage() {
 
             {/* Log Details Modal */}
             {isModalOpen && selectedLog && (
-                <div className="fixed inset-0 z-[9999] overflow-y-auto">
+                <div className="fixed inset-0 z-9999 overflow-y-auto">
                     <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                         {/* Background overlay */}
                         <div
@@ -459,7 +459,7 @@ export default function LogsPage() {
                         ></div>
 
                         {/* Modal panel - centered */}
-                        <div className="inline-block align-middle bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full relative z-[10000]">
+                        <div className="inline-block align-middle bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full relative z-10000">
                             {/* Header */}
                             <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
                                 <h3 className="text-lg font-serif text-gray-900">Log Details</h3>
@@ -478,15 +478,12 @@ export default function LogsPage() {
                                 {/* User Info */}
                                 <div className="flex items-start space-x-3 pb-3 border-b border-gray-100">
                                     <div className="w-10 h-10 bg-[#876D4A] rounded-full flex items-center justify-center text-white text-sm font-medium">
-                                        {selectedLog.user?.email?.charAt(0)?.toUpperCase() || '?'}
+                                        {selectedLog.email?.charAt(0)?.toUpperCase() || '?'}
                                     </div>
                                     <div>
-                                        <p className="font-medium text-gray-900">
-                                            {selectedLog.user?.email || 'System User'}
+                                        <p className="font-medium text-gray-900 mt-2">
+                                            {selectedLog.email || 'System User'}
                                         </p>
-                                        {selectedLog.user?.name && (
-                                            <p className="text-sm text-gray-600">{selectedLog.user.name}</p>
-                                        )}
                                     </div>
                                 </div>
 
@@ -536,7 +533,7 @@ export default function LogsPage() {
                                     {selectedLog.userAgent && (
                                         <div>
                                             <label className="block text-xs text-gray-500 mb-1">User Agent</label>
-                                            <p className="text-gray-900 text-xs bg-gray-50 p-2 rounded-lg break-words">
+                                            <p className="text-gray-900 text-xs bg-gray-50 p-2 rounded-lg wrap-break-word">
                                                 {selectedLog.userAgent}
                                             </p>
                                         </div>

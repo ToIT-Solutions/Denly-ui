@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
-import logo from '@/public/img/logo.png'
+import logo from '@/public/img/logoWhite.png'
 import Image from 'next/image'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useSignup } from '@/hooks/useAuth'

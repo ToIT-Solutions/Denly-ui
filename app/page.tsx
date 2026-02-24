@@ -7,51 +7,28 @@ import Footer from '@/components/Footer'
 
 export default function Homepage() {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-[#f8f6f2] to-[#f0ede6] overflow-hidden">
+    <div className="relative min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6] overflow-hidden">
 
       {/* Background Elements */}
-      <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-bl from-[#876D4A]/5 to-transparent rounded-full blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-2/3 h-2/3 bg-gradient-to-tr from-[#876D4A]/5 to-transparent rounded-full blur-3xl"></div>
+      <div className="absolute top-0 right-0 w-1/2 h-1/2 bg-linear-to-bl from-[#876D4A]/5 to-transparent rounded-full blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-2/3 h-2/3 bg-linear-to-tr from-[#876D4A]/5 to-transparent rounded-full blur-3xl"></div>
 
       {/* Navigation */}
-      <nav className="relative z-10 max-w-6xl mx-auto px-6 py-6 sm:py-8">
-        <div className="flex items-center justify-between">
-
+      <nav className="relative z-10 max-w-6xl pt-5 mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <div className="flex items-center justify-between flex-wrap">
           {/* Logo */}
-          <div className="flex items-center">
-            <Image src={logo} alt="denly Logo" className="w-24 sm:w-28" priority />
-          </div>
+          <Link href="/" className="shrink-0">
+            <Image src={logo} alt="denly Logo" className="w-24 sm:w-28" />
+          </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/features" className="text-gray-600 hover:text-[#876D4A] transition-colors">
-              Features
-            </Link>
-            <Link href="/pricing" className="text-gray-600 hover:text-[#876D4A] transition-colors">
-              Pricing
-            </Link>
-            <Link href="/auth/login" className="text-gray-600 hover:text-[#876D4A] transition-colors">
-              Login
-            </Link>
-            <Link
-              href="/auth/signup"
-              className="border border-[#876D4A] text-[#876D4A] px-6 py-2 rounded-full hover:bg-[#876D4A] hover:text-white transition-colors"
-            >
+          {/* Links */}
+          <div className="flex space-x-4 sm:space-x-6 lg:space-x-8 items-center sm:mt-0">
+            <Link href="/features" className="text-gray-600 hover:text-[#876D4A] transition-colors text-sm sm:text-base">Features</Link>
+            <Link href="/pricing" className="text-gray-600 text-sm sm:text-base">Pricing</Link>
+            <Link href="/auth/login" className="text-gray-600 hover:text-[#876D4A] transition-colors text-sm sm:text-base">Login</Link>
+            {/* <Link href="/auth/signup" className="border border-[#876D4A] text-[#876D4A] px-3 sm:px-6 py-1.5 sm:py-2 rounded-full hover:bg-[#876D4A] hover:text-white transition-colors text-sm sm:text-base">
               Get Started
-            </Link>
-          </div>
-
-          {/* Mobile Nav Links (horizontal) */}
-          <div className="flex justify-center space-x-4 md:hidden">
-            <Link href="/features" className="text-gray-600 hover:text-[#876D4A] transition-colors">
-              Features
-            </Link>
-            <Link href="/pricing" className="text-gray-600 hover:text-[#876D4A] transition-colors">
-              Pricing
-            </Link>
-            <Link href="/auth/login" className="text-gray-600 hover:text-[#876D4A] transition-colors">
-              Login
-            </Link>
+            </Link> */}
           </div>
         </div>
       </nav>
@@ -82,7 +59,7 @@ export default function Homepage() {
 
           {/* Right Content */}
           <div className="relative ">
-            <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl border border-gray-200 p-6 sm:p-8 transform rotate-0 lg:rotate-1 shadow-xl">
+            <div className="bg-linear-to-br from-white to-gray-50 rounded-2xl border border-gray-200 p-6 sm:p-8 transform rotate-0 lg:rotate-1 shadow-xl">
               <div className="rounded-lg h-56 sm:h-72 lg:h-80 w-full flex items-center justify-center">
                 <Image src={preview} alt="dashboard preview" />
               </div>
@@ -159,7 +136,7 @@ export default function Homepage() {
 
       {/* Features Section */}
       <section className="relative z-10 max-w-6xl mx-auto px-6 mb-20">
-        <div className="bg-gradient-to-br from-white to-gray-50 rounded-3xl border border-gray-200 p-6 sm:p-8 lg:p-12">
+        <div className="bg-linear-to-br from-white to-gray-50 rounded-3xl border border-gray-200 p-6 sm:p-8 lg:p-12">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-serif text-gray-800 mb-4">
               Everything You Need

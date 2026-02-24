@@ -57,14 +57,14 @@ export default function SinglePropertyPage() {
                                     :
                                     null}
 
-                                {CAN_INTERACT.includes(userRole) ?
+                                {/* {CAN_INTERACT.includes(userRole) ?
                                     <Link href="/dashboard/payments/new">
                                         <button className="bg-[#876D4A] text-white px-4 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm">
                                             Record Payment
                                         </button>
                                     </Link>
                                     :
-                                    null}
+                                    null} */}
                             </div>
                         </div>
 

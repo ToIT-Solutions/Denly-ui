@@ -71,19 +71,21 @@ export default function ContactPage() {
             <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-linear-to-tr from-[#876D4A]/5 to-transparent rounded-full blur-3xl"></div>
 
             {/* Navigation */}
-            <nav className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6">
-                <div className="flex items-center justify-between">
-                    <Link href="/" className="flex items-center space-x-3">
-                        <Image src={logo} alt='denly Logo' className='w-24 sm:w-29' />
+            <nav className="relative z-10 max-w-6xl pt-5 mx-auto px-4 sm:px-6 py-4 sm:py-6">
+                <div className="flex items-center justify-between flex-wrap">
+                    {/* Logo */}
+                    <Link href="/" className="shrink-0">
+                        <Image src={logo} alt="denly Logo" className="w-24 sm:w-28" />
                     </Link>
-                    <div className="flex items-center space-x-4 sm:space-x-6 lg:space-x-8">
-                        <Link href="/features" className="hidden sm:block text-gray-600 hover:text-[#876D4A] transition-colors text-sm">Features</Link>
-                        <Link href="/pricing" className="text-gray-600 hover:text-[#876D4A] transition-colors text-sm">Pricing</Link>
-                        {/* <Link href="/contact" className="text-[#876D4A] transition-colors text-sm">Contact</Link> */}
-                        <Link href="/auth/login" className="hidden sm:block text-gray-600 hover:text-[#876D4A] transition-colors text-sm">Login</Link>
-                        <Link href="/auth/signup" className="border border-[#876D4A] text-[#876D4A] px-4 py-2 sm:px-6 sm:py-2 rounded-full hover:bg-[#876D4A] hover:text-white transition-colors text-sm">
-                            Get Started
-                        </Link>
+
+                    {/* Links */}
+                    <div className="flex space-x-4 sm:space-x-6 lg:space-x-8 items-center sm:mt-0">
+                        <Link href="/features" className="text-gray-600 hover:text-[#876D4A] transition-colors text-sm sm:text-base">Features</Link>
+                        <Link href="/pricing" className="text-gray-600 text-sm sm:text-base">Pricing</Link>
+                        <Link href="/auth/login" className="text-gray-600 hover:text-[#876D4A] transition-colors text-sm sm:text-base">Login</Link>
+                        {/* <Link href="/auth/signup" className="border border-[#876D4A] text-[#876D4A] px-3 sm:px-6 py-1.5 sm:py-2 rounded-full hover:bg-[#876D4A] hover:text-white transition-colors text-sm sm:text-base">
+              Get Started
+            </Link> */}
                     </div>
                 </div>
             </nav>
@@ -147,7 +149,7 @@ export default function ContactPage() {
             <section className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 mb-16 text-center">
                 <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
                     <h2 className="text-2xl font-serif text-gray-800 mb-4">Ready to Simplify Property Management?</h2>
-                    <p className="text-gray-600 mb-6">Start your free 7-day trial today. No credit card required.</p>
+                    <p className="text-gray-600 mb-6">Start your free 30-day trial today. No credit card required.</p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
                             href="/auth/signup"

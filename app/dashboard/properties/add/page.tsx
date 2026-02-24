@@ -73,7 +73,18 @@ export default function AddPropertyPage() {
 
     const onSubmit = async (data: PropertyForm) => {
         console.log('📝 Property form submitted with data:', data)
-        propertyMutate(data)
+
+        const payload = {
+            ...data,
+            bedrooms: Number(data.bedrooms),
+            bathrooms: Number(data.bathrooms),
+            squareMeter: Number(data.squareMeter),
+            maxTenants: Number(data.maxTenants),
+            monthlyRent: Number(data.monthlyRent),
+            parkingSpaces: Number(data.parkingSpaces),
+        }
+
+        propertyMutate(payload)
     }
 
     const residentialFeatures = ['Parking', 'Laundry', 'Gym', 'Pool', 'Pet Friendly', 'Furnished', 'Air Conditioning', 'Balcony', 'Storage', 'Patio']
@@ -272,10 +283,13 @@ export default function AddPropertyPage() {
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 {...register('bedrooms', {
                                                     min: { value: 0, message: 'Bedrooms cannot be negative' },
-                                                    valueAsNumber: true
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                 })}
                                                 placeholder="0"
                                                 className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
@@ -287,11 +301,13 @@ export default function AddPropertyPage() {
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
                                             <input
-                                                type="number"
-                                                step="0.5"
+                                                type="text"
                                                 {...register('bathrooms', {
                                                     min: { value: 0, message: 'Bathrooms cannot be negative' },
-                                                    valueAsNumber: true
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                 })}
                                                 placeholder="0"
                                                 className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
@@ -303,10 +319,13 @@ export default function AddPropertyPage() {
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Square Meter</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 {...register('squareMeter', {
                                                     min: { value: 0, message: 'Square Meter cannot be negative' },
-                                                    valueAsNumber: true
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                 })}
                                                 placeholder="0"
                                                 className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
@@ -318,12 +337,14 @@ export default function AddPropertyPage() {
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
                                             <input
-                                                type="number"
-                                                step="0.01"
+                                                type="text"
                                                 {...register('monthlyRent', {
                                                     required: 'Monthly rent is required',
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                     min: { value: 0, message: 'Rent must be positive' },
-                                                    valueAsNumber: true
                                                 })}
                                                 placeholder="0.00"
                                                 className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.monthlyRent ? 'border-red-500' : 'border-gray-300'
@@ -339,12 +360,15 @@ export default function AddPropertyPage() {
                                                 Maximum Number of Tenants *
                                             </label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 {...register('maxTenants', {
                                                     required: 'Maximum tenants is required',
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                     min: { value: 1, message: 'Must allow at least 1 tenant' },
                                                     max: { value: 20, message: 'Maximum tenants cannot exceed 20' },
-                                                    valueAsNumber: true
                                                 })}
                                                 placeholder="e.g., 4"
                                                 className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
@@ -397,10 +421,13 @@ export default function AddPropertyPage() {
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Total Units</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 {...register('totalUnits', {
                                                     min: { value: 1, message: 'Must have at least 1 unit' },
-                                                    valueAsNumber: true
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                 })}
                                                 placeholder="1"
                                                 className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
@@ -409,10 +436,13 @@ export default function AddPropertyPage() {
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Parking Spaces</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 {...register('parkingSpaces', {
                                                     min: { value: 0, message: 'Cannot be negative' },
-                                                    valueAsNumber: true
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                 })}
                                                 placeholder="0"
                                                 className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
@@ -421,10 +451,13 @@ export default function AddPropertyPage() {
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Square Meter</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 {...register('squareMeter', {
                                                     min: { value: 0, message: 'Square Meter cannot be negative' },
-                                                    valueAsNumber: true
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                 })}
                                                 placeholder="0"
                                                 className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
@@ -436,12 +469,15 @@ export default function AddPropertyPage() {
                                                 Maximum Number of Tenants *
                                             </label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 {...register('maxTenants', {
                                                     required: 'Maximum tenants is required',
                                                     min: { value: 1, message: 'Must allow at least 1 tenant' },
                                                     max: { value: 50, message: 'Maximum tenants cannot exceed 50' },
-                                                    valueAsNumber: true
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                 })}
                                                 placeholder="e.g., 10"
                                                 className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
@@ -457,12 +493,15 @@ export default function AddPropertyPage() {
                                         <div className="md:col-span-2">
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 step="0.01"
                                                 {...register('monthlyRent', {
                                                     required: 'Monthly rent is required',
                                                     min: { value: 0, message: 'Rent must be positive' },
-                                                    valueAsNumber: true
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                 })}
                                                 placeholder="0.00"
                                                 className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.monthlyRent ? 'border-red-500' : 'border-gray-300'

@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
                 <div
                     className="absolute inset-0 bg-cover bg-center bg-no-repeat"
                 >
-                    <div className="absolute inset-0 bg-[#876D4A]/70 backdrop-blur-[1px]"></div>
+                    <div className="absolute inset-0 bg-[#876D4A]/40 backdrop-blur-[1px]"></div>
                 </div>
 
                 {/* Glass Morphism Container */}

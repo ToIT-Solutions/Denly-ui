@@ -80,6 +80,11 @@ export default function CompanyPage() {
                     <div className="mb-6">
                         <h1 className="text-2xl font-serif text-gray-900 mb-2">Company Settings</h1>
                         <p className="text-gray-600 text-sm">Manage your company information and preferences</p>
+
+                        {data?.name === 'Company name' ?
+                            <p className="text-black mt-5 underline font-bold text-md">Please enter your company details</p>
+                            :
+                            null}
                     </div>
 
                     {isLoading ?

@@ -269,7 +269,7 @@ export default function AddTenantPage() {
             nextOfKinEmail: formData.nextOfKinEmail,
             nextOfKinAddress: formData.nextOfKinAddress,
             propertyId: formData.propertyId,
-            actualRent: formData.actualRent,
+            actualRent: Number(formData.actualRent),
             leaseStart: formData.leaseStart,
             leaseEnd: formData.leaseEnd,
             status: formData.status,
@@ -506,12 +506,14 @@ export default function AddTenantPage() {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
                                         <input
-                                            type="number"
-                                            step="0.01"
+                                            type="text"
                                             {...register('actualRent', {
                                                 required: 'Monthly rent is required',
+                                                pattern: {
+                                                    value: /^\d+$/,
+                                                    message: 'Please enter a valid number'
+                                                },
                                                 min: { value: 0, message: 'Rent must be positive' },
-                                                valueAsNumber: true
                                             })}
                                             placeholder="0.00"
                                             className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.actualRent ? 'border-red-600' : 'border-gray-300'

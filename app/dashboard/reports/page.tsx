@@ -934,7 +934,7 @@ export default function ReportsPage() {
                                             <div className="mb-6">
                                                 <h3 className="font-medium text-gray-900 mb-3">📊 Monthly Revenue Trend</h3>
                                                 <div className="overflow-x-auto">
-                                                    <div className="flex items-end space-x-6 min-w-max p-4 bg-gray-50 rounded-xl">
+                                                    <div className="flex items-end space-x-6 min-w-max p-4 bg-orange-50 rounded-xl pt-11">
                                                         {financialReports.monthlyRevenue.map((month: any) => {
                                                             const maxRevenue = Math.max(...financialReports.monthlyRevenue.map((m: any) => m.paid))
                                                             const barHeight = maxRevenue > 0 ? (month.paid / maxRevenue) * 120 : 0
@@ -955,7 +955,7 @@ export default function ReportsPage() {
                                                                         </div>
                                                                     </div>
                                                                     <p className="text-xs font-medium text-gray-700 mt-4">{month.month}</p>
-                                                                    <p className="text-[10px] text-gray-500">{month.count} payments</p>
+                                                                    <p className="text-[10px] text-gray-900">{month.count} payments</p>
                                                                 </div>
                                                             )
                                                         })}
@@ -1108,7 +1108,7 @@ export default function ReportsPage() {
 
                                         {/* Document Compliance Summary */}
                                         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="bg-gradient-to-br from-[#f8f6f2] to-[#f0ede6] rounded-xl p-5 border border-gray-200">
+                                            <div className="bg-linear-to-br from-[#f8f6f2] to-[#f0ede6] rounded-xl p-5 border border-gray-200">
                                                 <h3 className="font-medium text-gray-900 mb-3">📄 Tenant Document Compliance</h3>
                                                 <div className="flex items-end justify-between">
                                                     <div>
@@ -1132,7 +1132,7 @@ export default function ReportsPage() {
                                             </div>
 
                                             {crossCuttingReports?.topRevenueProperties && crossCuttingReports.topRevenueProperties.length > 0 && (
-                                                <div className="bg-gradient-to-br from-[#f8f6f2] to-[#f0ede6] rounded-xl p-5 border border-gray-200">
+                                                <div className="bg-linear-to-br from-[#f8f6f2] to-[#f0ede6] rounded-xl p-5 border border-gray-200">
                                                     <h3 className="font-medium text-gray-900 mb-2">📊 Portfolio Performance</h3>
                                                     <p className="text-sm text-gray-600 mb-2">Top performing property</p>
                                                     <p className="text-lg font-semibold text-gray-900">{crossCuttingReports.topRevenueProperties[0]?.name || 'N/A'}</p>

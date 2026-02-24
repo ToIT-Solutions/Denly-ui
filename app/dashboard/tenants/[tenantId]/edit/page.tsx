@@ -71,6 +71,7 @@ export default function EditTenantPage() {
     } | null>(null)
 
     const { data, isLoading } = useFetchOneTenant(tenantId)
+    console.log(data)
     const { data: properties, isLoading: propertiesLoading } = useFetchAllProperties()
     const { data: payments } = useFetchAllPayments() // Fetch tenant's payment history
 
@@ -110,17 +111,6 @@ export default function EditTenantPage() {
 
     const selectedPropertyId = watch('propertyId')
 
-    // Update actualRent when property changes
-    useEffect(() => {
-        if (selectedPropertyId && properties) {
-            const selectedProperty = properties.find((p: any) => p.id === selectedPropertyId)
-            if (selectedProperty) {
-                setValue('actualRent', parseFloat(selectedProperty.monthlyRent) || 0)
-            }
-        } else if (selectedPropertyId === null) {
-            setValue('actualRent', 0)
-        }
-    }, [selectedPropertyId, properties, setValue])
 
     useEffect(() => {
         if (!CAN_EDIT.includes(userRole)) {
@@ -208,7 +198,8 @@ export default function EditTenantPage() {
     const onSubmit = async (formData: TenantForm) => {
         const formattedData = {
             ...formData,
-            propertyId: formData.propertyId === "null" ? null : formData.propertyId
+            propertyId: formData.propertyId === "null" ? null : formData.propertyId,
+            actualRent: Number(formData.actualRent)
         };
 
         // Check if property is being changed
@@ -643,32 +634,22 @@ export default function EditTenantPage() {
                                                 )}
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) {selectedPropertyId && '*'}</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($)</label>
                                                 <input
-                                                    type="number"
-                                                    step="0.01"
+                                                    type="text"
                                                     {...register('actualRent', {
-                                                        required: selectedPropertyId ? 'Monthly rent is required when a property is assigned' : false,
+                                                        // required: selectedPropertyId ? 'Monthly rent is required when a property is assigned' : false,
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
                                                         min: { value: 0, message: 'Rent must be positive' },
-                                                        valueAsNumber: true
                                                     })}
                                                     className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.actualRent ? 'border-red-600' : 'border-gray-300'
                                                         }`}
-                                                    placeholder={selectedPropertyId ? "0.00" : "No property selected"}
-                                                    disabled={!selectedPropertyId}
                                                 />
                                                 {errors.actualRent && (
                                                     <p className="mt-1 text-xs text-red-600">{errors.actualRent.message}</p>
-                                                )}
-                                                {selectedPropertyId && (
-                                                    <p className="mt-1 text-xs text-gray-500">
-                                                        Auto-filled from selected property
-                                                    </p>
-                                                )}
-                                                {!selectedPropertyId && (
-                                                    <p className="mt-1 text-xs text-gray-500">
-                                                        Rent disabled - no property selected
-                                                    </p>
                                                 )}
                                             </div>
                                             <div>

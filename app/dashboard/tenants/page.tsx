@@ -9,6 +9,7 @@ import useAuthStore from '@/store/useAuthStore'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useMemo } from 'react'
+import { formatDate } from '@/lib/dateFormatter'
 
 export default function TenantsPage() {
     usePageTitle("Tenants - Denly")
@@ -22,7 +23,7 @@ export default function TenantsPage() {
 
     const { data: tenants, isLoading, error } = useFetchAllTenants()
     const { data: allPayments, isLoading: paymentsLoading } = useFetchAllPayments() // Fetch all payments
-
+    console.log(tenants)
     // Calculate overdue status for each tenant
     const tenantsWithOverdueStatus = useMemo(() => {
         if (!tenants || !allPayments) return []
@@ -112,11 +113,6 @@ export default function TenantsPage() {
         }
     }, [tenantsWithOverdueStatus])
 
-    // Format date for display
-    const formatDate = (date: Date | null) => {
-        if (!date) return ''
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-    }
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -219,7 +215,7 @@ export default function TenantsPage() {
                                                 <th className="text-left p-6 font-serif text-gray-900">Property</th>
                                                 <th className="text-left p-6 font-serif text-gray-900">Rent</th>
                                                 <th className="text-left p-6 font-serif text-gray-900">Status</th>
-                                                <th className="text-left p-6 font-serif text-gray-900">Payment Status</th>
+                                                <th className="text-left p-6 font-serif text-gray-900">Last Payment</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -255,8 +251,8 @@ export default function TenantsPage() {
                                                             {tenant.status}
                                                         </span>
                                                     </td>
-                                                    <td className="p-6">
-                                                        {tenant.hasOverdue ? (
+                                                    <td className="p-6 text-gray-900">
+                                                        {/* {tenant.hasOverdue ? (
                                                             <div className="flex items-center gap-2">
                                                                 <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
                                                                 <div>
@@ -272,7 +268,8 @@ export default function TenantsPage() {
                                                             </div>
                                                         ) : (
                                                             <span className="text-gray-400 text-sm">—</span>
-                                                        )}
+                                                        )} */}
+                                                        {formatDate(tenant?.payments[0].createdAt, 'long')}
                                                     </td>
                                                 </tr>
                                             ))}

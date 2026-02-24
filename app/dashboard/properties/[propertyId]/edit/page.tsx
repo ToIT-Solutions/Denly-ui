@@ -19,11 +19,12 @@ export default function EditPropertyPage() {
     const propertyId = params.propertyId as string
 
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+    const [isCannotDeleteModalOpen, setIsCannotDeleteModalOpen] = useState(false)
 
     const router = useRouter()
 
     const { data, isLoading, error } = useFetchOneProperty(propertyId)
-    // console.log(data)
+    console.log(data)
 
     const { mutate: editMutate, isPending: isEditPending, error: editError } = useEditProperty()
 
@@ -86,15 +87,29 @@ export default function EditPropertyPage() {
     const onSubmit = (data: any) => {
         console.log('Updated property:', data)
 
-        editMutate({ propertyId, data: data })
+        const payload = {
+            ...data,
+            bedrooms: Number(data.bedrooms),
+            bathrooms: Number(data.bathrooms),
+            squareMeter: Number(data.squareMeter),
+            maxTenants: Number(data.maxTenants),
+        }
+
+        editMutate({ propertyId, data: payload })
     }
 
     const handleDelete = () => {
-        setIsDeleteModalOpen(true)
+        if (data?.tenants && data.tenants.length > 0) {
+            // Cannot delete because there are active tenants
+            setIsCannotDeleteModalOpen(true)
+        } else {
+            // Show normal confirmation modal
+            setIsDeleteModalOpen(true)
+        }
     }
 
     const confirmDelete = () => {
-        deleteMutate("d627a7a4-38bd-4be4-816e-4bbf79ce2731")
+        deleteMutate(propertyId)
         setIsDeleteModalOpen(false)
     }
 
@@ -244,14 +259,17 @@ export default function EditPropertyPage() {
                                         <div className="relative">
                                             <span className="absolute left-3 top-2 text-gray-500 text-sm">$</span>
                                             <input
-                                                type="number"
-                                                step="0.01"
+                                                type="text"
                                                 {...register('monthlyRent', {
                                                     required: 'Monthly rent is required',
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
                                                     min: { value: 0, message: 'Rent must be positive' }
                                                 })}
                                                 className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
-                                                placeholder="0.00"
+                                                placeholder="0"
                                             />
                                         </div>
                                         {errors.monthlyRent && (
@@ -266,12 +284,20 @@ export default function EditPropertyPage() {
                                         <div className="relative">
                                             <span className="absolute left-3 top-2 text-gray-500 text-sm">$</span>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 step="0.01"
-                                                {...register('securityDeposit')}
+                                                {...register('securityDeposit', {
+                                                    pattern: {
+                                                        value: /^\d+$/,
+                                                        message: 'Please enter a valid number'
+                                                    },
+                                                })}
                                                 className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
                                                 placeholder="0.00"
                                             />
+                                            {errors.securityDeposit && (
+                                                <p className="text-red-600 text-xs mt-1">{errors.securityDeposit.message?.toString()}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -283,11 +309,19 @@ export default function EditPropertyPage() {
                                             Bedrooms
                                         </label>
                                         <input
-                                            type="number"
-                                            {...register('bedrooms')}
+                                            type="text"
+                                            {...register('bedrooms', {
+                                                pattern: {
+                                                    value: /^\d+$/,
+                                                    message: 'Please enter a valid number'
+                                                },
+                                            })}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
                                             placeholder="0"
                                         />
+                                        {errors.bedrooms && (
+                                            <p className="text-red-600 text-xs mt-1">{errors.bedrooms.message?.toString()}</p>
+                                        )}
                                     </div>
 
                                     <div>
@@ -295,12 +329,20 @@ export default function EditPropertyPage() {
                                             Bathrooms
                                         </label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             step="0.5"
-                                            {...register('bathrooms')}
+                                            {...register('bathrooms', {
+                                                pattern: {
+                                                    value: /^\d+$/,
+                                                    message: 'Please enter a valid number'
+                                                },
+                                            })}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
                                             placeholder="0"
                                         />
+                                        {errors.bathrooms && (
+                                            <p className="text-red-600 text-xs mt-1">{errors.bathrooms.message?.toString()}</p>
+                                        )}
                                     </div>
 
                                     <div>
@@ -308,11 +350,19 @@ export default function EditPropertyPage() {
                                             Square Meter
                                         </label>
                                         <input
-                                            type="number"
-                                            {...register('squareMeter')}
+                                            type="text"
+                                            {...register('squareMeter', {
+                                                pattern: {
+                                                    value: /^\d+$/,
+                                                    message: 'Please enter a valid number'
+                                                },
+                                            })}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
                                             placeholder="0"
                                         />
+                                        {errors.squareMeter && (
+                                            <p className="text-red-600 text-xs mt-1">{errors.squareMeter.message?.toString()}</p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -322,15 +372,18 @@ export default function EditPropertyPage() {
                                         Maximum Number of Tenants *
                                     </label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         {...register('maxTenants', {
                                             required: 'Maximum tenants is required',
+                                            pattern: {
+                                                value: /^\d+$/,
+                                                message: 'Please enter a valid number'
+                                            },
                                             min: { value: 1, message: 'Must allow at least 1 tenant' },
                                             max: {
                                                 value: getMaxTenantsLimit(),
                                                 message: `Maximum tenants cannot exceed ${getMaxTenantsLimit()} for ${propertyType === 'commercial' ? 'commercial' : 'residential'} properties`
                                             },
-                                            valueAsNumber: true
                                         })}
                                         className={`w-full px-3 py-2 border rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
                                             }`}
@@ -356,7 +409,6 @@ export default function EditPropertyPage() {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black text-sm"
                                     >
                                         <option value="active">Active</option>
-                                        <option value="maintenance">Under Maintenance</option>
                                         <option value="vacant">Vacant</option>
                                     </select>
                                 </div>
@@ -407,8 +459,9 @@ export default function EditPropertyPage() {
                 </div>
             }
 
+            {/* Confirm Delete Modal */}
             {isDeleteModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-opacity-50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
                     <div className="bg-white rounded-xl shadow-lg p-6 w-[380px]">
                         <h2 className="text-lg font-semibold mb-2 text-gray-900">
                             Delete Property
@@ -431,6 +484,30 @@ export default function EditPropertyPage() {
                                 className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"
                             >
                                 Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Cannot Delete Modal */}
+            {isCannotDeleteModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white rounded-xl shadow-lg p-6 w-[380px]">
+                        <h2 className="text-lg font-semibold mb-2 text-gray-900">
+                            Cannot Delete Property
+                        </h2>
+
+                        <p className="text-sm text-gray-600 mb-6">
+                            This property cannot be deleted because it has active tenants.
+                        </p>
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setIsCannotDeleteModalOpen(false)}
+                                className="px-4 py-2 rounded-lg bg-[#876D4A] hover:bg-[#756045] transition cursor-pointer"
+                            >
+                                OK
                             </button>
                         </div>
                     </div>
