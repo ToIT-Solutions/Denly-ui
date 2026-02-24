@@ -11,6 +11,7 @@ import Spinner from '@/components/Spinner'
 import useAuthStore from '@/store/useAuthStore'
 import { CAN_EDIT } from '@/lib/roles'
 import { useFetchAllProperties } from '@/hooks/useProperty'
+import { useFetchAllPayments } from '@/hooks/usePayment' // You'll need this hook
 
 interface TenantForm {
     // Personal Information
@@ -29,7 +30,7 @@ interface TenantForm {
     nextOfKinAddress: string
 
     // Property & Lease (Matches your DB structure)
-    propertyId: string | null // Allow null for no property
+    propertyId: string | null
     actualRent: number
     leaseStart: string
     leaseEnd: string
@@ -39,6 +40,16 @@ interface TenantForm {
     occupation: string
     employer: string
     notes: string
+}
+
+interface Payment {
+    id: string
+    amount: number
+    dueDate: string
+    paidDate: string | null
+    status: 'paid' | 'pending' | 'overdue' | 'partial'
+    month: string
+    year: number
 }
 
 export default function EditTenantPage() {
@@ -51,13 +62,19 @@ export default function EditTenantPage() {
     const tenantId = params.tenantId as string
 
     const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [showPropertyChangeWarning, setShowPropertyChangeWarning] = useState(false)
+    const [propertyChangeData, setPropertyChangeData] = useState<{
+        newPropertyId: string | null
+        advancePayments: Payment[]
+        leaseAdvanceMonths: number
+        formData: TenantForm | null
+    } | null>(null)
 
     const { data, isLoading } = useFetchOneTenant(tenantId)
     const { data: properties, isLoading: propertiesLoading } = useFetchAllProperties()
-    // console.log(data)
+    const { data: payments } = useFetchAllPayments() // Fetch tenant's payment history
 
     const { mutate: editMutate, isPending: isEditPending, error: editError } = useEditTenant()
-
     const { mutate: deleteMutate, isPending: deletePending, error: deleteError } = useDeleteTenant()
 
     const router = useRouter()
@@ -68,6 +85,7 @@ export default function EditTenantPage() {
         reset,
         watch,
         setValue,
+        getValues,
         formState: { errors, isSubmitting }
     } = useForm<TenantForm>({
         defaultValues: {
@@ -82,7 +100,6 @@ export default function EditTenantPage() {
             actualRent: 0,
             status: 'pending',
             propertyId: null,
-            // Next of Kin defaults
             nextOfKinName: '',
             nextOfKinRelationship: '',
             nextOfKinPhone: '',
@@ -91,38 +108,30 @@ export default function EditTenantPage() {
         }
     })
 
-    // Watch propertyId to update when it changes
     const selectedPropertyId = watch('propertyId')
 
-    // Update actualRent when property changes (only if a property is selected)
+    // Update actualRent when property changes
     useEffect(() => {
         if (selectedPropertyId && properties) {
             const selectedProperty = properties.find((p: any) => p.id === selectedPropertyId)
             if (selectedProperty) {
-                // Set the actualRent to the property's monthly rent
                 setValue('actualRent', parseFloat(selectedProperty.monthlyRent) || 0)
             }
         } else if (selectedPropertyId === null) {
-            // If "No Property" is selected, clear the rent
             setValue('actualRent', 0)
         }
     }, [selectedPropertyId, properties, setValue])
 
     useEffect(() => {
-
         if (!CAN_EDIT.includes(userRole)) {
             return router.back()
         }
 
         if (data) {
-            // Format dates to YYYY-MM-DD for date picker
             const formatDateForInput = (dateString: string) => {
                 if (!dateString) return '';
                 const date = new Date(dateString);
-                // Check if date is valid
                 if (isNaN(date.getTime())) return '';
-
-                // Format to YYYY-MM-DD
                 const year = date.getFullYear();
                 const month = String(date.getMonth() + 1).padStart(2, '0');
                 const day = String(date.getDate()).padStart(2, '0');
@@ -140,8 +149,7 @@ export default function EditTenantPage() {
                 leaseEnd: formatDateForInput(data.leaseEnd),
                 actualRent: data.actualRent || 0,
                 status: data.status || 'pending',
-                propertyId: data.property?.id || null, // Will be null if no property
-                // Next of Kin defaults
+                propertyId: data.property?.id || null,
                 nextOfKinName: data.nextOfKinName || '',
                 nextOfKinRelationship: data.nextOfKinRelationship || '',
                 nextOfKinPhone: data.nextOfKinPhone || '',
@@ -151,33 +159,113 @@ export default function EditTenantPage() {
         }
     }, [data, reset]);
 
-    const onSubmit = async (data: TenantForm) => {
+    // Helper function to check for advance payments
+    const checkAdvancePayments = (): Payment[] => {
+        if (!payments || !data) return [];
+
+        const currentDate = new Date();
+        const advancePayments = payments.filter((payment: Payment) => {
+            if (payment.status === 'paid' && payment.paidDate) {
+                const dueDate = new Date(payment.dueDate);
+                // Check if payment was made before the due date (advance payment)
+                const paidDate = new Date(payment.paidDate);
+                return paidDate < dueDate;
+            }
+            return false;
+        });
+
+        return advancePayments;
+    };
+
+    // Helper function to check for advance lease periods
+    const checkAdvanceLease = (): number => {
+        if (!data || !data.leaseStart || !data.leaseEnd) return 0;
+
+        const leaseStart = new Date(data.leaseStart);
+        const leaseEnd = new Date(data.leaseEnd);
+        const currentDate = new Date();
+
+        // Calculate total lease duration in months
+        const totalMonths = (leaseEnd.getFullYear() - leaseStart.getFullYear()) * 12 +
+            (leaseEnd.getMonth() - leaseStart.getMonth());
+
+        // Calculate months elapsed
+        const monthsElapsed = (currentDate.getFullYear() - leaseStart.getFullYear()) * 12 +
+            (currentDate.getMonth() - leaseStart.getMonth());
+
+        // Calculate remaining months
+        const remainingMonths = totalMonths - monthsElapsed;
+
+        return remainingMonths > 0 ? remainingMonths : 0;
+    };
+
+    // Check if property is being changed
+    const isPropertyChanged = (newPropertyId: string | null): boolean => {
+        const currentPropertyId = data?.property?.id || null;
+        return currentPropertyId !== newPropertyId;
+    };
+
+    const onSubmit = async (formData: TenantForm) => {
         const formattedData = {
-            ...data,
-            propertyId: data.propertyId === "null" ? null : data.propertyId
+            ...formData,
+            propertyId: formData.propertyId === "null" ? null : formData.propertyId
+        };
+
+        // Check if property is being changed
+        if (isPropertyChanged(formattedData.propertyId)) {
+            const advancePayments = checkAdvancePayments();
+            const advanceLeaseMonths = checkAdvanceLease();
+
+            // If there are advance payments or advance lease, show warning
+            if (advancePayments.length > 0 || advanceLeaseMonths > 0) {
+                setPropertyChangeData({
+                    newPropertyId: formattedData.propertyId,
+                    advancePayments,
+                    leaseAdvanceMonths: advanceLeaseMonths,
+                    formData: formattedData
+                });
+                setShowPropertyChangeWarning(true);
+                return;
+            }
         }
 
-        console.log('📝 Tenant form submitted with data:', formattedData)
+        // No warnings, proceed with update
+        executeUpdate(formattedData);
+    };
 
+    const executeUpdate = (formattedData: any) => {
         editMutate({ tenantId, data: formattedData }, {
             onSuccess: () => {
-                router.push(`/dashboard/tenants/${tenantId}`)
+                router.push(`/dashboard/tenants/${tenantId}`);
             }
-        })
-    }
+        });
+    };
+
+    const confirmPropertyChange = () => {
+        if (propertyChangeData?.formData) {
+            executeUpdate(propertyChangeData.formData);
+        }
+        setShowPropertyChangeWarning(false);
+        setPropertyChangeData(null);
+    };
+
+    const cancelPropertyChange = () => {
+        setShowPropertyChangeWarning(false);
+        setPropertyChangeData(null);
+    };
 
     const handleDelete = () => {
-        setShowDeleteModal(true)
-    }
+        setShowDeleteModal(true);
+    };
 
     const confirmDelete = () => {
-        deleteMutate(tenantId)
-        setShowDeleteModal(false)
-    }
+        deleteMutate(tenantId);
+        setShowDeleteModal(false);
+    };
 
     const cancelDelete = () => {
-        setShowDeleteModal(false)
-    }
+        setShowDeleteModal(false);
+    };
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -186,29 +274,21 @@ export default function EditTenantPage() {
             {/* Delete Confirmation Modal */}
             {showDeleteModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-                    {/* Backdrop */}
                     <div
                         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                         onClick={cancelDelete}
                     ></div>
-
-                    {/* Modal */}
                     <div className="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-fadeIn">
                         <div className="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
                             <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </div>
-
-                        <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
-                            Delete Tenant
-                        </h3>
-
+                        <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">Delete Tenant</h3>
                         <p className="text-sm text-gray-600 text-center mb-6">
                             Are you sure you want to delete <span className="font-semibold">{data?.firstName} {data?.lastName}</span>?
                             This action cannot be undone and all associated data will be permanently removed.
                         </p>
-
                         <div className="flex flex-col sm:flex-row gap-3">
                             <button
                                 onClick={confirmDelete}
@@ -231,6 +311,100 @@ export default function EditTenantPage() {
                                 onClick={cancelDelete}
                                 disabled={deletePending}
                                 className="flex-1 border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 disabled:opacity-50 transition-colors cursor-pointer text-sm font-medium"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Property Change Warning Modal */}
+            {showPropertyChangeWarning && propertyChangeData && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+                    <div
+                        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                        onClick={cancelPropertyChange}
+                    ></div>
+                    <div className="relative bg-white rounded-2xl shadow-xl max-w-2xl w-full p-6 animate-fadeIn">
+                        <div className="flex items-center justify-center w-12 h-12 mx-auto bg-yellow-100 rounded-full mb-4">
+                            <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+
+                        <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+                            ⚠️ Property Change Warning
+                        </h3>
+
+                        <p className="text-sm text-gray-600 text-center mb-4">
+                            Changing the property assignment may affect advance payments and lease terms.
+                        </p>
+
+                        <div className="space-y-4 mb-6">
+                            {/* Advance Payments Alert */}
+                            {propertyChangeData.advancePayments.length > 0 && (
+                                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                                    <h4 className="font-medium text-blue-800 mb-2 flex items-center">
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Advance Payments Detected ({propertyChangeData.advancePayments.length})
+                                    </h4>
+                                    <p className="text-sm text-blue-700 mb-2">
+                                        This tenant has made advance payments for the following months:
+                                    </p>
+                                    <ul className="list-disc list-inside text-sm text-blue-700 space-y-1">
+                                        {propertyChangeData.advancePayments.map((payment, index) => (
+                                            <li key={index}>
+                                                {payment.month} {payment.year} - ${payment.amount} (paid on {new Date(payment.paidDate!).toLocaleDateString()})
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    <p className="text-sm text-blue-700 mt-2">
+                                        Changing properties will require handling these advance payments appropriately.
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Advance Lease Alert */}
+                            {propertyChangeData.leaseAdvanceMonths > 0 && (
+                                <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                                    <h4 className="font-medium text-purple-800 mb-2 flex items-center">
+                                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        Advance Lease Term
+                                    </h4>
+                                    <p className="text-sm text-purple-700">
+                                        This tenant has <span className="font-semibold">{propertyChangeData.leaseAdvanceMonths} month(s)</span> remaining on their current lease.
+                                        Changing properties now may require lease amendments.
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Combined Warning */}
+                            {propertyChangeData.advancePayments.length > 0 && propertyChangeData.leaseAdvanceMonths > 0 && (
+                                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                    <h4 className="font-medium text-red-800 mb-2">⚠️ Important Consideration</h4>
+                                    <p className="text-sm text-red-700">
+                                        This tenant has both advance payments and remaining lease time.
+                                        Consider discussing with them before making this change.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <button
+                                onClick={confirmPropertyChange}
+                                className="flex-1 bg-[#876D4A] text-white px-4 py-2.5 rounded-xl hover:bg-[#756045] transition-colors cursor-pointer text-sm font-medium"
+                            >
+                                Yes, Continue with Property Change
+                            </button>
+                            <button
+                                onClick={cancelPropertyChange}
+                                className="flex-1 border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer text-sm font-medium"
                             >
                                 Cancel
                             </button>
@@ -420,15 +594,13 @@ export default function EditTenantPage() {
                                     <div>
                                         <h2 className="font-medium text-gray-900 mb-4">Property & Lease Information</h2>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {/* Property Selection with "No Property" option */}
                                             <div className="md:col-span-2">
                                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                                     Property {!selectedPropertyId && <span className="text-gray-500 text-xs ml-1">(No property assigned)</span>}
                                                 </label>
                                                 <select
-                                                    {...register('propertyId')} // Removed required validation
-                                                    className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm `}
-                                                // ${errors.propertyId ? 'border-red-600' : 'border-gray-300'}
+                                                    {...register('propertyId')}
+                                                    className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm`}
                                                 >
                                                     <option value="null">No Property (Tenant not in any property)</option>
                                                     {properties?.map((property: any) => (
@@ -437,9 +609,6 @@ export default function EditTenantPage() {
                                                         </option>
                                                     ))}
                                                 </select>
-                                                {/* {errors.propertyId && (
-                                                    <p className="mt-1 text-xs text-red-600">{errors.propertyId.message}</p>
-                                                )} */}
                                                 <p className="mt-1 text-xs text-gray-500">
                                                     Select "No Property" if the tenant is moving out or hasn't been assigned yet
                                                 </p>
@@ -578,7 +747,6 @@ export default function EditTenantPage() {
                 </div>
             </div>
 
-            {/* Add this CSS to your global styles or component */}
             <style jsx>{`
                 @keyframes fadeIn {
                     from {

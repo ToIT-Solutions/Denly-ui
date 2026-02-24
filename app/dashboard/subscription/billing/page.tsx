@@ -100,7 +100,11 @@ export default function BillingPage() {
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
-            <Navbar />
+            {subState === 'no-sub' ?
+                null
+                :
+                <Navbar />
+            }
 
             <div className="pt-20 px-4 sm:px-6 lg:px-8 py-4">
                 <div className="max-w-6xl mx-auto">

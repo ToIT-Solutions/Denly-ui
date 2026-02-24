@@ -23,6 +23,7 @@ export default function ReportsPage() {
     const { data: properties, isLoading: propertiesLoading } = useFetchAllProperties()
     const { data: tenants, isLoading: tenantsLoading } = useFetchAllTenants()
     const { data: payments, isLoading: paymentsLoading } = useFetchAllPayments()
+    console.log(properties, tenants, payments)
 
     const isLoading = propertiesLoading || tenantsLoading || paymentsLoading
 

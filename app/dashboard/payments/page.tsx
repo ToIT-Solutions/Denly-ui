@@ -1,6 +1,7 @@
 "use client"
 import Navbar from '@/components/Navbar'
 import { useFetchAllPayments } from '@/hooks/usePayment'
+import { formatDate } from '@/lib/dateFormatter'
 import { useState, useMemo } from 'react'
 
 export default function PaymentsPage() {
@@ -12,6 +13,7 @@ export default function PaymentsPage() {
     ]
 
     const { data, isLoading, error } = useFetchAllPayments()
+    // console.log(data)
 
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState('All Status')
@@ -33,7 +35,7 @@ export default function PaymentsPage() {
         // Apply month filter
         if (monthFilter) {
             filtered = filtered.filter((payment: any) => {
-                const paymentDate = new Date(payment.date || payment.createdAt)
+                const paymentDate = new Date(payment.createdAt || payment.date)
                 const paymentMonth = paymentDate.toISOString().slice(0, 7) // YYYY-MM format
                 return paymentMonth === monthFilter
             })
@@ -53,8 +55,8 @@ export default function PaymentsPage() {
                     payment.method,
                     payment.status,
                     payment.amount?.toString(),
-                    payment.date,
-                    payment.createdAt
+                    payment.createdAt,
+                    payment.date
                 ]
                 return searchableFields.some(field =>
                     field?.toString().toLowerCase().includes(query)
@@ -67,30 +69,57 @@ export default function PaymentsPage() {
 
     // Calculate payment statistics
     const paymentStats = useMemo(() => {
-        const totalReceived = filteredPayments
+        const currentDate = new Date()
+        const currentYear = currentDate.getFullYear()
+        const currentMonth = currentDate.getMonth()
+
+        // Filter payments for current month using createdAt
+        const currentMonthPayments = paymentData.filter((payment: any) => {
+            const paymentDate = new Date(payment.createdAt || payment.date)
+            return paymentDate.getFullYear() === currentYear &&
+                paymentDate.getMonth() === currentMonth
+        })
+
+        // Calculate total received for current month (only paid payments)
+        const totalReceived = currentMonthPayments
             .filter((p: any) => p.status?.toLowerCase() === 'paid')
-            .reduce((sum: number, p: any) => sum + p.amount, 0)
+            .reduce((sum: number, p: any) => sum + Number(p.amount), 0)
 
-        const pending = filteredPayments
+        // Calculate pending amounts (from all payments, not just current month)
+        const pending = paymentData
             .filter((p: any) => p.status?.toLowerCase() === 'pending')
-            .reduce((sum: number, p: any) => sum + p.amount, 0)
+            .reduce((sum: number, p: any) => sum + Number(p.amount), 0)
 
-        const overdue = filteredPayments
+        // Calculate overdue amounts (from all payments)
+        const overdue = paymentData
             .filter((p: any) => p.status?.toLowerCase() === 'overdue')
-            .reduce((sum: number, p: any) => sum + p.amount, 0)
+            .reduce((sum: number, p: any) => sum + Number(p.amount), 0)
 
+        // Calculate total expected for the current period
         const totalExpected = totalReceived + pending + overdue
         const collectionRate = totalExpected > 0 ? Math.round((totalReceived / totalExpected) * 100) : 100
+
+        // Get counts for pending and overdue
+        const pendingCount = paymentData.filter((p: any) => p.status?.toLowerCase() === 'pending').length
+        const overdueCount = paymentData.filter((p: any) => p.status?.toLowerCase() === 'overdue').length
+
+        // Calculate average payment amount
+        const paidPayments = paymentData.filter((p: any) => p.status?.toLowerCase() === 'paid')
+        const averagePayment = paidPayments.length > 0
+            ? paidPayments.reduce((sum: number, p: any) => sum + Number(p.amount), 0) / paidPayments.length
+            : 0
 
         return {
             totalReceived,
             pending,
             overdue,
             collectionRate,
-            pendingCount: filteredPayments.filter((p: any) => p.status?.toLowerCase() === 'pending').length,
-            overdueCount: filteredPayments.filter((p: any) => p.status?.toLowerCase() === 'overdue').length
+            pendingCount,
+            overdueCount,
+            averagePayment,
+            totalTransactions: currentMonthPayments.length
         }
-    }, [filteredPayments])
+    }, [paymentData])
 
     if (isLoading) {
         return (
@@ -175,10 +204,26 @@ export default function PaymentsPage() {
                     {/* Payment Stats */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
                         {[
-                            { title: 'Total Received', value: `$${paymentStats.totalReceived.toLocaleString()}`, subtitle: 'This month' },
-                            { title: 'Pending', value: `$${paymentStats.pending.toLocaleString()}`, subtitle: `${paymentStats.pendingCount} payment${paymentStats.pendingCount !== 1 ? 's' : ''}` },
-                            { title: 'Overdue', value: `$${paymentStats.overdue.toLocaleString()}`, subtitle: `${paymentStats.overdueCount} payment${paymentStats.overdueCount !== 1 ? 's' : ''}` },
-                            { title: 'Collection Rate', value: `${paymentStats.collectionRate}%`, subtitle: 'This month' }
+                            {
+                                title: 'Total Received',
+                                value: `$${paymentStats.totalReceived.toLocaleString()}`,
+                                subtitle: `${paymentStats.totalTransactions} transaction${paymentStats.totalTransactions !== 1 ? 's' : ''} this month`
+                            },
+                            {
+                                title: 'Pending',
+                                value: `$${paymentStats.pending.toLocaleString()}`,
+                                subtitle: `${paymentStats.pendingCount} payment${paymentStats.pendingCount !== 1 ? 's' : ''} awaiting confirmation`
+                            },
+                            {
+                                title: 'Overdue',
+                                value: `$${paymentStats.overdue.toLocaleString()}`,
+                                subtitle: `${paymentStats.overdueCount} payment${paymentStats.overdueCount !== 1 ? 's' : ''} past due date`
+                            },
+                            {
+                                title: 'Collection Rate',
+                                value: `${paymentStats.collectionRate}%`,
+                                subtitle: `Avg payment: $${paymentStats.averagePayment.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
+                            }
                         ].map((stat, index) => (
                             <div key={index} className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                                 <p className="text-gray-600 text-sm mb-1">{stat.title}</p>
@@ -207,9 +252,9 @@ export default function PaymentsPage() {
 
                                     const propertyName = payment.property?.name || payment.property || 'Unknown Property'
                                     const paymentMethod = payment.paymentMethod || payment.method || 'Unknown Method'
-                                    const paymentDate = payment.date || payment.createdAt || 'No date'
+                                    const paymentDate = payment.createdAt || payment.date || 'No date'
                                     const paymentStatus = payment.status || 'Unknown'
-                                    const paymentAmount = payment.amount || 0
+                                    const paymentAmount = Number(payment.amount) || 0
 
                                     return (
                                         <div key={payment.id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors cursor-pointer">
@@ -226,7 +271,7 @@ export default function PaymentsPage() {
                                                 <div className="text-left sm:text-right">
                                                     <p className="text-[#876D4A] font-medium text-lg sm:text-lg">${paymentAmount.toLocaleString()}</p>
                                                     <div className="flex items-center space-x-2 sm:justify-end mt-1">
-                                                        <p className="text-gray-600 text-xs sm:text-sm">{paymentDate}</p>
+                                                        <p className="text-gray-600 text-xs sm:text-sm">{formatDate(paymentDate, 'long')}</p>
                                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${paymentStatus.toLowerCase() === 'paid'
                                                             ? 'bg-green-100 text-green-800'
                                                             : paymentStatus.toLowerCase() === 'overdue'

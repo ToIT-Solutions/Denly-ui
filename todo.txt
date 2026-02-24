@@ -20,31 +20,40 @@ forgot/ reset password
 payment length between 1-12 months
 expected payment
 changing property for tenants
-max tenants
+max tenants per property
 date formatting
+property change warning
 
 -----------DOING-------------
-hiding reports in navbar for other users
 
 
 
 
 -----------TODO--------------
+hiding reports in navbar for other users
 CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
-
-stats cards
 
 --kill tokens on expire/logout
 
 DELETION AND CASCADING
 
-MAX TENANTS PER PROPERTY 
-
-updatedAt should only change when details of the user change
-
 invited user doesnt have subID
 
+error when max tenants reached
+
 PAYEMNTS PAYMENTS PAYEMNTS PAYEMNTS PAYEMNTS PAYEMNTS
+
+RESPONSIVENESS
+
+route user to company page after signup
+
+Block deletion of properties with active tenants
+
+
+------------CONTROLS----------------------
+PARTIAL/ ADVANCED PAYMENTS  - keeping track of what percentage of the rent has been paid... if that is even a thing
+                            - how many months rent has been paid
+                            - leftovers/ spillages
 
 
 
