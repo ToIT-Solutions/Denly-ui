@@ -130,7 +130,7 @@ export default function RecordPaymentPage() {
                                 </label>
                                 <select
                                     {...register('propertyId', { required: 'Property is required' })}
-                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"
+                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                 >
                                     <option value="">Select a property</option>
                                     {propertyData?.map((property: Property) => (
@@ -151,7 +151,7 @@ export default function RecordPaymentPage() {
                                 </label>
                                 <select
                                     {...register('tenantId', { required: 'Tenant is required' })}
-                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"
+                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                     disabled={!watchedProperty}
                                 >
                                     <option value="">{watchedProperty ? 'Select a tenant' : 'Select a property first'}</option>
@@ -183,7 +183,7 @@ export default function RecordPaymentPage() {
                                         min: { value: 1, message: 'Duration must be at least 1 month' },
                                         max: { value: 12, message: 'Duration cannot exceed 12 months' }
                                     })}
-                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"
+                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                 >
                                     <option value="">Select duration</option>
                                     {months.map((month) => (
@@ -214,7 +214,7 @@ export default function RecordPaymentPage() {
                                             },
                                             min: { value: 0, message: 'Amount must be positive' }
                                         })}
-                                        className="w-full pl-8 pr-3 py-2 border border-gray-300 text-black placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"
+                                        className="w-full pl-8 pr-3 py-2 border border-gray-300 text-black placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                         placeholder="0.00"
                                     />
                                 </div>
@@ -244,7 +244,7 @@ export default function RecordPaymentPage() {
                                 <input
                                     type="date"
                                     {...register('paymentDate', { required: 'Payment date is required' })}
-                                    className="w-full px-3 py-2 border border-gray-300 text-black placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"
+                                    className="w-full px-3 py-2 border border-gray-300 text-black placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                     defaultValue={new Date().toISOString().split('T')[0]}
                                 />
                                 {errors.paymentDate && (
@@ -259,7 +259,7 @@ export default function RecordPaymentPage() {
                                 </label>
                                 <select
                                     {...register('paymentMethod')}
-                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"
+                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                 >
                                     <option value="">Select payment method</option>
                                     <option value="bank_transfer">Bank Transfer</option>
@@ -279,7 +279,7 @@ export default function RecordPaymentPage() {
                                 <textarea
                                     {...register('notes')}
                                     rows={3}
-                                    className="w-full px-3 py-2 border border-gray-300 text-black placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm"
+                                    className="w-full px-3 py-2 border border-gray-300 text-black placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                     placeholder="Add any reference numbers or notes about this payment..."
                                 />
                             </div>
@@ -292,7 +292,7 @@ export default function RecordPaymentPage() {
                                     <button
                                         type="button"
                                         onClick={() => router.back()}
-                                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm font-medium"
+                                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-300 transition-colors cursor-pointer text-sm font-medium"
                                     >
                                         Cancel
                                     </button>

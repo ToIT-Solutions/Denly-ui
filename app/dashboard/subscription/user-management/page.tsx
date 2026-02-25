@@ -162,7 +162,7 @@ export default function UserManagementPage() {
                                                 <div className="flex items-start justify-between">
                                                     {/* Left side - User info */}
                                                     <div className="flex items-center space-x-3">
-                                                        <div className="w-8 h-8 bg-[#876D4A] rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                                                        <div className="w-8 h-8 bg-[#876D4A] rounded-full flex items-center justify-center text-white text-xs font-medium shrink-0">
                                                             {getInitials(user.firstName + ' ' + user.lastName)}
                                                         </div>
                                                         <div>
@@ -275,7 +275,7 @@ export default function UserManagementPage() {
                                                             <div className="flex items-start justify-between">
                                                                 {/* Left side - User info */}
                                                                 <div className="flex items-center space-x-3">
-                                                                    <div className="w-8 h-8 bg-[#876D4A] rounded-full flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
+                                                                    <div className="w-8 h-8 bg-[#876D4A] rounded-full flex items-center justify-center text-white text-xs font-medium shrink-0">
                                                                         {getInitials(user.email)}
                                                                     </div>
                                                                     <div>

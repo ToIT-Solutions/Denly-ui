@@ -301,7 +301,7 @@ export default function EditTenantPage() {
                             <button
                                 onClick={cancelDelete}
                                 disabled={deletePending}
-                                className="flex-1 border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 disabled:opacity-50 transition-colors cursor-pointer text-sm font-medium"
+                                className="flex-1 border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-300 disabled:opacity-50 transition-colors cursor-pointer text-sm font-medium"
                             >
                                 Cancel
                             </button>
@@ -395,7 +395,7 @@ export default function EditTenantPage() {
                             </button>
                             <button
                                 onClick={cancelPropertyChange}
-                                className="flex-1 border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 transition-colors cursor-pointer text-sm font-medium"
+                                className="flex-1 border border-gray-300 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-300 transition-colors cursor-pointer text-sm font-medium"
                             >
                                 Cancel
                             </button>
@@ -661,6 +661,7 @@ export default function EditTenantPage() {
                                                     <option value="active">Active</option>
                                                     <option value="pending">Pending</option>
                                                     <option value="inactive">Inactive</option>
+                                                    <option value="terminated">Terminated</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -672,24 +673,24 @@ export default function EditTenantPage() {
                                         :
                                         <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                                             <button
-                                                type="submit"
-                                                className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 transition-colors cursor-pointer text-sm font-medium"
-                                            >
-                                                Save Changes
-                                            </button>
-                                            <button
                                                 type="button"
                                                 onClick={handleDelete}
-                                                className="border border-red-300 text-red-700 px-5 py-2 rounded-2xl hover:bg-red-50 disabled:opacity-50 transition-colors cursor-pointer text-sm font-medium"
+                                                className="border border-red-300 text-red-700 px-5 py-2 rounded-2xl hover:bg-red-300 disabled:opacity-50 transition-colors cursor-pointer text-sm font-medium"
                                             >
                                                 Delete Tenant
                                             </button>
                                             <div
                                                 onClick={() => router.back()}
-                                                className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm text-center font-medium"
+                                                className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-300 transition-colors cursor-pointer text-sm text-center font-medium"
                                             >
                                                 Cancel
                                             </div>
+                                            <button
+                                                type="submit"
+                                                className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 transition-colors cursor-pointer text-sm font-medium sm:ml-auto"
+                                            >
+                                                Save Changes
+                                            </button>
                                         </div>
                                     }
                                 </form>

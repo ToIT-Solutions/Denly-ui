@@ -173,7 +173,7 @@ export default function SinglePropertyPage() {
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between text-sm">
                                             <span className="text-gray-600">Last Payment</span>
-                                            <span className="font-medium text-gray-900">{formatDate(data?.lastPayment.createdAt)} { }</span>
+                                            <span className="font-medium text-gray-900">{data?.lastPayment ? formatDate(data?.lastPayment?.createdAt) : 'Never'} { }</span>
                                         </div>
                                     </div>
                                 </div>

@@ -156,7 +156,7 @@ export default function EditPropertyPage() {
                                         <input
                                             type="text"
                                             {...register('name', { required: 'Property name is required' })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                             placeholder="Enter property name"
                                         />
                                         {errors.name && (
@@ -170,7 +170,7 @@ export default function EditPropertyPage() {
                                         </label>
                                         <select
                                             {...register('type', { required: 'Property type is required' })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black text-sm"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black text-sm"
                                         >
                                             <option value="apartment">Apartment</option>
                                             <option value="house">House</option>
@@ -189,7 +189,7 @@ export default function EditPropertyPage() {
                                     <input
                                         type="text"
                                         {...register('address', { required: 'Address is required' })}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                         placeholder="Enter street address"
                                     />
                                     {errors.address && (
@@ -205,7 +205,7 @@ export default function EditPropertyPage() {
                                         <input
                                             type="text"
                                             {...register('city', { required: 'City is required' })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                             placeholder="Enter city"
                                         />
                                         {errors.city && (
@@ -220,7 +220,7 @@ export default function EditPropertyPage() {
                                         <input
                                             type="text"
                                             {...register('state', { required: 'State is required' })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                             placeholder="Enter state"
                                         />
                                         {errors.state && (
@@ -241,7 +241,7 @@ export default function EditPropertyPage() {
                                                     message: 'Invalid ZIP code format'
                                                 }
                                             })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                             placeholder="Enter ZIP code"
                                         />
                                         {errors.zipCode && (
@@ -268,7 +268,7 @@ export default function EditPropertyPage() {
                                                     },
                                                     min: { value: 0, message: 'Rent must be positive' }
                                                 })}
-                                                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                                 placeholder="0"
                                             />
                                         </div>
@@ -292,7 +292,7 @@ export default function EditPropertyPage() {
                                                         message: 'Please enter a valid number'
                                                     },
                                                 })}
-                                                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                                className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                                 placeholder="0.00"
                                             />
                                             {errors.securityDeposit && (
@@ -316,7 +316,7 @@ export default function EditPropertyPage() {
                                                     message: 'Please enter a valid number'
                                                 },
                                             })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                             placeholder="0"
                                         />
                                         {errors.bedrooms && (
@@ -337,7 +337,7 @@ export default function EditPropertyPage() {
                                                     message: 'Please enter a valid number'
                                                 },
                                             })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                             placeholder="0"
                                         />
                                         {errors.bathrooms && (
@@ -357,7 +357,7 @@ export default function EditPropertyPage() {
                                                     message: 'Please enter a valid number'
                                                 },
                                             })}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                             placeholder="0"
                                         />
                                         {errors.squareMeter && (
@@ -385,7 +385,7 @@ export default function EditPropertyPage() {
                                                 message: `Maximum tenants cannot exceed ${getMaxTenantsLimit()} for ${propertyType === 'commercial' ? 'commercial' : 'residential'} properties`
                                             },
                                         })}
-                                        className={`w-full px-3 py-2 border rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
+                                        className={`w-full px-3 py-2 border rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
                                             }`}
                                         placeholder={propertyType === 'commercial' ? "e.g., 10" : "e.g., 4"}
                                     />
@@ -406,10 +406,11 @@ export default function EditPropertyPage() {
                                     </label>
                                     <select
                                         {...register('status', { required: 'Status is required' })}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black text-sm"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black text-sm"
                                     >
                                         <option value="active">Active</option>
-                                        <option value="vacant">Vacant</option>
+                                        <option value="maintenance">Under Maintenance</option>
+                                        <option value="construction">Under Construction</option>
                                     </select>
                                 </div>
 
@@ -421,7 +422,7 @@ export default function EditPropertyPage() {
                                     <textarea
                                         rows={3}
                                         {...register('description')}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-black placeholder-gray-400 text-sm"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-black placeholder-gray-400 text-sm"
                                         placeholder="Describe the property features, amenities, and any additional information..."
                                     />
                                 </div>

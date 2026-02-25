@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
 export default function BillingPage() {
-    usePageTitle('Billing - Denly')
+    usePageTitle('Billing & Subscription - Denly')
 
     const params = useSearchParams()
     const subState = params.get('state')
@@ -168,7 +168,7 @@ export default function BillingPage() {
                                 </div>
 
                                 <div className="border-t border-gray-200 pt-4 flex space-x-3">
-                                    <button className="px-3 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-50 transition-colors text-xs font-medium">
+                                    <button className="px-3 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-300 transition-colors text-xs font-medium">
                                         Cancel Subscription
                                     </button>
                                     <button className="px-3 py-2 bg-[#876D4A] text-white rounded-lg hover:bg-[#756045] transition-colors text-xs font-medium">
@@ -224,7 +224,7 @@ export default function BillingPage() {
                                     ))}
                                 </div>
 
-                                <button className="w-full mt-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-xs">
+                                <button className="w-full mt-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-xs">
                                     View Full Billing History
                                 </button>
                             </div>

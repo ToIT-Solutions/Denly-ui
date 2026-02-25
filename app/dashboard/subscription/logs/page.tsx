@@ -234,7 +234,7 @@ export default function LogsPage() {
                                         placeholder="Search by user, details..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm text-black"
+                                        className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm text-black"
                                     />
                                     <svg className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -248,7 +248,7 @@ export default function LogsPage() {
                                 <select
                                     value={actionFilter}
                                     onChange={(e) => setActionFilter(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm text-black"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm text-black"
                                 >
                                     {uniqueActions.map((action) => (
                                         <option key={action} value={action}>
@@ -264,7 +264,7 @@ export default function LogsPage() {
                                 <select
                                     value={dateRange}
                                     onChange={(e) => setDateRange(e.target.value as any)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm text-black"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm text-black"
                                 >
                                     <option value="all">All Time</option>
                                     <option value="today">Today</option>
@@ -400,7 +400,7 @@ export default function LogsPage() {
                                 <button
                                     onClick={() => goToPage(currentPage - 1)}
                                     disabled={currentPage === 1}
-                                    className="px-3 py-1 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                                    className="px-3 py-1 border border-gray-300 hover:border-[#876D4A] rounded-lg text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                                 >
                                     Previous
                                 </button>
@@ -425,7 +425,7 @@ export default function LogsPage() {
                                                 onClick={() => goToPage(pageNum)}
                                                 className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors cursor-pointer ${currentPage === pageNum
                                                     ? 'bg-[#876D4A] text-white'
-                                                    : 'text-gray-700 hover:bg-gray-100'
+                                                    : 'text-gray-700 hover:bg-gray-100 border border-gray-300 hover:border-[#876D4A]'
                                                     }`}
                                             >
                                                 {pageNum}
@@ -437,7 +437,7 @@ export default function LogsPage() {
                                 <button
                                     onClick={() => goToPage(currentPage + 1)}
                                     disabled={currentPage === totalPages}
-                                    className="px-3 py-1 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                                    className="px-3 py-1 border border-gray-300 hover:border-[#876D4A] rounded-lg text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer"
                                 >
                                     Next
                                 </button>
@@ -506,7 +506,7 @@ export default function LogsPage() {
                                 {/* Description */}
                                 <div>
                                     <label className="block text-xs text-gray-500 mb-1">Description</label>
-                                    <p className="text-gray-900 bg-gray-50 p-3 rounded-lg text-sm">
+                                    <p className="text-gray-900 bg-[#e9e0d5] p-3 rounded-lg text-sm">
                                         {selectedLog.description || selectedLog.details || 'No description provided'}
                                     </p>
                                 </div>

@@ -555,6 +555,8 @@ export default function AddTenantPage() {
                                         >
                                             <option value="active">Active</option>
                                             <option value="pending">Pending</option>
+                                            <option value="inactive">Inactive</option>
+                                            <option value="terminated">Terminated</option>
                                         </select>
                                     </div>
                                 </div>

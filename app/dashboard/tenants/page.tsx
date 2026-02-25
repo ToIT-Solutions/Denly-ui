@@ -150,7 +150,7 @@ export default function TenantsPage() {
                                 <input
                                     type="text"
                                     placeholder="Search tenants"
-                                    className="px-4 py-1 border text-black outline-0 placeholder-gray-400 border-gray-300 rounded-2xl focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors w-full sm:w-80"
+                                    className="px-4 py-1 border text-black outline-0 placeholder-gray-400 border-gray-300 rounded-2xl focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors w-full sm:w-80"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />

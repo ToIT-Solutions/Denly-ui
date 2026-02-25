@@ -561,7 +561,7 @@ export default function AddPropertyPage() {
                                     </button>
                                     <Link
                                         href="/dashboard/properties"
-                                        className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm text-center font-medium"
+                                        className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-300 transition-colors cursor-pointer text-sm text-center font-medium"
                                     >
                                         Cancel
                                     </Link>

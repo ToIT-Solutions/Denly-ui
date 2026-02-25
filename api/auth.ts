@@ -45,6 +45,16 @@ export const logout = async() => {
     }
 }
 
+export const changePassword = async(data: any) => {
+    try {
+         const response = await api.post("/v1/auth/change-password", data);
+        return response.data;
+    } catch (error: any) {
+        const message = error.response?.data?.message || error.message || "An error occured trying to change your password";
+        throw new Error(message);
+    }
+}
+
 export const forgotPassword = async(data: any) => {
     try {
          const response = await api.post("/v1/auth/forgot", data);

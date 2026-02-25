@@ -112,7 +112,7 @@ export default function CompanyPage() {
                                                     }
                                                 })}
                                                 className={`w-full border ${errors.name ? 'border-red-300' : 'border-gray-300'
-                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm`}
+                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none`}
                                             />
                                             {errors.name && (
                                                 <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
@@ -134,7 +134,7 @@ export default function CompanyPage() {
                                                     }
                                                 })}
                                                 className={`w-full border ${errors.email ? 'border-red-300' : 'border-gray-300'
-                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm`}
+                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none`}
                                             />
                                             {errors.email && (
                                                 <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>
@@ -156,7 +156,7 @@ export default function CompanyPage() {
                                                     }
                                                 })}
                                                 className={`w-full border ${errors.phone ? 'border-red-300' : 'border-gray-300'
-                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm`}
+                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none`}
                                             />
                                             {errors.phone && (
                                                 <p className="mt-1 text-xs text-red-600">{errors.phone.message}</p>
@@ -171,7 +171,7 @@ export default function CompanyPage() {
                                                 id="industry"
                                                 type="text"
                                                 {...register('industry')}
-                                                className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm"
+                                                className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none"
                                             />
                                         </div>
                                     </div>
@@ -192,7 +192,7 @@ export default function CompanyPage() {
                                                     required: 'Street address is required'
                                                 })}
                                                 className={`w-full border ${errors.address ? 'border-red-300' : 'border-gray-300'
-                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm`}
+                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none`}
                                             />
                                             {errors.address && (
                                                 <p className="mt-1 text-xs text-red-600">{errors.address.message}</p>
@@ -210,7 +210,7 @@ export default function CompanyPage() {
                                                     required: 'City is required'
                                                 })}
                                                 className={`w-full border ${errors.city ? 'border-red-300' : 'border-gray-300'
-                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm`}
+                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none`}
                                             />
                                             {errors.city && (
                                                 <p className="mt-1 text-xs text-red-600">{errors.city.message}</p>
@@ -228,7 +228,7 @@ export default function CompanyPage() {
                                                     required: 'State/Province is required'
                                                 })}
                                                 className={`w-full border ${errors.state ? 'border-red-300' : 'border-gray-300'
-                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm`}
+                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none`}
                                             />
                                             {errors.state && (
                                                 <p className="mt-1 text-xs text-red-600">{errors.state.message}</p>
@@ -250,7 +250,7 @@ export default function CompanyPage() {
                                                     }
                                                 })}
                                                 className={`w-full border ${errors.zipCode ? 'border-red-300' : 'border-gray-300'
-                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm`}
+                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none`}
                                             />
                                             {errors.zipCode && (
                                                 <p className="mt-1 text-xs text-red-600">{errors.zipCode.message}</p>
@@ -268,7 +268,7 @@ export default function CompanyPage() {
                                                     required: 'Country is required'
                                                 })}
                                                 className={`w-full border ${errors.country ? 'border-red-300' : 'border-gray-300'
-                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm`}
+                                                    } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none`}
                                             />
                                             {errors.country && (
                                                 <p className="mt-1 text-xs text-red-600">{errors.country.message}</p>
@@ -283,7 +283,7 @@ export default function CompanyPage() {
                                                 id="taxId"
                                                 type="text"
                                                 {...register('taxId')}
-                                                className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm"
+                                                className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none"
                                             />
                                         </div>
                                     </div>
@@ -296,14 +296,14 @@ export default function CompanyPage() {
                                     <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                                         <button
                                             type="submit"
-                                            className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm font-medium"
+                                            className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm font-medium focus:outline-none"
                                         >
                                             Save Changes
                                         </button>
                                         <button
                                             type="button"
                                             onClick={handleCancel}
-                                            className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm font-medium"
+                                            className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm font-medium focus:outline-none"
                                         >
                                             Cancel
                                         </button>

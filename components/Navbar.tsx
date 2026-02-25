@@ -1,4 +1,3 @@
-// components/Navbar.jsx
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -127,7 +126,7 @@ export default function Navbar() {
                                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                                 className="flex items-center space-x-2 lg:space-x-3 cursor-pointer focus:outline-none"
                             >
-                                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-[#876D4A] rounded-full flex items-center justify-center text-white text-xs lg:text-sm font-medium">
+                                <div className="w-8 h-8 lg:w-10 lg:h-10 bg-[#876D4A] hover:bg-[#756045] rounded-full flex items-center justify-center text-white text-xs lg:text-sm font-medium">
                                     {getInitials(user?.firstName + ' ' + user?.lastName)}
                                 </div>
                             </button>
@@ -253,7 +252,7 @@ export default function Navbar() {
                             <div className="flex space-x-3">
                                 <button
                                     onClick={() => setIsLogoutModalOpen(false)}
-                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm font-medium"
+                                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-300 transition-colors cursor-pointer text-sm font-medium"
                                 >
                                     Cancel
                                 </button>

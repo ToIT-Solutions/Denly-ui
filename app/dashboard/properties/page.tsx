@@ -56,11 +56,11 @@ export default function PropertiesPage() {
                             <input
                                 type="text"
                                 placeholder="Search properties"
-                                className="border text-black placeholder-gray-400 outline-0 border-gray-300 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm w-full sm:w-80"
+                                className="border text-black placeholder-gray-400 outline-0 border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm w-full sm:w-80"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            {/* <select className="border border-gray-300 text-black outline-0 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm">
+                            {/* <select className="border border-gray-300 text-black outline-0 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm">
                                 <option>All Status</option>
                                 <option>Occupied</option>
                                 <option>Vacant</option>

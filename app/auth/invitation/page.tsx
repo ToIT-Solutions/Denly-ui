@@ -99,7 +99,7 @@ export default function InvitationSignupPage() {
                                             message: 'Minimum 2 characters'
                                         }
                                     })}
-                                    className={`w-full px-3 py-2 bg-white rounded-2xl text-gray-900 outline-0 ${errors.firstName ? 'border border-red-600' : ''
+                                    className={`w-full px-3 py-2 border border-gray-300 bg-white rounded-2xl text-gray-900 outline-0 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-all ${errors.firstName ? 'border border-red-600' : ''
                                         }`}
                                     placeholder='Enter your first name'
                                 />
@@ -123,7 +123,7 @@ export default function InvitationSignupPage() {
                                             message: 'Minimum 2 characters'
                                         }
                                     })}
-                                    className={`w-full px-3 py-2 bg-white rounded-2xl text-gray-900 outline-0 ${errors.lastName ? 'border border-red-600' : ''
+                                    className={`w-full px-3 py-2 bg-white rounded-2xl text-gray-900 outline-0 border border-gray-300 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-all ${errors.lastName ? 'border border-red-600' : ''
                                         }`}
                                     placeholder='Enter your last name'
                                 />
@@ -148,7 +148,7 @@ export default function InvitationSignupPage() {
                                             message: 'Password must be at least 8 characters'
                                         }
                                     })}
-                                    className={`w-full px-3 py-2 bg-white rounded-2xl text-gray-900 outline-0 ${errors.password ? 'border border-red-600' : ''
+                                    className={`w-full px-3 py-2 bg-white rounded-2xl text-gray-900 outline-0 border border-gray-300 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-all ${errors.password ? 'border border-red-600' : ''
                                         }`}
                                     placeholder='Enter your password'
                                 />
@@ -171,7 +171,7 @@ export default function InvitationSignupPage() {
                                         validate: value =>
                                             value === password || 'Passwords do not match'
                                     })}
-                                    className={`w-full px-3 py-2 bg-white rounded-2xl text-gray-900 outline-0 ${errors.confirmPassword ? 'border border-red-600' : ''
+                                    className={`w-full px-3 py-2 bg-white rounded-2xl text-gray-900 outline-0 border border-gray-300 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-all ${errors.confirmPassword ? 'border border-red-600' : ''
                                         }`}
                                     placeholder='Re-enter your password'
                                 />

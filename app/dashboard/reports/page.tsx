@@ -636,7 +636,7 @@ export default function ReportsPage() {
                             </div>
                             <div className="flex flex-col sm:flex-row gap-3">
                                 <select
-                                    className="border border-gray-300 text-black outline-0 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm"
+                                    className="border border-gray-300 text-black outline-0 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm"
                                     value={selectedReportType}
                                     onChange={(e) => setSelectedReportType(e.target.value)}
                                 >
@@ -649,7 +649,7 @@ export default function ReportsPage() {
                                 <input
                                     type="text"
                                     placeholder="Search reports..."
-                                    className="border border-gray-300 text-black outline-0 placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm w-full sm:w-64"
+                                    className="border border-gray-300 text-black outline-0 placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm w-full sm:w-64"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />

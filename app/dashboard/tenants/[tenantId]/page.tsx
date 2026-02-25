@@ -8,23 +8,24 @@ import { useFetchOneTenant } from '@/hooks/useTenant'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
-import { api } from '@/api/axios' // Import api for the download endpoint
 import useAuthStore from '@/store/useAuthStore'
 import { CAN_EDIT } from '@/lib/roles'
-import { useFetchAllProperties } from '@/hooks/useProperty'
 import { formatDate } from '@/lib/dateFormatter'
 
 export default function ViewTenantPage() {
-    usePageTitle("Tenant Details - Denly")
 
     const user = useAuthStore((state) => state.user)
     const userRole = user?.role
+
 
     const params = useParams()
     const tenantId = params.tenantId as string
 
     const { data, isLoading } = useFetchOneTenant(tenantId)
     console.log(data)
+
+    usePageTitle(`${data?.firstName + ' ' + data?.lastName} - Denly`)
+
     // const { data: properties, isLoading: propertyLoading } = useFetchAllProperties()
     // console.log(properties)
 

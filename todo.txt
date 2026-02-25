@@ -23,9 +23,13 @@ changing property for tenants
 max tenants per property
 date formatting
 property change warning
-marketing pages responsiveness
 fixed number inputs which were changing the number values
 Block deletion of properties with active tenants
+error when max tenants reached
+tenant statuses
+consistency - inputs
+change password
+responsiveness app wide
 
 -----------DOING-------------
 
@@ -36,19 +40,18 @@ Block deletion of properties with active tenants
 hiding reports in navbar for other users
 CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
 
---kill tokens on expire/logout
-
 DELETION AND CASCADING
-
-invited user doesnt have subID
-
-error when max tenants reached
 
 PAYEMNTS PAYMENTS PAYEMNTS PAYEMNTS PAYEMNTS PAYEMNTS
 
-RESPONSIVENESS
+redo the property edit page since properties cant be edited to the full capacity
 
-reset password when already logged in
+
+ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
+                - STORE ACTIVITY STATUS (WHEN A LOGIN FAILS ITS SHOULD STILL LOG)
+                - CHANGES SNAPSHOT(WHAT WAS CHANGED WHEN EDITED FOR ANYTHING THAT IS EDITED)
+                - CHANGES JSON IN THE PRISMA
+                - 
 
 
 ------------CONTROLS----------------------
@@ -57,7 +60,8 @@ PARTIAL/ ADVANCED PAYMENTS  - keeping track of what percentage of the rent has b
                             - leftovers/ spillages
 
 
-
+---------------THINGS TO CONSIDER---------------------
+phone number for users
 
 
 

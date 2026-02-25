@@ -84,7 +84,7 @@ export default function BillingPage() {
                                             <button className="w-full bg-[#876D4A] text-white py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm">
                                                 Upgrade Plan
                                             </button>
-                                            <button className="w-full border border-gray-300 text-gray-700 py-2 rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer text-sm">
+                                            <button className="w-full border border-gray-300 text-gray-700 py-2 rounded-2xl hover:bg-gray-300 transition-colors cursor-pointer text-sm">
                                                 Update Payment Method
                                             </button>
                                         </div>

@@ -1,10 +1,12 @@
-"use client"
+'use client'
 import Navbar from '@/components/Navbar'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllPayments } from '@/hooks/usePayment'
 import { formatDate } from '@/lib/dateFormatter'
 import { useState, useMemo } from 'react'
 
 export default function PaymentsPage() {
+    usePageTitle('Payments - Denly')
     const payments = [
         { id: 1, tenant: 'John Smith', property: 'Downtown Loft', amount: 2400, date: '2024-01-15', status: 'Paid', method: 'Bank Transfer' },
         { id: 2, tenant: 'Sarah Johnson', property: 'Garden Villa', amount: 3200, date: '2024-01-14', status: 'Paid', method: 'Credit Card' },
@@ -13,35 +15,29 @@ export default function PaymentsPage() {
     ]
 
     const { data, isLoading, error } = useFetchAllPayments()
-    // console.log(data)
-
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState('All Status')
     const [monthFilter, setMonthFilter] = useState('')
 
-    // Use API data if available, otherwise use mock data
     const paymentData = data || payments
 
     const filteredPayments = useMemo(() => {
         let filtered = paymentData
 
-        // Apply status filter
         if (statusFilter !== 'All Status') {
             filtered = filtered.filter((payment: any) =>
                 payment.status?.toLowerCase() === statusFilter.toLowerCase()
             )
         }
 
-        // Apply month filter
         if (monthFilter) {
             filtered = filtered.filter((payment: any) => {
                 const paymentDate = new Date(payment.createdAt || payment.date)
-                const paymentMonth = paymentDate.toISOString().slice(0, 7) // YYYY-MM format
+                const paymentMonth = paymentDate.toISOString().slice(0, 7)
                 return paymentMonth === monthFilter
             })
         }
 
-        // Apply search query
         if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase().trim()
             filtered = filtered.filter((payment: any) => {
@@ -67,43 +63,35 @@ export default function PaymentsPage() {
         return filtered
     }, [paymentData, searchQuery, statusFilter, monthFilter])
 
-    // Calculate payment statistics
     const paymentStats = useMemo(() => {
         const currentDate = new Date()
         const currentYear = currentDate.getFullYear()
         const currentMonth = currentDate.getMonth()
 
-        // Filter payments for current month using createdAt
         const currentMonthPayments = paymentData.filter((payment: any) => {
             const paymentDate = new Date(payment.createdAt || payment.date)
             return paymentDate.getFullYear() === currentYear &&
                 paymentDate.getMonth() === currentMonth
         })
 
-        // Calculate total received for current month (only paid payments)
         const totalReceived = currentMonthPayments
             .filter((p: any) => p.status?.toLowerCase() === 'paid')
             .reduce((sum: number, p: any) => sum + Number(p.amount), 0)
 
-        // Calculate pending amounts (from all payments, not just current month)
         const pending = paymentData
             .filter((p: any) => p.status?.toLowerCase() === 'pending')
             .reduce((sum: number, p: any) => sum + Number(p.amount), 0)
 
-        // Calculate overdue amounts (from all payments)
         const overdue = paymentData
             .filter((p: any) => p.status?.toLowerCase() === 'overdue')
             .reduce((sum: number, p: any) => sum + Number(p.amount), 0)
 
-        // Calculate total expected for the current period
         const totalExpected = totalReceived + pending + overdue
         const collectionRate = totalExpected > 0 ? Math.round((totalReceived / totalExpected) * 100) : 100
 
-        // Get counts for pending and overdue
         const pendingCount = paymentData.filter((p: any) => p.status?.toLowerCase() === 'pending').length
         const overdueCount = paymentData.filter((p: any) => p.status?.toLowerCase() === 'overdue').length
 
-        // Calculate average payment amount
         const paidPayments = paymentData.filter((p: any) => p.status?.toLowerCase() === 'paid')
         const averagePayment = paidPayments.length > 0
             ? paidPayments.reduce((sum: number, p: any) => sum + Number(p.amount), 0) / paidPayments.length
@@ -121,42 +109,31 @@ export default function PaymentsPage() {
         }
     }, [paymentData])
 
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
-                <Navbar />
-                <div className="pt-24 px-8 py-6">
-                    <div className="max-w-6xl mx-auto flex justify-center items-center h-64">
-                        <div className="text-center">
-                            <div className="w-12 h-12 border-4 border-[#876D4A] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                            <p className="text-gray-600">Loading payments...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
+
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
             <Navbar />
 
-            <div className="pt-24 px-4 sm:px-6 lg:px-8 py-6">
+            <div className="pt-20 px-4 sm:px-6 lg:px-8 py-6">
                 <div className="max-w-6xl mx-auto">
+
                     {/* Header */}
-                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 space-y-4 lg:space-y-0">
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 lg:mb-8 space-y-4 lg:space-y-0">
                         <div>
-                            <h1 className="text-2xl sm:text-3xl font-serif text-gray-900 mb-2">Payments</h1>
-                            <p className="text-gray-600">Track and manage rental payments</p>
+                            <h1 className="text-2xl sm:text-3xl font-serif text-gray-900 mb-1">Payments</h1>
+                            <p className="text-gray-600 text-sm sm:text-base">Track and manage rental payments</p>
                             {paymentData && (
                                 <p className="text-sm text-gray-500 mt-1">
                                     Total: {paymentData.length} {paymentData.length === 1 ? 'payment' : 'payments'}
                                 </p>
                             )}
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-3">
+
+                        {/* Filters */}
+                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
                             <select
-                                className="border border-gray-300 text-black outline-0 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm"
+                                className="border border-gray-300 text-black outline-0 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm w-full sm:w-auto"
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
                             >
@@ -167,21 +144,21 @@ export default function PaymentsPage() {
                             </select>
                             <input
                                 type="month"
-                                className="border border-gray-300 text-black outline-0 placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm"
+                                className="border border-gray-300 text-black outline-0 placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm w-full sm:w-auto"
                                 value={monthFilter}
                                 onChange={(e) => setMonthFilter(e.target.value)}
                             />
                             <input
                                 type="text"
                                 placeholder="Search payments..."
-                                className="border border-gray-300 text-black outline-0 placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-2 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm w-full sm:w-64"
+                                className="border border-gray-300 text-black outline-0 placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm w-full sm:w-64"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    {/* Filter and Search Results Info */}
+                    {/* Filter Info */}
                     {(searchQuery || statusFilter !== 'All Status' || monthFilter) && (
                         <div className="mb-4 text-sm text-gray-600 flex flex-wrap items-center gap-2">
                             <span>Found {filteredPayments.length} {filteredPayments.length === 1 ? 'payment' : 'payments'}</span>
@@ -189,11 +166,7 @@ export default function PaymentsPage() {
                             {statusFilter !== 'All Status' && <span>with status: {statusFilter}</span>}
                             {monthFilter && <span>for month: {monthFilter}</span>}
                             <button
-                                onClick={() => {
-                                    setSearchQuery('')
-                                    setStatusFilter('All Status')
-                                    setMonthFilter('')
-                                }}
+                                onClick={() => { setSearchQuery(''); setStatusFilter('All Status'); setMonthFilter(''); }}
                                 className="text-[#876D4A] hover:text-[#756045] underline text-xs ml-2"
                             >
                                 Clear all filters
@@ -202,30 +175,14 @@ export default function PaymentsPage() {
                     )}
 
                     {/* Payment Stats */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 lg:mb-8">
                         {[
-                            {
-                                title: 'Total Received',
-                                value: `$${paymentStats.totalReceived.toLocaleString()}`,
-                                subtitle: `${paymentStats.totalTransactions} transaction${paymentStats.totalTransactions !== 1 ? 's' : ''} this month`
-                            },
-                            {
-                                title: 'Pending',
-                                value: `$${paymentStats.pending.toLocaleString()}`,
-                                subtitle: `${paymentStats.pendingCount} payment${paymentStats.pendingCount !== 1 ? 's' : ''} awaiting confirmation`
-                            },
-                            {
-                                title: 'Overdue',
-                                value: `$${paymentStats.overdue.toLocaleString()}`,
-                                subtitle: `${paymentStats.overdueCount} payment${paymentStats.overdueCount !== 1 ? 's' : ''} past due date`
-                            },
-                            {
-                                title: 'Collection Rate',
-                                value: `${paymentStats.collectionRate}%`,
-                                subtitle: `Avg payment: $${paymentStats.averagePayment.toLocaleString(undefined, { maximumFractionDigits: 0 })}`
-                            }
-                        ].map((stat, index) => (
-                            <div key={index} className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+                            { title: 'Total Received', value: `$${paymentStats.totalReceived.toLocaleString()}`, subtitle: `${paymentStats.totalTransactions} transaction${paymentStats.totalTransactions !== 1 ? 's' : ''} this month` },
+                            { title: 'Pending', value: `$${paymentStats.pending.toLocaleString()}`, subtitle: `${paymentStats.pendingCount} payment${paymentStats.pendingCount !== 1 ? 's' : ''} awaiting confirmation` },
+                            { title: 'Overdue', value: `$${paymentStats.overdue.toLocaleString()}`, subtitle: `${paymentStats.overdueCount} payment${paymentStats.overdueCount !== 1 ? 's' : ''} past due date` },
+                            { title: 'Collection Rate', value: `${paymentStats.collectionRate}%`, subtitle: `Avg payment: $${paymentStats.averagePayment.toLocaleString(undefined, { maximumFractionDigits: 0 })}` },
+                        ].map((stat, idx) => (
+                            <div key={idx} className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                                 <p className="text-gray-600 text-sm mb-1">{stat.title}</p>
                                 <div className="text-xl sm:text-2xl font-serif text-gray-900 mb-1">{stat.value}</div>
                                 <p className="text-gray-500 text-xs">{stat.subtitle}</p>
@@ -235,17 +192,14 @@ export default function PaymentsPage() {
 
                     {/* Payments List */}
                     <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                        <div className="p-4 sm:p-6 border-b border-gray-200 flex justify-between items-center">
-                            <h2 className="font-serif text-lg sm:text-xl text-gray-900">Recent Payments</h2>
-                            <span className="text-sm text-gray-500">
-                                {filteredPayments.length} {filteredPayments.length === 1 ? 'payment' : 'payments'}
-                            </span>
+                        <div className="p-4 sm:p-6 border-b border-gray-200 flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                            <h2 className="font-serif text-lg sm:text-xl text-gray-900 mb-2 sm:mb-0">Recent Payments</h2>
+                            <span className="text-sm text-gray-500">{filteredPayments.length} {filteredPayments.length === 1 ? 'payment' : 'payments'}</span>
                         </div>
 
                         {filteredPayments.length > 0 ? (
                             <div className="divide-y divide-gray-100">
                                 {filteredPayments.map((payment: any) => {
-                                    // Handle both mock data and API data structures
                                     const tenantName = payment.tenant
                                         ? `${payment.tenant.firstName || ''} ${payment.tenant.lastName || ''}`.trim()
                                         : payment.tenant || 'Unknown Tenant'
@@ -260,9 +214,7 @@ export default function PaymentsPage() {
                                         <div key={payment.id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors cursor-pointer">
                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                                                 <div className="flex items-center space-x-3 sm:space-x-4">
-                                                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#876D4A] rounded-lg flex items-center justify-center text-white text-sm sm:text-base">
-                                                        💰
-                                                    </div>
+                                                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#876D4A] rounded-lg flex items-center justify-center text-white text-sm sm:text-base">💰</div>
                                                     <div>
                                                         <p className="font-medium text-gray-900 text-sm sm:text-base">{tenantName}</p>
                                                         <p className="text-gray-600 text-xs sm:text-sm">{propertyName} • {paymentMethod}</p>
@@ -270,7 +222,7 @@ export default function PaymentsPage() {
                                                 </div>
                                                 <div className="text-left sm:text-right">
                                                     <p className="text-[#876D4A] font-medium text-lg sm:text-lg">${paymentAmount.toLocaleString()}</p>
-                                                    <div className="flex items-center space-x-2 sm:justify-end mt-1">
+                                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end space-y-1 sm:space-y-0 sm:space-x-2 mt-1">
                                                         <p className="text-gray-600 text-xs sm:text-sm">{formatDate(paymentDate, 'long')}</p>
                                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${paymentStatus.toLowerCase() === 'paid'
                                                             ? 'bg-green-100 text-green-800'
@@ -290,29 +242,20 @@ export default function PaymentsPage() {
                                 })}
                             </div>
                         ) : (
-                            /* No Results State */
                             <div className="p-12 text-center">
                                 {paymentData.length === 0 ? (
                                     <>
-                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            💰
-                                        </div>
+                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">💰</div>
                                         <h3 className="font-serif text-lg text-gray-900 mb-2">No payments yet</h3>
                                         <p className="text-gray-600 mb-6">Payments will appear here once tenants start paying</p>
                                     </>
                                 ) : (
                                     <>
-                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            🔍
-                                        </div>
+                                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">🔍</div>
                                         <h3 className="font-serif text-lg text-gray-900 mb-2">No payments found</h3>
                                         <p className="text-gray-600 mb-6">No payments match your search or filter criteria</p>
                                         <button
-                                            onClick={() => {
-                                                setSearchQuery('')
-                                                setStatusFilter('All Status')
-                                                setMonthFilter('')
-                                            }}
+                                            onClick={() => { setSearchQuery(''); setStatusFilter('All Status'); setMonthFilter(''); }}
                                             className="bg-[#876D4A] text-white px-6 py-3 rounded-lg hover:bg-[#756045] transition-colors cursor-pointer"
                                         >
                                             Clear All Filters
@@ -322,6 +265,7 @@ export default function PaymentsPage() {
                             </div>
                         )}
                     </div>
+
                 </div>
             </div>
         </div>

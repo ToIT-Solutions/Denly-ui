@@ -1,4 +1,4 @@
-import { forgotPassword, login, resetPassword, signup } from '@/api/auth'
+import { changePassword, forgotPassword, login, resetPassword, signup } from '@/api/auth'
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from 'next/navigation'
 import useAuthStore from '@/store/useAuthStore';
@@ -35,6 +35,22 @@ export const useLogin = () => {
             showSuccessToast('You have logged in successfully')
             setUser(data)
             router.push(`/dashboard`)
+        },
+        onError: (error: any) => {
+            console.log(error)
+            showErrorToast(error)
+        }
+    })
+}
+
+export const useChangePassword = () => {
+    const router = useRouter()
+
+    return useMutation({
+        mutationFn: changePassword,
+        onSuccess: (data) => {
+            console.log(data)
+            showSuccessToast('Your password has been changed successfully')
         },
         onError: (error: any) => {
             console.log(error)
