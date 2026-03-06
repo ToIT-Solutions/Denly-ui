@@ -9,7 +9,7 @@ export default function Footer() {
             <div className="max-w-6xl mx-auto px-6">
 
                 {/* Main Grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-10">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-8">
 
                     {/* Brand */}
                     <div className="col-span-2 lg:col-span-1">
@@ -35,16 +35,16 @@ export default function Footer() {
                                     Pricing
                                 </Link>
                             </li>
-                            <li>
+                            {/* <li>
                                 <Link href="/integrations" className="text-gray-300 hover:text-[#876D4A] transition-colors">
                                     Integrations
                                 </Link>
-                            </li>
+                            </li> */}
                         </ul>
                     </div>
 
                     {/* Resources */}
-                    <div>
+                    {/* <div>
                         <h4 className="font-semibold text-white mb-4">Resources</h4>
                         <ul className="space-y-2 text-sm">
                             <li>
@@ -63,16 +63,16 @@ export default function Footer() {
                                 </Link>
                             </li>
                         </ul>
-                    </div>
+                    </div> */}
 
                     {/* Company */}
                     <div>
                         <h4 className="font-semibold text-white mb-4">Company</h4>
                         <ul className="space-y-2 text-sm">
                             <li>
-                                <Link href="/about" className="text-gray-300 hover:text-[#876D4A] transition-colors">
+                                {/* <Link href="/about" className="text-gray-300 hover:text-[#876D4A] transition-colors">
                                     About
-                                </Link>
+                                </Link> */}
                             </li>
                             <li>
                                 <Link href="/contact" className="text-gray-300 hover:text-[#876D4A] transition-colors">
@@ -106,9 +106,9 @@ export default function Footer() {
                         <Link href="/privacy-policy" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
                             Privacy
                         </Link>
-                        <Link href="/cookies" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
+                        {/* <Link href="/cookies" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
                             Cookies
-                        </Link>
+                        </Link> */}
                     </div>
                 </div>
 

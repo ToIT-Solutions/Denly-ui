@@ -10,6 +10,7 @@ import useAuthStore from '@/store/useAuthStore'
 
 export default function LogsPage() {
     usePageTitle('Activity Logs - Denly')
+
     const [searchQuery, setSearchQuery] = useState('')
     const [actionFilter, setActionFilter] = useState<string>('all')
     const [dateRange, setDateRange] = useState<'today' | 'week' | 'month' | 'all'>('all')
@@ -329,6 +330,7 @@ export default function LogsPage() {
                                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Action</th>
                                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Description</th>
                                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Date & Time</th>
+                                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
@@ -339,7 +341,7 @@ export default function LogsPage() {
                                                 <tr
                                                     key={log.id}
                                                     onClick={() => openLogModal(log)}
-                                                    className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                                    className={`hover:bg-gray-200 transition-colors cursor-pointer ${log.status === 'error' ? 'bg-red-50' : null}`}
                                                 >
                                                     <td className="px-4 py-3">
                                                         <div className="flex items-center space-x-2">
@@ -365,6 +367,16 @@ export default function LogsPage() {
                                                     <td className="px-4 py-3">
                                                         <span className="text-sm text-gray-600 whitespace-nowrap">
                                                             {formatLogDate(log.createdAt)}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-3">
+                                                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
+        ${log.status === 'success' ? 'bg-green-100 text-green-800' :
+                                                                log.status === 'error' ? 'bg-red-100 text-red-800' :
+                                                                    log.status === 'failed' ? 'bg-orange-100 text-orange-800' :
+                                                                        'bg-gray-100 text-gray-800'}`}
+                                                        >
+                                                            {log.status || 'Unknown'}
                                                         </span>
                                                     </td>
                                                 </tr>
@@ -488,20 +500,38 @@ export default function LogsPage() {
                                 </div>
 
                                 {/* Action */}
-                                <div>
-                                    <label className="block text-xs text-gray-500 mb-1">Action</label>
-                                    <div className="flex items-center space-x-2">
-                                        {(() => {
-                                            const styles = getActionStyles(selectedLog.action)
-                                            return (
-                                                <span className={`inline-flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm ${styles.badge}`}>
-                                                    <span>{styles.icon}</span>
-                                                    <span>{selectedLog.action}</span>
-                                                </span>
-                                            )
-                                        })()}
+                                <div className='flex gap-9'>
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Action</label>
+                                        <div className="flex items-center space-x-2">
+                                            {(() => {
+                                                const styles = getActionStyles(selectedLog.action)
+                                                return (
+                                                    <span className={`inline-flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm ${styles.badge}`}>
+                                                        <span>{styles.icon}</span>
+                                                        <span>{selectedLog.action}</span>
+                                                    </span>
+                                                )
+                                            })()}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Status</label>
+                                        <div className="flex items-center space-x-2">
+
+                                            <span className={`inline-flex items-center space-x-1 px-3 py-1.5 rounded-full text-sm
+                                                ${selectedLog.status === 'success' ? 'bg-green-100 text-green-800' :
+                                                    selectedLog.status === 'error' ? 'bg-red-100 text-red-800' :
+                                                        selectedLog.status === 'failed' ? 'bg-orange-100 text-orange-800' :
+                                                            'bg-gray-100 text-gray-800'}`}
+                                            >
+                                                {selectedLog.status || 'Unknown'}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
+
 
                                 {/* Description */}
                                 <div>
@@ -510,6 +540,16 @@ export default function LogsPage() {
                                         {selectedLog.description || selectedLog.details || 'No description provided'}
                                     </p>
                                 </div>
+
+                                {selectedLog.status === 'error' || selectedLog.status === 'error' ?
+                                    <div>
+                                        <label className="block text-xs text-gray-500 mb-1">Reason</label>
+                                        <p className="text-gray-900 bg-[#e9e0d5] p-3 rounded-lg text-sm">
+                                            {selectedLog.reason || 'No description provided'}
+                                        </p>
+                                    </div>
+                                    :
+                                    null}
 
                                 {/* Timestamps */}
                                 <div className="grid grid-cols-2 gap-4">
@@ -557,7 +597,7 @@ export default function LogsPage() {
                             <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
                                 <button
                                     onClick={closeModal}
-                                    className="px-4 py-2 bg-[#876D4A] text-white rounded-lg hover:bg-[#756045] transition-colors text-sm font-medium"
+                                    className="px-4 py-2 bg-[#876D4A] text-white rounded-lg hover:bg-[#756045] transition-colors text-sm font-medium cursor-pointer"
                                 >
                                     Close
                                 </button>

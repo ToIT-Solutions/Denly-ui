@@ -12,28 +12,65 @@ export default function FeaturesPage() {
     const features = [
         {
             category: 'Financial Management',
-            description: 'Complete control over your rental finances with clear insights and automated tracking.',
+            description: 'Track rental income and keep clear visibility over property performance.',
             items: [
-                { title: 'Payment Tracking', description: 'Automatically track rent payments, send reminders, and identify late payments instantly.', icon: '💳' },
-                // { title: 'Expense Management', description: 'Categorize and track property expenses and operational spending.', icon: '📊' },
-                { title: 'Financial Reports', description: 'Generate detailed profit/loss statements, cash flow analysis, and tax-ready reports.', icon: '📈' }
+                {
+                    title: 'Payment Tracking',
+                    description: 'Track rent payments for each tenant and quickly identify overdue payments.',
+                    icon: '💳'
+                },
+                {
+                    title: 'Rent Overview',
+                    description: 'View expected rent vs received payments across all your properties.',
+                    icon: '📊'
+                },
+                {
+                    title: 'Financial Reports',
+                    description: 'Generate clear reports showing rental income and payment history.',
+                    icon: '📈'
+                }
             ]
         },
         {
             category: 'Property Management',
-            description: 'Centralized management for all your properties with real-time overview and insights.',
+            description: 'Manage all your properties and tenants from a single dashboard.',
             items: [
-                { title: 'Portfolio Dashboard', description: 'See all your properties at a glance with occupancy rates and financial performance.', icon: '🏠' },
-                { title: 'Tenant Management', description: 'Store tenant information, lease details, and communication history in one place.', icon: '👥' }
+                {
+                    title: 'Property Portfolio',
+                    description: 'View and manage all properties in one place with tenant occupancy insights.',
+                    icon: '🏠'
+                },
+                {
+                    title: 'Tenant Management',
+                    description: 'Store tenant profiles, lease periods, contact details, and statuses.',
+                    icon: '👥'
+                },
+                {
+                    title: 'Lease Tracking',
+                    description: 'Track lease start and end dates to stay ahead of renewals or terminations.',
+                    icon: '📅'
+                }
             ]
         },
         {
             category: 'Automation & Tools',
-            description: 'Smart automation that saves you time and reduces manual work.',
+            description: 'Smart tools designed to simplify daily property management tasks.',
             items: [
-                { title: 'Auto Reminders', description: 'Automated payment reminders to tenants and expense alerts to you.', icon: '⏰' },
-                { title: 'Late Fee Calculation', description: 'Automatic late fee calculations and tracking based on your rules.', icon: '💰' },
-                { title: 'Document Storage', description: 'Secure storage for leases, invoices, receipts, and important documents.', icon: '📁' }
+                {
+                    title: 'Activity Logs',
+                    description: 'Track important system actions such as payments, updates, and user activities for transparency and auditing.',
+                    icon: '📋'
+                },
+                {
+                    title: 'Secure Access Control',
+                    description: 'Role-based permissions ensure users only access features and data relevant to their responsibilities.',
+                    icon: '🔐'
+                },
+                {
+                    title: 'Document Storage',
+                    description: 'Store important documents such as lease agreements, receipts, and property records securely.',
+                    icon: '📁'
+                }
             ]
         }
     ]

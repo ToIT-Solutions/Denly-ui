@@ -30,6 +30,9 @@ tenant statuses
 consistency - inputs
 change password
 responsiveness app wide
+added status to log activity
+properties can be edited to the full capacity
+
 
 -----------DOING-------------
 
@@ -39,19 +42,16 @@ responsiveness app wide
 -----------TODO--------------
 hiding reports in navbar for other users
 CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
-
+editing tenant documents
 DELETION AND CASCADING
 
 PAYEMNTS PAYMENTS PAYEMNTS PAYEMNTS PAYEMNTS PAYEMNTS
 
-redo the property edit page since properties cant be edited to the full capacity
 
 
 ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
-                - STORE ACTIVITY STATUS (WHEN A LOGIN FAILS ITS SHOULD STILL LOG)
                 - CHANGES SNAPSHOT(WHAT WAS CHANGED WHEN EDITED FOR ANYTHING THAT IS EDITED)
                 - CHANGES JSON IN THE PRISMA
-                - 
 
 
 ------------CONTROLS----------------------
@@ -59,10 +59,14 @@ PARTIAL/ ADVANCED PAYMENTS  - keeping track of what percentage of the rent has b
                             - how many months rent has been paid
                             - leftovers/ spillages
 
+backend protection from deleting properties with tenants
+and tenants who still have paid in advance or a long leases
+log activity for auth/invitation controller
+
 
 ---------------THINGS TO CONSIDER---------------------
 phone number for users
-
+unit management
 
 
 

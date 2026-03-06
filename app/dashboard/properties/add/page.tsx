@@ -20,7 +20,7 @@ interface PropertyForm {
     city: string
     state: string
     zipCode: string
-    country: string
+    // country: string
     squareMeter: number
     monthlyRent: number
     features: string[]
@@ -87,8 +87,8 @@ export default function AddPropertyPage() {
         propertyMutate(payload)
     }
 
-    const residentialFeatures = ['Parking', 'Laundry', 'Gym', 'Pool', 'Pet Friendly', 'Furnished', 'Air Conditioning', 'Balcony', 'Storage', 'Patio']
-    const commercialFeatures = ['Parking', 'Elevator', 'Security System', 'Conference Room', 'Reception Area', 'Kitchenette', 'Restrooms', 'Storage', 'Loading Dock', 'HVAC']
+    const residentialFeatures = ['Parking', 'Laundry', 'Borehole', 'Gym', 'Pool', 'Pet Friendly', 'Furnished', 'Air Conditioning', 'Balcony', 'Storage', 'Patio']
+    const commercialFeatures = ['Parking', 'Elevator', 'Borehole', 'Security System', 'Conference Room', 'Reception Area', 'Kitchenette', 'Restrooms', 'Storage', 'Loading Dock', 'HVAC']
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -259,7 +259,7 @@ export default function AddPropertyPage() {
                                             <p className="mt-1 text-xs text-red-600">{errors.zipCode.message}</p>
                                         )}
                                     </div>
-                                    <div>
+                                    {/* <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
                                         <input
                                             type="text"
@@ -271,7 +271,7 @@ export default function AddPropertyPage() {
                                         {errors.country && (
                                             <p className="mt-1 text-xs text-red-600">{errors.country.message}</p>
                                         )}
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
 

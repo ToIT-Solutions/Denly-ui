@@ -9,7 +9,7 @@ interface PropertyData {
     city: string
     state: string
     zipCode: string
-    country: string
+    // country: string
     squareMeter: number
     monthlyRent: number
     features: string[]
