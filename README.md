@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Denly – Frontend
 
-## Getting Started
+## Overview
+This is the frontend for the Denly.  
+It provides a clean and simple interface for landlords and property managers to manage their properties, tenants, payments, and documents from a single dashboard.
 
-First, run the development server:
+The frontend communicates with the backend API and focuses on usability, performance, and clarity so users can quickly access important information about their rental portfolio.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Property Management
+- View and manage all properties in one place
+- See property details and tenant assignments
+- Edit property information when needed
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Tenant Management
+- Add and manage tenants
+- Store tenant contact and lease information
+- Track tenant status (active, pending, terminated, inactive)
 
-## Learn More
+### Payments
+- Track rent payments
+- View payment history
+- Filter payments by status, date, or tenant
 
-To learn more about Next.js, take a look at the following resources:
+### Document Storage
+- Upload and manage important tenant or property documents
+- Store leases and related files securely
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Dashboard Insights
+- Overview of properties and tenants
+- Financial summaries
+- Quick access to important information
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Tech Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Next.js** 
+- **React**
+- **TypeScript** 
+- **Tailwind CSS** 
+- **React Query**
+- **Axios**
+- **Zustand**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
