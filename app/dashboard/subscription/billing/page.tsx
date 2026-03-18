@@ -1,5 +1,4 @@
 "use client"
-import { getSubscriptionData } from '@/api/subscription'
 import Navbar from '@/components/Navbar'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchSubscriptionData, useFetchSubscriptionPlans } from '@/hooks/useSubscription'

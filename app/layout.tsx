@@ -12,6 +12,8 @@ const font = Raleway({
   // display: "swap",
 });
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Denly",
   description: "Rental properties made simple.",
