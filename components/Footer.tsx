@@ -109,6 +109,9 @@ export default function Footer() {
                         {/* <Link href="/cookies" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
                             Cookies
                         </Link> */}
+                        <div className="text-gray-400 transition-colors text-sm">
+                            Version: 1.0.0
+                        </div>
                     </div>
                 </div>
 

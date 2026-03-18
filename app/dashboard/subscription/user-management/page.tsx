@@ -340,6 +340,7 @@ export default function UserManagementPage() {
                                                 <p className="text-gray-600 text-xs mt-1">{role.description}</p>
                                             </div>
                                         ))}
+                                        <div className="text-gray-600 text-xs text-right">Version: 1.0.0</div>
                                     </div>
                                 </div>
 
