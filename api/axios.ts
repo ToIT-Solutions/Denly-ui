@@ -4,7 +4,7 @@ import { showErrorToast } from '@/lib/toast'
 import { redirect } from '@/lib/redirect'
 
 export const api = axios.create({
-    baseURL: 'https://denly-backend.onrender.com',
+    baseURL: 'https://denly-backend-2oce.onrender.com',
     // baseURL: 'http://localhost:8888/api',
     timeout: 5000,
     withCredentials: true,
