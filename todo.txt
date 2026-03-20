@@ -70,3 +70,8 @@ unit management
 
 
 
+
+-----------------THINGS TO FIX AFTER HOSTING-----------------
+EDIT COMPANY
+
+

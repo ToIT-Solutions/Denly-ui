@@ -6,7 +6,7 @@ import { redirect } from '@/lib/redirect'
 export const api = axios.create({
     baseURL: 'https://denly-backend-production.up.railway.app/api',
     // baseURL: 'http://localhost:8888/api',
-    timeout: 5000,
+    timeout: 10000,
     // withCredentials: true,
 })
 
