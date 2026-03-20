@@ -269,7 +269,7 @@ export default function TenantsPage() {
                                                         ) : (
                                                             <span className="text-gray-400 text-sm">—</span>
                                                         )} */}
-                                                        {formatDate(tenant?.payments[0].createdAt, 'long')}
+                                                        {formatDate(tenant?.payments[0]?.createdAt, 'long')}
                                                     </td>
                                                 </tr>
                                             ))}
