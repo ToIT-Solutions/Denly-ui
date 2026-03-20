@@ -7,7 +7,7 @@ export const api = axios.create({
     baseURL: 'https://denly-backend-2oce.onrender.com/api',
     // baseURL: 'http://localhost:8888/api',
     timeout: 5000,
-    withCredentials: true,
+    // withCredentials: true,
 })
 
 // Request interceptor - get token from Zustand
