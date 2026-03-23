@@ -88,14 +88,16 @@ export default function UserManagementPage() {
     }
 
     const handleCancelInvite = () => {
+        // const data = { id: inviteToCancelId }
         deleteInvite(inviteToCancelId)
+        // console.log(inviteToCancelId)
         closeCancelInviteModal()
     }
 
     const handleResendInvite = (inviteEmail: string) => {
         const data = { email: inviteEmail }
         resendInvite(data)
-        console.log(data)
+        // console.log(data)
     }
 
     const startRoleEdit = (userId: string, currentRole: string) => {

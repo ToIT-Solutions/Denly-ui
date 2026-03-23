@@ -22,34 +22,82 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 )
 
+// Define error types that should redirect to error page
+const REDIRECT_ERROR_STATUSES = [500, 502, 503, 504]
+const TOAST_ERROR_STATUSES = [400, 404, 409, 422]
+const AUTH_ERROR_STATUSES = [401]
+const SUBSCRIPTION_ERROR_STATUSES = [402]
+
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
-        if (error.response?.status === 401) {
-            console.log('no auth')
-            showErrorToast('Your session has expired. Log in')
+        const status = error.response?.status
+        const errorCode = error.response?.data?.code
+        const errorMessage = error.response?.data?.message
+
+        // Handle Authentication Errors (401)
+        if (status === 401) {
+            console.log('Authentication error')
+            showErrorToast('Your session has expired. Please log in again.')
             
-            // Get the clearUser function from Zustand and call it
             const { clearUser } = useAuthStore.getState()
             clearUser()
-            redirect('/auth/login')
             
-            // Redirect to login
             window.location.href = '/auth/login'
+            return Promise.reject(error)
         }
 
-        
-
-        if (error.response?.status === 402) {
+        // Handle Subscription Errors (402)
+        if (status === 402) {
+            console.log('Subscription error')
+            showErrorToast('Your subscription has expired or is inactive.')
             
-            console.log('no sub')
-            showErrorToast('Your subscription has expired')
-            
-            redirect('/dashboard/subscription/billing?state=no-sub')
-            
-            // Redirect to login
             window.location.href = '/dashboard/subscription/billing?state=no-sub'
+            return Promise.reject(error)
         }
+
+        // Handle Redirect Errors (500, 502, 503, 504, etc.)
+        if (REDIRECT_ERROR_STATUSES.includes(status)) {
+            console.log('Server error - redirecting to error page')
+            
+            // Encode the error message to safely pass in URL
+            const encodedMessage = encodeURIComponent(errorMessage || 'An unexpected server error occurred')
+            
+            window.location.href = `/error?status=${status}&code=${errorCode || 'SERVER_ERROR'}&message=${encodedMessage}`
+            return Promise.reject(error)
+        }
+
+        // Handle Specific Error Codes that should redirect
+        if (errorCode === 'DATABASE_ERROR' || 
+            errorCode === 'SERVICE_UNAVAILABLE' ||
+            errorCode === 'RATE_LIMIT_EXCEEDED' ||
+            errorCode === 'MAINTENANCE_MODE') {
+            
+            const encodedMessage = encodeURIComponent(errorMessage || `Error: ${errorCode}`)
+            window.location.href = `/error?status=${status || 500}&code=${errorCode}&message=${encodedMessage}`
+            return Promise.reject(error)
+        }
+
+        // Handle Network Errors (no response from server)
+        if (error.code === 'ECONNABORTED' || error.code === 'ERR_NETWORK') {
+            console.log('Network error')
+            
+            window.location.href = '/error?status=0&code=NETWORK_ERROR&message=Unable%20to%20connect%20to%20the%20server.%20Please%20check%20your%20internet%20connection.'
+            return Promise.reject(error)
+        }
+
+        // Handle Toast Errors (400, 404, 409, 422, etc.)
+        if (TOAST_ERROR_STATUSES.includes(status)) {
+            console.log('Client error - showing toast')
+            showErrorToast(errorMessage || 'An error occurred. Please try again.')
+            return Promise.reject(error)
+        }
+
+        // Handle any other unhandled errors - redirect to error page
+        console.log('Unhandled error:', error)
+        const encodedMessage = encodeURIComponent(errorMessage || error.message || 'An unexpected error occurred')
+        window.location.href = `/error?status=${status || 500}&code=${errorCode || 'UNKNOWN_ERROR'}&message=${encodedMessage}`
+        
         return Promise.reject(error)
     }
 )

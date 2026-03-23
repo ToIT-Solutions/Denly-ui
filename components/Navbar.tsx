@@ -76,8 +76,8 @@ export default function Navbar() {
                                 key={item.name}
                                 href={item.href}
                                 className={`transition-colors cursor-pointer text-sm ${isActive(item.href)
-                                        ? 'text-[#876D4A] border-b-2 border-[#876D4A] pb-1'
-                                        : 'text-gray-600 hover:text-[#876D4A]'
+                                    ? 'text-[#876D4A] border-b-2 border-[#876D4A] pb-1'
+                                    : 'text-gray-600 hover:text-[#876D4A]'
                                     }`}
                             >
                                 {item.name}
@@ -88,8 +88,8 @@ export default function Navbar() {
                             <Link
                                 href="/dashboard/reports"
                                 className={`transition-colors cursor-pointer text-sm ${isActive('/dashboard/reports')
-                                        ? 'text-[#876D4A] border-b-2 border-[#876D4A] pb-1'
-                                        : 'text-gray-600 hover:text-[#876D4A]'
+                                    ? 'text-[#876D4A] border-b-2 border-[#876D4A] pb-1'
+                                    : 'text-gray-600 hover:text-[#876D4A]'
                                     }`}
                             >
                                 Reports
@@ -213,6 +213,18 @@ export default function Navbar() {
                                     {item.name}
                                 </Link>
                             ))}
+
+                            {CAN_VIEW_REPORTS.includes(userRole) && (
+                                <Link
+                                    href="/dashboard/reports"
+                                    className={`transition-colors cursor-pointer text-sm ${isActive('/dashboard/reports')
+                                        ? 'text-[#876D4A] border-b-2 border-[#876D4A] pb-1'
+                                        : 'text-gray-600 hover:text-[#876D4A]'
+                                        }`}
+                                >
+                                    Reports
+                                </Link>
+                            )}
                         </div>
 
                         {CAN_INTERACT.includes(userRole) ? (

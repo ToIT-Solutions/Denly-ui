@@ -32,7 +32,10 @@ change password
 responsiveness app wide
 added status to log activity
 properties can be edited to the full capacity
-
+global dynamic error
+added reports to navbar on phone
+fixed edit company
+fixed the delete invite
 
 -----------DOING-------------
 
@@ -72,7 +75,4 @@ unit management
 
 
 -----------------THINGS TO FIX AFTER HOSTING-----------------
-EDIT COMPANY
-INVITE IS BEING JOINED ON RESEND AND DELETE
 INVITE EMAIL NOT SENDING
-
