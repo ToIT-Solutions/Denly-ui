@@ -43,6 +43,7 @@ export const useEditTenant = () => {
             console.log(data)
             showSuccessToast('Tenant edited successfully')
             queryClient.invalidateQueries({ queryKey: ["Tenant", tenantId] });
+            router.push(`/dashboard/tenants`)
         },
         onError: (error: any) => {
             showErrorToast(error)

@@ -1,5 +1,6 @@
 "use client"
 import Navbar from '@/components/Navbar'
+import Spinner from '@/components/Spinner'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchSubscriptionData, useFetchSubscriptionPlans } from '@/hooks/useSubscription'
 import { formatDate } from '@/lib/dateFormatter'
@@ -15,10 +16,10 @@ export default function BillingPage() {
 
     const { data, isLoading, error } = useFetchSubscriptionData()
     const refinedData = data?.[0]
-    console.log(refinedData)
+    // console.log(refinedData)
 
     const { data: subPlan, isLoading: loadingPlans, error: plansError } = useFetchSubscriptionPlans()
-    console.log(subPlan)
+    // console.log(subPlan)
 
 
     const currentPlan = {
@@ -130,51 +131,56 @@ export default function BillingPage() {
                         {/* Current Plan & Billing Info */}
                         <div className="lg:col-span-2 space-y-6">
                             {/* Current Plan Card */}
-                            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-                                    <div>
-                                        <h2 className="font-medium text-gray-900 mb-2">Current Plan</h2>
-                                        <div className="flex items-center space-x-3">
-                                            <span className="text-xl font-bold text-gray-900">{refinedData?.subscriptionPlan?.name}</span>
-                                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                                                {refinedData?.status}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="mt-3 sm:mt-0 text-right">
-                                        <div className="text-2xl font-bold text-gray-900">${refinedData?.subscriptionPlan?.priceMonthly}
-                                            <span className="text-base text-gray-600">/{currentPlan.period}</span>
-                                        </div>
-                                        <p className="text-xs text-gray-600">Next billing:
-                                            {formatDate(refinedData?.currentPeriodEnd)}</p>
-                                    </div>
-                                </div>
-
-                                <div className="border-t border-gray-200 pt-4 mb-2">
-                                    <h3 className="font-medium text-gray-900 mb-3">Plan Features</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                        {refinedData?.subscriptionPlan?.features.map((feature: any, index: any) => (
-                                            <div key={index} className="flex items-center space-x-2">
-                                                <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center">
-                                                    <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </div>
-                                                <span className="text-gray-700 text-xs">{feature}</span>
+                            {isLoading ?
+                                <Spinner />
+                                :
+                                <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                                        <div>
+                                            <h2 className="font-medium text-gray-900 mb-2">Current Plan</h2>
+                                            <div className="flex items-center space-x-3">
+                                                <span className="text-xl font-bold text-gray-900">{refinedData?.subscriptionPlan?.name}</span>
+                                                <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                                                    {refinedData?.status}
+                                                </span>
                                             </div>
-                                        ))}
+                                        </div>
+                                        <div className="mt-3 sm:mt-0 text-right">
+                                            <div className="text-2xl font-bold text-gray-900">${refinedData?.subscriptionPlan?.priceMonthly}
+                                                <span className="text-base text-gray-600">/{currentPlan.period}</span>
+                                            </div>
+                                            <p className="text-md text-gray-600">Next billing:
+                                                <span></span>{formatDate(refinedData?.currentPeriodEnd)}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border-t border-gray-200 pt-4 mb-2">
+                                        <h3 className="font-medium text-gray-900 mb-3">Plan Features</h3>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            {refinedData?.subscriptionPlan?.features.map((feature: any, index: any) => (
+                                                <div key={index} className="flex items-center space-x-2">
+                                                    <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center">
+                                                        <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                    </div>
+                                                    <span className="text-gray-700 text-xs">{feature}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="border-t border-gray-200 pt-4 flex space-x-3">
+                                        <button className="px-3 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-300 transition-colors text-xs font-medium">
+                                            Cancel Subscription
+                                        </button>
+                                        <button className="px-3 py-2 bg-[#876D4A] text-white rounded-lg hover:bg-[#756045] transition-colors text-xs font-medium">
+                                            Upgrade Plan
+                                        </button>
                                     </div>
                                 </div>
-
-                                <div className="border-t border-gray-200 pt-4 flex space-x-3">
-                                    <button className="px-3 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-300 transition-colors text-xs font-medium">
-                                        Cancel Subscription
-                                    </button>
-                                    <button className="px-3 py-2 bg-[#876D4A] text-white rounded-lg hover:bg-[#756045] transition-colors text-xs font-medium">
-                                        Upgrade Plan
-                                    </button>
-                                </div>
-                            </div>
+                            }
 
                             {/* Payment Method */}
                             <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
@@ -233,56 +239,61 @@ export default function BillingPage() {
                         <div className="space-y-4">
                             <h2 className="font-medium text-gray-900 mb-3">Available Plans</h2>
 
-                            {subPlan?.map((plan: any) => (
-                                <div key={plan.id} className={`bg-white rounded-xl p-4 border-2 ${plan.isPopular ? 'border-[#876D4A]' : 'border-gray-200'} shadow-sm relative`}>
-                                    {plan.isPopular && (
-                                        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                                            <span className="bg-[#876D4A] text-white px-2 py-1 rounded-full text-xs font-medium">
-                                                Most Popular
-                                            </span>
-                                        </div>
-                                    )}
+                            {loadingPlans ?
+                                <Spinner />
+                                :
+                                subPlan?.map((plan: any) => (
+                                    <div key={plan.id} className={`bg-white rounded-xl p-4 border-2 ${plan.isPopular ? 'border-[#876D4A]' : 'border-gray-200'} shadow-sm relative`}>
+                                        {plan.isPopular && (
+                                            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                                                <span className="bg-[#876D4A] text-white px-2 py-1 rounded-full text-xs font-medium">
+                                                    Most Popular
+                                                </span>
+                                            </div>
+                                        )}
 
-                                    <div className="text-center mb-4">
-                                        <h3 className="font-medium text-gray-900 text-sm mb-1">{plan.name}</h3>
-                                        <div className="flex items-baseline justify-center space-x-1">
-                                            <span className="text-xl font-bold text-gray-900">${plan.priceMonthly}</span>
-                                            <span className="text-gray-600 text-sm">/month</span>
+                                        <div className="text-center mb-4">
+                                            <h3 className="font-medium text-gray-900 text-sm mb-1">{plan.name}</h3>
+                                            <div className="flex items-baseline justify-center space-x-1">
+                                                <span className="text-xl font-bold text-gray-900">${plan.priceMonthly}</span>
+                                                <span className="text-gray-600 text-sm">/month</span>
+                                            </div>
+                                            <p className="text-gray-600 text-xs mt-1">{plan.description}</p>
                                         </div>
-                                        <p className="text-gray-600 text-xs mt-1">{plan.description}</p>
-                                    </div>
 
-                                    <div className="space-y-2 mb-4">
-                                        <div className="flex items-center space-x-2">
-                                            <svg className="w-3 h-3 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                            <span className="text-gray-700 text-xs">Up to {plan?.maxProperties} properties</span>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <svg className="w-3 h-3 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                            <span className="text-gray-700 text-xs">Up to {plan?.maxUsers} users</span>
-                                        </div>
-                                        {plan?.features?.map((feature: any, featureIndex: any) => (
-                                            <div key={featureIndex} className="flex items-center space-x-2">
+                                        <div className="space-y-2 mb-4">
+                                            <div className="flex items-center space-x-2">
                                                 <svg className="w-3 h-3 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                                 </svg>
-                                                <span className="text-gray-700 text-xs">{feature}</span>
+                                                <span className="text-gray-700 text-xs">Up to {plan?.maxProperties} properties</span>
                                             </div>
-                                        ))}
-                                    </div>
+                                            <div className="flex items-center space-x-2">
+                                                <svg className="w-3 h-3 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                <span className="text-gray-700 text-xs">Up to {plan?.maxUsers} users</span>
+                                            </div>
+                                            {plan?.features?.map((feature: any, featureIndex: any) => (
+                                                <div key={featureIndex} className="flex items-center space-x-2">
+                                                    <svg className="w-3 h-3 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    <span className="text-gray-700 text-xs">{feature}</span>
+                                                </div>
+                                            ))}
+                                        </div>
 
-                                    <button className={`w-full py-2 rounded-lg transition-colors text-xs font-medium cursor-pointer ${refinedData?.planId === plan.id
-                                        ? 'bg-[#876D4A] text-white hover:bg-[#584935]'
-                                        : 'border border-[#876D4A] text-[#876D4A] hover:bg-[#876D4A] hover:text-white'
-                                        }`}>
-                                        {refinedData?.planId === plan.id ? 'Current Plan' : 'Switch to ' + plan.name}
-                                    </button>
-                                </div>
-                            ))}
+                                        <Link href={`/dashboard/subscription/billing/pay?plan=${plan.name.toLowerCase()}`}>
+                                            <div className={`w-full py-2 rounded-lg transition-colors text-xs text-center font-medium cursor-pointer ${refinedData?.planId === plan.id
+                                                ? 'bg-[#876D4A] text-white hover:bg-[#584935]'
+                                                : 'border border-[#876D4A] text-[#876D4A] hover:bg-[#876D4A] hover:text-white'
+                                                }`}>
+                                                {refinedData?.planId === plan.id ? 'Current Plan' : 'Switch to ' + plan.name}
+                                            </div>
+                                        </Link>
+                                    </div>
+                                ))}
                         </div>
                     </div>
 

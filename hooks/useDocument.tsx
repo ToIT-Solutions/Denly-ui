@@ -1,5 +1,5 @@
 // hooks/useDocument.ts
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     fetchOneDocument,
     downloadDocument as downloadDocumentApi,
@@ -7,6 +7,8 @@ import {
     deleteDocument
 } from "@/api/document";
 import { api } from '@/api/axios'
+import { toast } from "sonner"
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 
 // ✅ For fetching document METADATA (what you were originally using)
@@ -90,12 +92,20 @@ export const useDownloadDocument = () => {
 
 // ✅ For DELETING document
 export const useDeleteDocument = () => {
+    const queryClient = useQueryClient();
     return useMutation({
         mutationFn: async (documentId: string) => {
             if (!documentId) throw new Error("Document ID is required");
             const response = await deleteDocument(documentId);
             return response;
         },
+        onSuccess: (documentId) => {
+            showSuccessToast('Document deleted successfully')
+            queryClient.invalidateQueries({ queryKey: ["allTenants"] });
+        },
+        onError: (error: any) => {
+            showErrorToast(error)
+        }
     });
 };
 

@@ -12,6 +12,7 @@ import { CAN_EDIT } from '@/lib/roles'
 import { useFetchAllProperties } from '@/hooks/useProperty'
 import { useFetchAllPayments } from '@/hooks/usePayment'
 import { toast } from 'sonner'
+import { useDeleteDocument, useDocumentActions } from '@/hooks/useDocument'
 
 interface TenantForm {
     // Personal Information
@@ -55,10 +56,15 @@ interface Payment {
 interface Document {
     id: string
     name: string
+    filename: string
     type: string
+    fileType: string
+    documentType: string
     category: DocumentCategory
     url: string
+    fileUrl: string
     size?: number
+    fileSize?: number
     uploadedAt: string
 }
 
@@ -113,14 +119,17 @@ export default function EditTenantPage() {
     const [newDocuments, setNewDocuments] = useState<DocumentFile[]>([])
     const [documentsToDelete, setDocumentsToDelete] = useState<string[]>([])
     const [activeCategory, setActiveCategory] = useState<DocumentCategory>(DocumentCategory.IDENTIFICATION)
+    const [activeDocumentId, setActiveDocumentId] = useState<string | null>(null)
+
 
     const { data, isLoading } = useFetchOneTenant(tenantId)
-    console.log(data)
+    // console.log(data)
     const { data: properties, isLoading: propertiesLoading } = useFetchAllProperties()
     const { data: payments } = useFetchAllPayments()
 
     const { mutate: editMutate, isPending: isEditPending, error: editError } = useEditTenant()
     const { mutate: deleteMutate, isPending: deletePending, error: deleteError } = useDeleteTenant()
+    const { mutate: deleteDocument, isPending: documentPending } = useDeleteDocument()
 
     const router = useRouter()
 
@@ -155,7 +164,7 @@ export default function EditTenantPage() {
 
     const selectedPropertyId = watch('propertyId')
 
-    // Category configurations
+    // Category configurations - ALL REQUIRED SET TO FALSE
     const categoryConfigs: CategoryConfig[] = [
         {
             id: DocumentCategory.IDENTIFICATION,
@@ -164,7 +173,7 @@ export default function EditTenantPage() {
             accept: '.pdf,.jpg,.jpeg,.png',
             multiple: true,
             maxFiles: 3,
-            required: true,
+            required: false, // Changed to false
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
@@ -178,6 +187,7 @@ export default function EditTenantPage() {
             accept: '.pdf,.jpg,.jpeg,.png,.doc,.docx',
             multiple: true,
             maxFiles: 6,
+            required: false, // Changed to false
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -191,7 +201,7 @@ export default function EditTenantPage() {
             accept: '.pdf,.doc,.docx',
             multiple: true,
             maxFiles: 2,
-            required: true,
+            required: false, // Changed to false
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -205,6 +215,7 @@ export default function EditTenantPage() {
             accept: '.pdf,.jpg,.jpeg,.png,.doc,.docx',
             multiple: true,
             maxFiles: 3,
+            required: false, // Changed to false
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -218,6 +229,7 @@ export default function EditTenantPage() {
             accept: '.pdf,.csv,.xls,.xlsx',
             multiple: true,
             maxFiles: 6,
+            required: false, // Changed to false
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4m-9 4v10" />
@@ -230,6 +242,7 @@ export default function EditTenantPage() {
             description: 'References, guarantor forms, additional documents',
             accept: '.pdf,.jpg,.jpeg,.png,.doc,.docx',
             multiple: true,
+            required: false, // Changed to false
             icon: (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
@@ -376,27 +389,27 @@ export default function EditTenantPage() {
     }
 
     const onSubmit = async (formData: TenantForm) => {
-        // Check required documents
-        const missingRequired = categoryConfigs
-            .filter(config => config.required)
-            .filter(config => {
-                const { existing, news } = getDocumentsByCategory(config.id)
-                return existing.length + news.length === 0
-            })
-            .map(config => config.label)
+        // Remove required document check - documents are now optional
+        // const missingRequired = categoryConfigs
+        //     .filter(config => config.required)
+        //     .filter(config => {
+        //         const { existing, news } = getDocumentsByCategory(config.id)
+        //         return existing.length + news.length === 0
+        //     })
+        //     .map(config => config.label)
 
-        if (missingRequired.length > 0) {
-            toast.error(`Please upload required documents: ${missingRequired.join(', ')}`, {
-                style: {
-                    background: 'red',
-                    border: 'none',
-                    textAlign: "center",
-                    justifyContent: "center",
-                    color: "white"
-                }
-            })
-            return
-        }
+        // if (missingRequired.length > 0) {
+        //     toast.error(`Please upload required documents: ${missingRequired.join(', ')}`, {
+        //         style: {
+        //             background: 'red',
+        //             border: 'none',
+        //             textAlign: "center",
+        //             justifyContent: "center",
+        //             color: "white"
+        //         }
+        //     })
+        //     return
+        // }
 
         const formattedData = {
             ...formData,
@@ -424,40 +437,68 @@ export default function EditTenantPage() {
 
         // No warnings, proceed with update
         executeUpdate(formattedData);
+        // console.log(formattedData)
     };
 
     const executeUpdate = (formattedData: TenantForm) => {
-        // Create FormData for file upload
-        const formDataToSend = new FormData()
+        // Check if there are any document changes
+        const hasNewDocuments = newDocuments.length > 0;
+        const hasDocumentsToDelete = documentsToDelete.length > 0;
 
-        // Append tenant data as JSON string
-        const tenantData = {
-            ...formattedData
+        // If no document changes, send as regular JSON
+        if (!hasNewDocuments && !hasDocumentsToDelete) {
+            // console.log('Sending as JSON:', formattedData);
+            editMutate({ tenantId, data: formattedData }, {
+                onSuccess: () => {
+                    router.push(`/dashboard/tenants/${tenantId}`);
+                }
+            });
+            return;
         }
 
-        formDataToSend.append('data', JSON.stringify(tenantData))
+        // If there are document changes, send as FormData
+        const formDataToSend = new FormData()
+
+        // IMPORTANT: Make sure formattedData is not empty
+        // console.log('Formatted data being sent:', formattedData);
+
+        // Convert to JSON string and append
+        const jsonString = JSON.stringify(formattedData);
+        // console.log('JSON string length:', jsonString.length);
+        formDataToSend.append('data', jsonString);
 
         // Append documents to delete
         if (documentsToDelete.length > 0) {
-            formDataToSend.append('deleteDocuments', JSON.stringify(documentsToDelete))
+            const deleteJson = JSON.stringify(documentsToDelete);
+            // console.log('Delete documents JSON:', deleteJson);
+            formDataToSend.append('deleteDocuments', deleteJson);
         }
 
         // Append all new documents
-        newDocuments.forEach((doc) => {
-            formDataToSend.append('documents', doc.file)
-        })
-
-        // Append categories for new documents
         if (newDocuments.length > 0) {
-            const categories = newDocuments.map(doc => doc.category)
-            formDataToSend.append('categories', JSON.stringify(categories))
+            // console.log('Number of new documents:', newDocuments.length);
+            newDocuments.forEach((doc, index) => {
+                // console.log(`Adding file ${index}:`, doc.file.name, doc.file.size);
+                formDataToSend.append('documents', doc.file);
+            });
+
+            // Append categories
+            const categories = newDocuments.map(doc => doc.category);
+            const categoriesJson = JSON.stringify(categories);
+            // console.log('Categories JSON:', categoriesJson);
+            formDataToSend.append('categories', categoriesJson);
         }
 
-        editMutate({ tenantId, data: formDataToSend }, {
-            onSuccess: () => {
-                router.push(`/dashboard/tenants/${tenantId}`);
-            }
-        });
+        // TEST: Verify FormData contents by getting them
+        // console.log('Verifying FormData contents:');
+        const dataValue = formDataToSend.get('data');
+        // console.log('Data field exists:', !!dataValue);
+        if (dataValue) {
+            // console.log('Data field length:', dataValue.toString().length);
+        }
+
+        // Send to backend
+        editMutate({ tenantId, data: formDataToSend });
     };
 
     const confirmPropertyChange = () => {
@@ -522,6 +563,21 @@ export default function EditTenantPage() {
         if (kb < 1024) return `${kb.toFixed(1)} KB`
         const mb = kb / 1024
         return `${mb.toFixed(1)} MB`
+    }
+
+    const {
+        viewDocument,
+    } = useDocumentActions()
+
+    const handleViewDocument = async (documentId: string) => {
+        try {
+            setActiveDocumentId(documentId)
+            await viewDocument(documentId)
+        } catch (error) {
+            console.error('Error viewing document:', error)
+        } finally {
+            setActiveDocumentId(null)
+        }
     }
 
     return (
@@ -1255,29 +1311,76 @@ export default function EditTenantPage() {
 
                             {/* Document Summary Sidebar */}
                             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
-                                <h3 className="font-medium text-gray-900 mb-3">Document Summary</h3>
-                                <div className="space-y-2">
-                                    {categoryConfigs.map((category) => {
-                                        const { existing, news } = getDocumentsByCategory(category.id)
-                                        const totalCount = existing.length + news.length
-                                        if (totalCount === 0) return null
-                                        return (
-                                            <div key={category.id} className="flex items-center justify-between">
-                                                <div className="flex items-center space-x-2">
-                                                    <span className="text-gray-600">{category.icon}</span>
-                                                    <span className="text-xs text-gray-600">{category.label}</span>
+                                <h3 className="font-medium text-gray-900 mb-3">Documents</h3>
+                                <div className="space-y-3 max-h-96 overflow-y-auto">
+                                    {existingDocuments.length > 0 ? (
+                                        existingDocuments.map((doc) => {
+                                            const category = categoryConfigs.find(c => c.id === doc.category)
+                                            return (
+                                                <div key={doc.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors group">
+                                                    <div className="flex items-center space-x-2 flex-1 min-w-0">
+                                                        {/* File Icon */}
+                                                        <div className="shrink-0">
+                                                            {getFileIcon(doc.fileType)}
+                                                        </div>
+                                                        {/* Document Info */}
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs font-medium text-gray-500 mb-1 truncate">{doc.documentType?.toUpperCase() || 'DOCUMENT'}</p>
+                                                            <p className="text-xs font-medium text-gray-900 truncate">{doc.filename}</p>
+                                                            <div className="flex items-center space-x-2 mt-0.5">
+                                                                {category && (
+                                                                    <span className="text-[10px] text-gray-500">{category.label}</span>
+                                                                )}
+                                                                <span className="text-[10px] text-gray-500">•</span>
+                                                                <span className="text-[10px] text-gray-500">
+                                                                    {formatFileSize(doc.fileSize)}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center space-x-1 shrink-0">
+                                                        {/* View Button */}
+                                                        <button
+                                                            onClick={() => handleViewDocument(doc.id)}
+                                                            className="p-1 text-gray-400 hover:text-[#876D4A] transition-colors cursor-pointer"
+                                                            title="View document"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                            </svg>
+                                                        </button>
+                                                        {/* Delete Button */}
+                                                        <button
+                                                            onClick={() => {
+                                                                if (confirm('Are you sure you want to delete this document?')) {
+                                                                    deleteDocument(doc.id)
+                                                                }
+                                                            }}
+                                                            className="p-1 cursor-pointer text-gray-400 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                                                            title="Delete document"
+                                                        >
+                                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <span className="text-xs font-medium text-gray-900">
-                                                    {totalCount}
-                                                    {news.length > 0 && <span className="text-blue-600 ml-1">(+{news.length})</span>}
-                                                </span>
-                                            </div>
-                                        )
-                                    })}
-                                    {existingDocuments.length === 0 && newDocuments.length === 0 && (
-                                        <p className="text-xs text-gray-500 text-center py-2">No documents uploaded</p>
+                                            )
+                                        })
+                                    ) : (
+                                        <p className="text-xs text-gray-500 text-center py-4">No documents uploaded</p>
                                     )}
                                 </div>
+
+                                {/* Document Count */}
+                                {existingDocuments.length > 0 && (
+                                    <div className="mt-3 pt-3 border-t border-gray-100">
+                                        <p className="text-xs text-gray-500">
+                                            Total: {existingDocuments.length} document{existingDocuments.length !== 1 ? 's' : ''}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

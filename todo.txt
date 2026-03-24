@@ -36,20 +36,16 @@ global dynamic error
 added reports to navbar on phone
 fixed edit company
 fixed the delete invite
-
------------DOING-------------
-
-
-
+fixed edit tenant and update & delete documents on edit tenant page
+fixed subscription plan order to ascending
 
 -----------TODO--------------
-hiding reports in navbar for other users
 CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
-editing tenant documents
 DELETION AND CASCADING
 
 PAYEMNTS PAYMENTS PAYEMNTS PAYEMNTS PAYEMNTS PAYEMNTS
 
+payment processing fee on checkout
 
 
 ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
@@ -62,15 +58,12 @@ PARTIAL/ ADVANCED PAYMENTS  - keeping track of what percentage of the rent has b
                             - how many months rent has been paid
                             - leftovers/ spillages
 
-backend protection from deleting properties with tenants
-and tenants who still have paid in advance or a long leases
 log activity for auth/invitation controller
 
 
 ---------------THINGS TO CONSIDER---------------------
 phone number for users
 unit management
-
 
 
 
