@@ -11,6 +11,7 @@ import { useState } from 'react'
 import useAuthStore from '@/store/useAuthStore'
 import { CAN_EDIT } from '@/lib/roles'
 import { formatDate } from '@/lib/dateFormatter'
+import { useFetchOneRentLedger } from '@/hooks/useRentLedger'
 
 export default function ViewTenantPage() {
 
@@ -23,6 +24,9 @@ export default function ViewTenantPage() {
 
     const { data, isLoading } = useFetchOneTenant(tenantId)
     console.log(data)
+
+    const { data: ledger } = useFetchOneRentLedger(tenantId)
+    console.log(ledger)
 
     usePageTitle(`${data?.firstName + ' ' + data?.lastName} - Denly`)
 
@@ -186,13 +190,13 @@ export default function ViewTenantPage() {
                                             <p className="text-xl font-semibold text-[#876D4A]">${data?.actualRent}</p>
                                         </div>
                                         <div>
-                                            <label className="text-xs text-gray-600">Rent Due Date</label>
+                                            {/* <label className="text-xs text-gray-600">Rent Due Date</label>
                                             <p className="text-gray-900 text-sm">
                                                 {data?.payments?.[0]?.dueDate
                                                     ? formatDate(data.payments[0].dueDate)
                                                     : 'Not set'
                                                 }
-                                            </p>
+                                            </p> */}
                                         </div>
                                         <div>
                                             <label className="text-xs text-gray-600">Lease Start</label>
@@ -223,18 +227,18 @@ export default function ViewTenantPage() {
                                             data.payments.map((payment: any) => (
                                                 <div key={payment.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-2xl">
                                                     <div>
-                                                        <p className="font-medium text-gray-900 text-sm">${payment.amount}</p>
+                                                        <p className="font-medium text-gray-900 text-sm">${payment.amountPaid}</p>
                                                         <p className="text-xs text-gray-600">
                                                             {formatDate(payment.createdAt, 'long')}
                                                         </p>
                                                     </div>
                                                     <div className="text-right">
-                                                        <span className={`px-2 py-1 rounded-full text-xs ${payment.status?.toLowerCase() === 'paid'
+                                                        {/* <span className={`px-2 py-1 rounded-full text-xs ${payment.status?.toLowerCase() === 'paid'
                                                             ? 'bg-green-100 text-green-800'
                                                             : 'bg-yellow-100 text-yellow-800'
                                                             }`}>
                                                             {payment.status}
-                                                        </span>
+                                                        </span> */}
                                                         <p className="text-xs text-gray-600 mt-1">{payment.paymentMethod || payment.method}</p>
                                                     </div>
                                                 </div>
@@ -351,21 +355,39 @@ export default function ViewTenantPage() {
                                     </div>
                                 </div>
 
-                                {/* Quick Actions Card */}
-                                {/* <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
-                                    <h2 className="font-medium text-gray-900 mb-3">Quick Actions</h2>
+                                {/* Rent Ledger Card */}
+                                <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                                    <h2 className="font-medium text-gray-900 mb-3">Rent Ledger</h2>
                                     <div className="space-y-2">
-                                        <button className="w-full text-left p-2 border border-gray-200 rounded-2xl hover:border-[#876D4A] hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-xs">
-                                            Record Payment
-                                        </button>
-                                        <button className="w-full text-left p-2 border border-gray-200 rounded-2xl hover:border-[#876D4A] hover:bg-[#876D4A] hover:text-white transition-colors cursor-pointer text-xs">
-                                            Send Reminder
-                                        </button>
-                                        <button className="w-full text-left p-2 border border-gray-200 rounded-2xl hover:border-red-200 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer text-xs">
-                                            Terminate Lease
-                                        </button>
+                                        {ledger?.length > 0 ? (
+                                            ledger.map((ledger: any) => (
+                                                <div key={ledger.id} className="flex items-center justify-between p-3 border border-gray-100 rounded-2xl">
+                                                    <div>
+                                                        <p className="font-medium text-gray-900 text-sm underline">{formatDate(ledger.periodStart, 'monthYear')}</p>
+                                                        {/* + ' to ' + formatDate(ledger.periodEnd) */}
+                                                        <p className="font-medium text-gray-900 text-sm mt-2">Amount Due: ${ledger.amount}</p>
+                                                        <p className="font-medium text-gray-900 text-sm">Amount Paid: ${ledger.amountPaid}</p>
+                                                        <p className="text-xs text-gray-600">
+                                                            {/* {formatDate(ledger.periodStart, 'monthYear')} */}
+                                                        </p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        {/* <p className="text-xs text-gray-600 mt-1">{ledger.status}</p> */}
+                                                        <span className={`px-2 py-1 rounded-full text-xs ${ledger.status?.toLowerCase() === 'paid' ? 'bg-green-100 text-green-800'
+                                                            : ledger.status?.toLowerCase() === 'partial' ? 'bg-yellow-100 text-yellow-800'
+                                                                : ledger.status?.toLowerCase() === 'overdue' ? 'bg-red-100 text-red-800'
+                                                                    : 'bg-gray-100 text-gray-800'
+                                                            }`}>
+                                                            {ledger.status}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-sm text-gray-500 text-center py-4">No rent ledger history available</p>
+                                        )}
                                     </div>
-                                </div> */}
+                                </div>
                             </div>
                         </div>
                     </div>

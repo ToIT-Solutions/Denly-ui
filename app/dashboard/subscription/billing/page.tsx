@@ -1,7 +1,9 @@
 "use client"
 import Navbar from '@/components/Navbar'
 import Spinner from '@/components/Spinner'
+import { useFetchAllBilling } from '@/hooks/useBilling'
 import { usePageTitle } from '@/hooks/usePageTitle'
+import { useFetchAllProperties } from '@/hooks/useProperty'
 import { useFetchSubscriptionData, useFetchSubscriptionPlans } from '@/hooks/useSubscription'
 import { formatDate } from '@/lib/dateFormatter'
 import Link from 'next/link'
@@ -18,99 +20,29 @@ export default function BillingPage() {
     const refinedData = data?.[0]
     // console.log(refinedData)
 
+    const { data: propertyData } = useFetchAllProperties()
+
     const { data: subPlan, isLoading: loadingPlans, error: plansError } = useFetchSubscriptionPlans()
     // console.log(subPlan)
 
+    const { data: billing, isLoading: loadingBilling } = useFetchAllBilling()
+    // console.log(billing)
 
-    const currentPlan = {
-        name: 'Professional',
-        price: '$49',
-        period: 'month',
-        features: [
-            'Up to 50 properties',
-            'Unlimited tenants',
-            'Advanced reporting',
-            'Priority support',
-            'Custom branding'
-        ],
-        status: 'active',
-        nextBilling: 'March 15, 2024'
-    }
 
-    const plans = [
-        {
-            name: 'Starter',
-            price: '$19',
-            period: 'month',
-            description: 'Perfect for small portfolios',
-            features: [
-                'Up to 10 properties',
-                'Basic reporting',
-                'Email support',
-                'Payment tracking',
-                'Tenant management'
-            ],
-            popular: false
-        },
-        {
-            name: 'Professional',
-            price: '$49',
-            period: 'month',
-            description: 'Ideal for growing businesses',
-            features: [
-                'Up to 50 properties',
-                'Advanced reporting',
-                'Priority support',
-                'Custom branding',
-                'API access',
-                'Bulk operations'
-            ],
-            popular: true
-        },
-        {
-            name: 'Enterprise',
-            price: '$99',
-            period: 'month',
-            description: 'For large property managers',
-            features: [
-                'Unlimited properties',
-                'Custom reporting',
-                '24/7 phone support',
-                'White-label solution',
-                'Dedicated account manager',
-                'Advanced analytics'
-            ],
-            popular: false
-        }
-    ]
-
-    const billingHistory = [
-        { id: 1, date: 'Feb 15, 2024', amount: '$49.00', status: 'Paid', invoice: 'INV-001' },
-        { id: 2, date: 'Jan 15, 2024', amount: '$49.00', status: 'Paid', invoice: 'INV-002' },
-        { id: 3, date: 'Dec 15, 2023', amount: '$49.00', status: 'Paid', invoice: 'INV-003' },
-        { id: 4, date: 'Nov 15, 2023', amount: '$49.00', status: 'Paid', invoice: 'INV-004' },
-    ]
-
-    const paymentMethod = {
-        type: 'credit_card',
-        last4: '4242',
-        brand: 'Visa',
-        expiry: '12/25'
-    }
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
-            {subState === 'no-sub' ?
+            {/* {subState === 'no-sub' ?
                 null
-                :
-                <Navbar />
-            }
+                : */}
+            <Navbar />
+            {/* } */}
 
             <div className="pt-20 px-4 sm:px-6 lg:px-8 py-4">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}
                     <div className="mb-6">
-                        <h1 className="text-2xl font-serif text-gray-900 mb-2">Billing & Subscription</h1>
+                        <h1 className="text-2xl font-serif text-gray-900 mb-2">Billing & Subscription (Beta)</h1>
                         <p className="text-gray-600 text-sm">Manage your subscription and payment methods</p>
                     </div>
 
@@ -140,14 +72,13 @@ export default function BillingPage() {
                                             <h2 className="font-medium text-gray-900 mb-2">Current Plan</h2>
                                             <div className="flex items-center space-x-3">
                                                 <span className="text-xl font-bold text-gray-900">{refinedData?.subscriptionPlan?.name}</span>
-                                                <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                                                <span className={`px-2 py-1 ${refinedData?.status === 'active' ? 'bg-green-100 text-green-800' : refinedData?.status === 'expired' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'}  rounded-full text-xs font-medium`}>
                                                     {refinedData?.status}
                                                 </span>
                                             </div>
                                         </div>
                                         <div className="mt-3 sm:mt-0 text-right">
                                             <div className="text-2xl font-bold text-gray-900">${refinedData?.subscriptionPlan?.priceMonthly}
-                                                <span className="text-base text-gray-600">/{currentPlan.period}</span>
                                             </div>
                                             <p className="text-md text-gray-600">Next billing:
                                                 <span></span>{formatDate(refinedData?.currentPeriodEnd)}
@@ -155,35 +86,72 @@ export default function BillingPage() {
                                         </div>
                                     </div>
 
-                                    <div className="border-t border-gray-200 pt-4 mb-2">
-                                        <h3 className="font-medium text-gray-900 mb-3">Plan Features</h3>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                            {refinedData?.subscriptionPlan?.features.map((feature: any, index: any) => (
-                                                <div key={index} className="flex items-center space-x-2">
-                                                    <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center">
-                                                        <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                                        </svg>
+                                    {refinedData?.subscriptionPlan ?
+                                        <div className="border-t border-gray-200 pt-4 mb-2">
+                                            <h3 className="font-medium text-gray-900 mb-3">Plan Features</h3>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                {refinedData?.subscriptionPlan?.features.map((feature: any, index: any) => (
+                                                    <div key={index} className="flex items-center space-x-2">
+                                                        <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center">
+                                                            <svg className="w-3 h-3 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        </div>
+                                                        <span className="text-gray-700 text-xs">{feature}</span>
                                                     </div>
-                                                    <span className="text-gray-700 text-xs">{feature}</span>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
+                                        :
+                                        null}
 
-                                    <div className="border-t border-gray-200 pt-4 flex space-x-3">
+                                    {/* <div className="border-t border-gray-200 pt-4 flex space-x-3">
                                         <button className="px-3 py-2 border border-red-300 text-red-700 rounded-lg hover:bg-red-300 transition-colors text-xs font-medium">
                                             Cancel Subscription
                                         </button>
                                         <button className="px-3 py-2 bg-[#876D4A] text-white rounded-lg hover:bg-[#756045] transition-colors text-xs font-medium">
                                             Upgrade Plan
                                         </button>
-                                    </div>
+                                    </div> */}
                                 </div>
                             }
 
+                            {/* Future Plans */}
+                            {billing && billing.length > 0 && (
+                                (() => {
+                                    const now = new Date();
+                                    const futureBills = billing.filter((b: any) =>
+                                        b.status === "success" && new Date(b.startDate) > now
+                                    );
+
+                                    if (futureBills.length === 0) return null;
+
+                                    return (
+                                        <div className="relative p-1 mb-6 rounded-xl"
+                                            style={{ background: 'linear-gradient(90deg, #FDE8C5, #F5A55D, #876D4A)' }}>
+                                            <div className="bg-white rounded-lg p-4 border border-transparent shadow-lg">
+                                                <h2 className="font-semibold text-xl text-gray-900 mb-4">Future Subscription Plan(s)</h2>
+                                                <div className="space-y-3">
+                                                    {futureBills.map((b: any) => (
+                                                        <div key={b.id} className="p-3 rounded-lg border-l-4 border-orange-400 bg-orange-50 shadow-sm">
+                                                            <p className="text-md text-gray-800 font-semibold">Subscription Plan: {b.planName}</p>
+                                                            <p className="text-md text-gray-700">
+                                                                Amount: ${Number(b.amount)} | Billing Period: {b.billingPeriod}
+                                                            </p>
+                                                            <p className="text-md text-gray-700">
+                                                                Starts: {formatDate(b.startDate)} | Ends: {formatDate(b.dueDate)}
+                                                            </p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })()
+                            )}
+
                             {/* Payment Method */}
-                            <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+                            {/* <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
                                 <h2 className="font-medium text-gray-900 mb-4">Payment Method</h2>
 
                                 <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
@@ -206,32 +174,42 @@ export default function BillingPage() {
                                         + Add Payment Method
                                     </button>
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Billing History */}
                             <div className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
-                                <h2 className="font-medium text-gray-900 mb-4">Billing History</h2>
+                                <h2 className="font-medium text-gray-900 mb-4 ">Billing History</h2>
 
                                 <div className="space-y-3">
-                                    {billingHistory.map((invoice) => (
-                                        <div key={invoice.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                    {billing?.map((billing: any) => (
+                                        <Link href={`/dashboard/subscription/billing/result?bill=${billing.id}`} key={billing.id} className="flex items-center justify-between p-3 border border-gray-200 hover:border-[#876D4A] hover:bg-gray-100  rounded-lg">
                                             <div>
-                                                <p className="font-medium text-gray-900 text-sm">{invoice.date}</p>
-                                                <p className="text-xs text-gray-600">{invoice.invoice}</p>
+                                                <p className="font-medium text-gray-900 text-md">Date: {formatDate(billing.createdAt, 'long')}</p>
+                                                <p className="text-md text-gray-700">Subscription Plan: {billing.planName}</p>
+                                                <p className="text-md text-gray-700">Billing Period: {billing.billingPeriod}</p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-medium text-gray-900 text-sm">{invoice.amount}</p>
-                                                <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                                                    {invoice.status}
+                                                <p className="font-medium text-gray-900 text-sm">${Number(billing.amount)}</p>
+                                                <span
+                                                    className={`px-2 py-1 rounded-full text-xs font-medium ${billing.status === "pending"
+                                                        ? "bg-orange-100 text-orange-800"
+                                                        : billing.status === "paid" || billing.status === "success"
+                                                            ? "bg-green-100 text-green-800"
+                                                            : billing.status === "error"
+                                                                ? "bg-red-100 text-red-800"
+                                                                : "bg-gray-200 text-gray-800" // fallback
+                                                        }`}
+                                                >
+                                                    {billing.status}
                                                 </span>
                                             </div>
-                                        </div>
+                                        </Link>
                                     ))}
                                 </div>
 
-                                <button className="w-full mt-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-xs">
+                                {/* <button className="w-full mt-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors text-xs">
                                     View Full Billing History
-                                </button>
+                                </button> */}
                             </div>
                         </div>
 
@@ -284,14 +262,16 @@ export default function BillingPage() {
                                             ))}
                                         </div>
 
-                                        <Link href={`/dashboard/subscription/billing/pay?plan=${plan.name.toLowerCase()}`}>
-                                            <div className={`w-full py-2 rounded-lg transition-colors text-xs text-center font-medium cursor-pointer ${refinedData?.planId === plan.id
-                                                ? 'bg-[#876D4A] text-white hover:bg-[#584935]'
-                                                : 'border border-[#876D4A] text-[#876D4A] hover:bg-[#876D4A] hover:text-white'
-                                                }`}>
-                                                {refinedData?.planId === plan.id ? 'Current Plan' : 'Switch to ' + plan.name}
-                                            </div>
-                                        </Link>
+                                        {plan.name === 'Free Trial' ? null :
+                                            <Link href={`/dashboard/subscription/billing/pay?plan=${plan.name.toLowerCase()}`}>
+                                                <div className={`w-full py-2 rounded-lg transition-colors text-xs text-center font-medium cursor-pointer ${refinedData?.planId === plan.id
+                                                    ? 'bg-[#876D4A] text-white hover:bg-[#584935]'
+                                                    : 'border border-[#876D4A] text-[#876D4A] hover:bg-[#876D4A] hover:text-white'
+                                                    }`}>
+                                                    {refinedData?.planId === plan.id ? 'Current Plan' : 'Switch to ' + plan.name}
+                                                </div>
+                                            </Link>
+                                        }
                                     </div>
                                 ))}
                         </div>
@@ -303,25 +283,25 @@ export default function BillingPage() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="text-center">
-                                <div className="text-xl font-bold text-gray-900 mb-1">8</div>
-                                <div className="text-xs text-gray-600">Properties Used</div>
-                                <div className="text-xs text-gray-500">of {refinedData?.subscriptionPlan?.maxProperties} available</div>
+                                <div className="text-xl font-bold text-gray-900 mb-1">{propertyData?.length || 0}</div>
+                                <div className="text-sm text-gray-600">Properties Used</div>
+                                <div className="text-sm text-gray-600">of {refinedData?.subscriptionPlan?.maxProperties} available</div>
                             </div>
-                            <div className="text-center">
+                            {/* <div className="text-center">
                                 <div className="text-xl font-bold text-gray-900 mb-1">24</div>
-                                <div className="text-xs text-gray-600">Active Tenants</div>
-                                <div className="text-xs text-gray-500">unlimited</div>
+                                <div className="text-sm text-gray-600">Active Tenants</div>
+                                <div className="text-sm text-gray-500">unlimited</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-xl font-bold text-gray-900 mb-1">156</div>
-                                <div className="text-xs text-gray-600">Payments Processed</div>
-                                <div className="text-xs text-gray-500">this month</div>
+                                <div className="text-sm text-gray-600">Payments Processed</div>
+                                <div className="text-sm text-gray-500">this month</div>
                             </div>
                             <div className="text-center">
                                 <div className="text-xl font-bold text-gray-900 mb-1">42%</div>
-                                <div className="text-xs text-gray-600">Storage Used</div>
-                                <div className="text-xs text-gray-500">of 10GB</div>
-                            </div>
+                                <div className="text-sm text-gray-600">Storage Used</div>
+                                <div className="text-sm text-gray-500">of 10GB</div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

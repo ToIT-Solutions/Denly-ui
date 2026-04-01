@@ -73,3 +73,13 @@ export const deleteProperty = async(propertyId: string) => {
         throw new Error(message);
     }
 }
+
+export const checkProperties = async() => {
+    try {
+        const response = await api.get(`/v1/property/check`);
+        return response.data;
+    } catch (error: any) {
+        const message = error.response?.data?.message || error.message || "An error occured when checking properties";
+        throw new Error(message);
+    }
+}

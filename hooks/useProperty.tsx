@@ -1,4 +1,4 @@
-import { addProperty, editProperty, fetchAllProperties, fetchOneProperty, deleteProperty } from "@/api/property";
+import { addProperty, editProperty, fetchAllProperties, fetchOneProperty, deleteProperty, checkProperties } from "@/api/property";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
@@ -68,5 +68,12 @@ export const useDeleteProperty = () => {
         onError: (error: any) => {
             showErrorToast(error)
         }
+    })
+}
+
+export const useCheckProperties = () => {
+    return useQuery({
+        queryKey: ["checkProperties"],
+        queryFn: () => checkProperties(),
     })
 }

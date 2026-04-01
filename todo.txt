@@ -38,14 +38,27 @@ fixed edit company
 fixed the delete invite
 fixed edit tenant and update & delete documents on edit tenant page
 fixed subscription plan order to ascending
+pay result page
+initiate payment page
+PAYEMENT PROCESSING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+integration with paynow and routing after paynow
+subscription stacking so that it depends on duedate if there is an active sub
+automated subscription switching
+subscription limits(front and backend) - inviting user, adding property
+grace period before marking subscription as expired
+changed payments structure so that they always auto generate then landlord changes whether they have been paid or not
+ALLOW EACH COMPANY TO DECIDE ITS OWN DUE date
+rent ledger and payment separation
 
 -----------TODO--------------
 CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
 DELETION AND CASCADING
 
-PAYEMNTS PAYMENTS PAYEMNTS PAYEMNTS PAYEMNTS PAYEMNTS
+SUBSCRIPTION LIMITS
 
-payment processing fee on checkout
+LOG ACTIVITY FOR BILLING
+
+fix the result page since whenever i visit it then gives me an error but i will probably just need to query the db when wanting to host anyway
 
 
 ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
@@ -53,19 +66,41 @@ ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
                 - CHANGES JSON IN THE PRISMA
 
 
+CHANGE THE PAYMENT STRUCTURE SO THAT THE AUTO-GENERATED INVOICES JUST HAVE TO BE EDITED WHETHER PAID OR OVERDUE
+
+cuid and uuid mixing
+
+OVERPAYMENT - TENANT SHOULD HAVE A FIELD OF CREDITBALANCE WHERE ANY OVERPAYMENT IS PUT INTO THEN USED FOR THE NEXT MONTH
+PENALTIES -
+
 ------------CONTROLS----------------------
 PARTIAL/ ADVANCED PAYMENTS  - keeping track of what percentage of the rent has been paid... if that is even a thing
                             - how many months rent has been paid
                             - leftovers/ spillages
 
-log activity for auth/invitation controller
 
 
 ---------------THINGS TO CONSIDER---------------------
 phone number for users
 unit management
-
+USING RESEND INSTEAD OF NODEMAILER FOR EMAILS OR I JUST USE A CRON BASED ONE THEN I ADD FIELDS TO THE SHCEMA TO TRACK IF AN EMAIL HAS BEEN SENT AND IF NOT IT WILL DO SO
 
 
 -----------------THINGS TO FIX AFTER HOSTING-----------------
 INVITE EMAIL NOT SENDING
+
+
+
+
+----------------------THINGS TO CHANGE WHEN NOW LIVE----------------------
+CHANGE THE POLLING FROM PER TRANSACTION TO THE CRON JOB - SO ESSENTIALLY IN THE BILLING RESULT PAGE IT SHOULD JUST CHECK FROM THE DB AND NOT ACTUALLY POLL PAYNOW
+INITAL PLAN AFTER SIGNUP IS ONLY 2 MINS SO EXTEND TO 7 DAYS
+OTHER PLANS ARE ALSO AT 2 MINS SO EXTEND TO 1 MONTH
+ACTIVATE ALL CRONS
+
+
+
+
+
+
+GIT MERGE WHEN NEAR PROD

@@ -1,112 +1,108 @@
 'use client'
-import { useForm } from 'react-hook-form'
+import { useForm, SubmitHandler } from 'react-hook-form'
 import { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllProperties } from '@/hooks/useProperty'
-import { useAddPayment } from '@/hooks/usePayment'
+import { useAddPayment, useFetchOnePayment } from '@/hooks/usePayment'
 import Spinner from '@/components/Spinner'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface Property {
-    id: string;
-    name: string;
-    address: string;
-    propertyType: string;
-    monthlyRent: string;
-    status: string;
-    tenants?: Tenant[];
+    id: string
+    name: string
+    address: string
+    propertyType: string
+    monthlyRent: string
+    status: string
+    tenants?: Tenant[]
 }
 
 interface Tenant {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
+    id: string
+    firstName: string
+    lastName: string
+    email: string
+    phone: string
+    actualRent?: number
 }
 
 interface PaymentFormData {
-    propertyId: string;
-    tenantId: string;
-    amount: number;
-    paymentDate: string;
-    paymentMethod: string;
-    notes: string;
-    duration: number;
+    // id?: string
+    propertyId: string
+    tenantId: string
+    amountPaid: number
+    paymentDate: string
+    paymentMethod?: string
+    notes?: string
+    duration: number
 }
 
 export default function RecordPaymentPage() {
     usePageTitle('New Payment - Denly')
-    const { data: propertyData, isPending: propertyPending, error: propertyError } = useFetchAllProperties()
 
-    const [selectedProperty, setSelectedProperty] = useState('')
-    const [selectedTenant, setSelectedTenant] = useState('')
+    const { data: propertyData, isPending: propertyPending } = useFetchAllProperties() as {
+        data: Property[] | undefined
+        isPending: boolean
+    }
+
+
+    const router = useRouter()
+    const { mutate: paymentMutate, isPending } = useAddPayment()
+
+    // const { data, isPending: dataPending } = useFetchOnePayment(id as string)
+    // console.log(data)
+
     const [availableTenants, setAvailableTenants] = useState<Tenant[]>([])
     const [expectedAmount, setExpectedAmount] = useState<number | null>(null)
 
-    const { mutate: paymentMutate, isPending, error } = useAddPayment()
-    const router = useRouter()
+    const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm<PaymentFormData>()
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        setValue,
-        watch,
-        getValues
-    } = useForm<PaymentFormData>()
-
-    // Watch for property and duration changes
     const watchedProperty = watch('propertyId')
     const watchedDuration = watch('duration')
 
-    // Calculate expected amount whenever property or duration changes
+    // Update tenants when property changes
     useEffect(() => {
-        if (watchedProperty && watchedDuration) {
-            const selectedProp = propertyData?.find((prop: Property) => prop.id === watchedProperty)
-            if (selectedProp) {
-                const monthlyRent = parseFloat(selectedProp.monthlyRent) || 0
-                const calculatedAmount = monthlyRent * watchedDuration
-                setExpectedAmount(calculatedAmount)
-            }
-        } else {
-            setExpectedAmount(null)
-        }
-    }, [watchedProperty, watchedDuration, propertyData])
 
-    // Update available tenants when property is selected
-    useEffect(() => {
         if (watchedProperty) {
-            const selectedProp = propertyData?.find((prop: Property) => prop.id === watchedProperty)
+            const selectedProp = propertyData?.find(p => p.id === watchedProperty)
             setAvailableTenants(selectedProp?.tenants || [])
-            // Clear tenant selection when property changes
             setValue('tenantId', '')
-            setSelectedTenant('')
         } else {
             setAvailableTenants([])
         }
     }, [watchedProperty, propertyData, setValue])
 
-    const onSubmit = (data: PaymentFormData) => {
-        console.log('Payment recorded:', data)
+    // Calculate expected amount
+    useEffect(() => {
+        if (watchedProperty && watchedDuration) {
+            const selectedProp = propertyData?.find(p => p.id === watchedProperty)
+            const monthlyRent = selectedProp?.tenants?.[0]?.actualRent || parseFloat(selectedProp?.monthlyRent || '0')
+            const totalAmount = monthlyRent * watchedDuration
+            setExpectedAmount(totalAmount)
+            setValue('amountPaid', totalAmount)
+        } else {
+            setExpectedAmount(null)
+        }
+    }, [watchedProperty, watchedDuration, propertyData, setValue])
 
-        const payload = {
+    const onSubmit: SubmitHandler<PaymentFormData> = (data) => {
+
+        const payload: PaymentFormData = {
             ...data,
-            amount: Number(data.amount)
+            amountPaid: Number(data.amountPaid),
         }
 
         paymentMutate(payload)
+        // console.log(payload)
     }
 
-    // Generate array of months from 1 to 12
     const months = Array.from({ length: 12 }, (_, i) => i + 1)
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
             <Navbar />
-
             <div className="pt-20 px-4 sm:px-6 lg:px-8 py-4">
                 <div className="max-w-6xl mx-auto">
                     {/* Header */}
@@ -120,188 +116,131 @@ export default function RecordPaymentPage() {
                         <p className="text-gray-600 text-sm">Enter payment details</p>
                     </div>
 
-                    {/* Payment Form */}
+                    {/* Form */}
                     <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                            {/* Property Dropdown */}
+                        {/* <div className='text-black'>You are about to record payment details for :-
+                            <div className='text-black'>Name: {data?.tenant?.firstName + ' ' + data?.tenant?.lastName + ' '}</div>
+                            <div className='text-black'>Property: {data?.property?.name} ({data?.property?.address})</div>
+                            <div className='text-black'>Monthly Rent: ${data?.tenant?.actualRent} </div>
+                            <div className='text-black'></div>
+                        </div> */}
+
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-6">
+                            {/* Property*/}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Property *
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Property *</label>
                                 <select
                                     {...register('propertyId', { required: 'Property is required' })}
                                     className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                 >
                                     <option value="">Select a property</option>
-                                    {propertyData?.map((property: Property) => (
-                                        <option key={property.id} value={property.id}>
-                                            {property.name} - {property.address} | (${property.monthlyRent}/month)
+                                    {propertyData?.map(p => (
+                                        <option key={p.id} value={p.id}>
+                                            {p.name} - {p.address} | (${p.monthlyRent}/month)
                                         </option>
                                     ))}
                                 </select>
-                                {errors.propertyId && (
-                                    <p className="text-red-600 text-xs mt-1">{errors.propertyId.message}</p>
-                                )}
+                                {errors.propertyId && <p className="text-red-600 text-xs mt-1">{errors.propertyId.message}</p>}
                             </div>
 
-                            {/* Tenant Dropdown - Updates based on property selection */}
+                            {/* Tenant */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Tenant *
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Tenant *</label>
                                 <select
                                     {...register('tenantId', { required: 'Tenant is required' })}
-                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                     disabled={!watchedProperty}
+                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                 >
                                     <option value="">{watchedProperty ? 'Select a tenant' : 'Select a property first'}</option>
-                                    {availableTenants.map((tenant: Tenant) => (
-                                        <option key={tenant.id} value={tenant.id}>
-                                            {tenant.firstName} {tenant.lastName}
+                                    {availableTenants.map(t => (
+                                        <option key={t.id} value={t.id}>
+                                            {t.firstName} {t.lastName} | (${t.actualRent || '0'}/month)
                                         </option>
                                     ))}
                                 </select>
-                                {errors.tenantId && (
-                                    <p className="text-red-600 text-xs mt-1">{errors.tenantId.message}</p>
-                                )}
-                                {!watchedProperty && (
-                                    <p className="text-gray-500 text-xs mt-1">Please select a property first to see available tenants</p>
-                                )}
-                                {watchedProperty && availableTenants.length === 0 && (
-                                    <p className="text-gray-500 text-xs mt-1">No tenants found for this property</p>
-                                )}
+                                {errors.tenantId && <p className="text-red-600 text-xs mt-1">{errors.tenantId.message}</p>}
                             </div>
 
-                            {/* Payment Duration */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Payment Duration (Months) *
-                                </label>
+                            {/* Duration */}
+                            {/* <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Payment Duration (Months) *</label>
                                 <select
                                     {...register('duration', {
-                                        required: 'Payment duration is required',
-                                        min: { value: 1, message: 'Duration must be at least 1 month' },
-                                        max: { value: 12, message: 'Duration cannot exceed 12 months' }
+                                        required: 'Duration is required',
+                                        min: { value: 1, message: 'Minimum 1 month' },
+                                        max: { value: 12, message: 'Maximum 12 months' }
                                     })}
                                     className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                 >
                                     <option value="">Select duration</option>
-                                    {months.map((month) => (
-                                        <option key={month} value={month}>
-                                            {month} {month === 1 ? 'month' : 'months'}
-                                        </option>
+                                    {months.map(m => (
+                                        <option key={m} value={m}>{m} {m === 1 ? 'month' : 'months'}</option>
                                     ))}
                                 </select>
-                                {errors.duration && (
-                                    <p className="text-red-600 text-xs mt-1">{errors.duration.message}</p>
-                                )}
-                            </div>
+                                {errors.duration && <p className="text-red-600 text-xs mt-1">{errors.duration.message}</p>}
+                            </div>  */}
 
                             {/* Amount */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Amount *
-                                </label>
-                                <div className="relative">
-                                    <span className="absolute left-3 top-2 text-gray-500 text-sm">$</span>
-                                    <input
-                                        type="text"
-                                        {...register('amount', {
-                                            required: 'Amount is required',
-                                            pattern: {
-                                                value: /^\d+$/,
-                                                message: 'Please enter a valid number'
-                                            },
-                                            min: { value: 0, message: 'Amount must be positive' }
-                                        })}
-                                        className="w-full pl-8 pr-3 py-2 border border-gray-300 text-black placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
-                                        placeholder="0.00"
-                                    />
-                                </div>
-                                {errors.amount && (
-                                    <p className="text-red-600 text-xs mt-1">{errors.amount.message}</p>
-                                )}
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Amount ($)*</label>
+                                <input
+                                    type="text"
+                                    {...register('amountPaid', { required: true, min: 0 })}
+                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
+                                    // value={expectedAmount || ''}
+                                    onChange={(e) => setValue('amountPaid', Number(e.target.value))}
+                                />
+                                {/* {expectedAmount && (
+                                    <p className="text-md text-orange-800 mt-1">
+                                        Expected: ${expectedAmount.toFixed(2)}
+                                    </p>
+                                )} */}
                             </div>
 
-                            {/* Expected Amount Display - Updates in real-time */}
-                            {expectedAmount !== null && (
-                                <div className="bg-orange-50 border border-orange-200 rounded-lg p-2 ">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-orange-800">Expected Amount:</span>
-                                        <span className="text-lg font-semibold text-orange-900">${expectedAmount.toFixed(2)}</span>
-                                    </div>
-                                    <p className="text-xs text-orange-600 mt-1">
-                                        Based on ${propertyData?.find((p: Property) => p.id === watchedProperty)?.monthlyRent} monthly rent × {watchedDuration} {watchedDuration === 1 ? 'month' : 'months'}
-                                    </p>
-                                </div>
-                            )}
-
                             {/* Payment Date */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Payment Date *
-                                </label>
+                            {/* <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Payment Date *</label>
                                 <input
                                     type="date"
                                     {...register('paymentDate', { required: 'Payment date is required' })}
-                                    className="w-full px-3 py-2 border border-gray-300 text-black placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
+                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                     defaultValue={new Date().toISOString().split('T')[0]}
                                 />
-                                {errors.paymentDate && (
-                                    <p className="text-red-600 text-xs mt-1">{errors.paymentDate.message}</p>
-                                )}
-                            </div>
+                            </div> */}
 
-                            {/* Payment Method (Optional) */}
+                            {/* Payment Method */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Payment Method
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
                                 <select
                                     {...register('paymentMethod')}
                                     className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                 >
-                                    <option value="">Select payment method</option>
+                                    {/* <option value="">Not Paid</option> */}
                                     <option value="bank_transfer">Bank Transfer</option>
                                     <option value="cash">Cash</option>
-                                    <option value="check">Check</option>
-                                    <option value="credit_card">Credit Card</option>
-                                    <option value="debit_card">Debit Card</option>
+                                    {/* <option value="check">Check</option> */}
+                                    {/* <option value="credit_card">Credit Card</option>
+                                    <option value="debit_card">Debit Card</option> */}
                                     <option value="mobile_money">Mobile Money</option>
                                 </select>
                             </div>
 
-                            {/* Reference/Notes (Optional) */}
+                            {/* Notes */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Reference / Notes
-                                </label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Reference / Notes</label>
                                 <textarea
                                     {...register('notes')}
                                     rows={3}
-                                    className="w-full px-3 py-2 border border-gray-300 text-black placeholder-gray-400 rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
-                                    placeholder="Add any reference numbers or notes about this payment..."
+                                    className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
+                                    placeholder="Optional notes"
                                 />
                             </div>
 
-                            {/* Form Actions */}
-                            {isPending ?
-                                <Spinner />
-                                :
+                            {/* Actions */}
+                            {isPending ? <Spinner /> :
                                 <div className="flex space-x-3 pt-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => router.back()}
-                                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-2xl hover:bg-gray-300 transition-colors cursor-pointer text-sm font-medium"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="flex-1 px-4 py-2 bg-[#876D4A] text-white rounded-2xl hover:bg-[#756045] transition-colors text-sm font-medium cursor-pointer"
-                                    >
-                                        Record Payment
-                                    </button>
+                                    <button type="button" onClick={() => router.back()} className="flex-1 px-4 py-2 border border-gray-300 rounded-2xl text-gray-700 hover:bg-gray-300 transition-colors cursor-pointer">Cancel</button>
+                                    <button type="submit" className="flex-1 px-4 py-2 bg-[#876D4A] text-white rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer">Record Payment</button>
                                 </div>
                             }
                         </form>

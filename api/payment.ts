@@ -1,12 +1,14 @@
 import {api} from './axios'
 
 interface PaymentData {
+    // id: string,
     propertyId: string;
     tenantId: string;
-    amount: number;
+    amountPaid: number;
     paymentDate: string;
-    paymentMethod: string;
-    notes: string;
+    paymentMethod?: string;
+    notes?: string;
+    duration: number;
 }
 
 export const addPayment = async(data: PaymentData) => {

@@ -236,7 +236,7 @@ export default function TenantsPage() {
                                                         <p className="text-gray-600 text-sm">{tenant.phone}</p>
                                                     </td>
                                                     <td className="p-6">
-                                                        <p className="text-gray-900">{tenant.property?.name || '—'}</p>
+                                                        <p className="text-gray-900">{tenant.rentLedger[0]?.property?.name || '—'}</p>
                                                     </td>
                                                     <td className="p-6">
                                                         <p className="text-[#876D4A] font-medium">${tenant.actualRent}</p>

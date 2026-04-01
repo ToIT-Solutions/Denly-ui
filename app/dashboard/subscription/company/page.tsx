@@ -17,6 +17,7 @@ interface CompanyFormData {
     country: string
     taxId: string
     industry: string
+    rentDueDay: number
 }
 
 export default function CompanyPage() {
@@ -38,7 +39,8 @@ export default function CompanyPage() {
             zipCode: '',
             country: '',
             taxId: '',
-            industry: ''
+            industry: '',
+            rentDueDay: 1
         }
     })
 
@@ -54,7 +56,8 @@ export default function CompanyPage() {
                 zipCode: data.zipCode,
                 country: data.country,
                 taxId: data.taxId,
-                industry: data.industry
+                industry: data.industry,
+                rentDueDay: data.rentDueDay
             })
         }
     }, [data, reset])
@@ -286,6 +289,30 @@ export default function CompanyPage() {
                                                 className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none"
                                             />
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h2 className="font-medium text-gray-900 mb-4">Settings</h2>
+                                    <div>
+                                        <label htmlFor="rentDueDay" className="block text-sm font-medium text-gray-700 mb-1">
+                                            Day Rent will be due on
+                                        </label>
+                                        <input
+                                            id="rentDueDay"
+                                            type="text"
+                                            {...register('rentDueDay', {
+                                                pattern: {
+                                                    value: /^[0-9\-]+$/,
+                                                    message: 'Invalid day number'
+                                                }
+                                            })}
+                                            className={`w-full border ${errors.rentDueDay ? 'border-red-300' : 'border-gray-300'
+                                                } text-black placeholder-gray-400 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-sm focus:outline-none`}
+                                        />
+                                        {errors.rentDueDay && (
+                                            <p className="mt-1 text-xs text-red-600">{errors.rentDueDay.message}</p>
+                                        )}
                                     </div>
                                 </div>
 
