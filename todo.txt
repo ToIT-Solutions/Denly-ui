@@ -38,6 +38,7 @@ fixed edit company
 fixed the delete invite
 fixed edit tenant and update & delete documents on edit tenant page
 fixed subscription plan order to ascending
+--
 pay result page
 initiate payment page
 PAYEMENT PROCESSING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -49,6 +50,8 @@ grace period before marking subscription as expired
 changed payments structure so that they always auto generate then landlord changes whether they have been paid or not
 ALLOW EACH COMPANY TO DECIDE ITS OWN DUE date
 rent ledger and payment separation
+error toasts now showing the error properly and only firing once
+added a progress bar for when routing between pages but not showing in dev for now
 
 -----------TODO--------------
 CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
@@ -65,8 +68,6 @@ ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
                 - CHANGES SNAPSHOT(WHAT WAS CHANGED WHEN EDITED FOR ANYTHING THAT IS EDITED)
                 - CHANGES JSON IN THE PRISMA
 
-
-CHANGE THE PAYMENT STRUCTURE SO THAT THE AUTO-GENERATED INVOICES JUST HAVE TO BE EDITED WHETHER PAID OR OVERDUE
 
 cuid and uuid mixing
 

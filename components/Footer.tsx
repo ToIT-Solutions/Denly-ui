@@ -81,12 +81,12 @@ export default function Footer() {
                             </li>
                             <li>
                                 <Link href="/terms" className="text-gray-300 hover:text-[#876D4A] transition-colors">
-                                    Terms
+                                    Terms of Service
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/privacy-policy" className="text-gray-300 hover:text-[#876D4A] transition-colors">
-                                    Privacy
+                                    Privacy Policy
                                 </Link>
                             </li>
                         </ul>
@@ -100,12 +100,12 @@ export default function Footer() {
                     </p>
 
                     <div className="flex flex-wrap justify-center sm:justify-end gap-6">
-                        <Link href="/terms" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
-                            Terms
+                        {/* <Link href="/terms" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
+                            Terms of Service
                         </Link>
                         <Link href="/privacy-policy" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
-                            Privacy
-                        </Link>
+                            Privacy Policy
+                        </Link> */}
                         {/* <Link href="/cookies" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
                             Cookies
                         </Link> */}
