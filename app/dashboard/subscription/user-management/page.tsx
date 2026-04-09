@@ -32,7 +32,7 @@ export default function UserManagementPage() {
     const { data, isLoading: isLoadingUsers } = useFetchAllUsers()
     const { data: invites, isLoading: isLoadingInvites } = useFetchAllInvites()
     const { data: subPlan } = useFetchSubscriptionData()
-    console.log(subPlan?.subscriptionPlan)
+    console.log(subPlan?.[0]?.subscriptionPlan?.maxUsers)
     // console.log(invites)
 
     const { mutate: updateRole, isPending: isUpdatingRole } = useEditUserRole()
@@ -385,7 +385,7 @@ export default function UserManagementPage() {
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-600 text-xs">Seats Used</span>
-                                            <span className="font-medium text-gray-900 text-sm">{data?.length}/{subPlan[0]?.subscriptionPlan?.maxUsers || 1}</span>
+                                            <span className="font-medium text-gray-900 text-sm">{data?.length}/{subPlan?.[0]?.subscriptionPlan?.maxUsers || 1}</span>
                                         </div>
                                     </div>
                                 </div>

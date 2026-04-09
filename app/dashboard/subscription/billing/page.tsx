@@ -6,11 +6,16 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllProperties } from '@/hooks/useProperty'
 import { useFetchSubscriptionData, useFetchSubscriptionPlans } from '@/hooks/useSubscription'
 import { formatDate } from '@/lib/dateFormatter'
+import { CAN_EDIT } from '@/lib/roles'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import useAuthStore from '@/store/useAuthStore'
 
 export default function BillingPage() {
     usePageTitle('Billing & Subscription - Denly')
+
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
 
     const params = useSearchParams()
     const subState = params.get('state')
@@ -262,15 +267,17 @@ export default function BillingPage() {
                                             ))}
                                         </div>
 
-                                        {plan.name === 'Free Trial' ? null :
-                                            <Link href={`/dashboard/subscription/billing/pay?plan=${plan.name.toLowerCase()}`}>
-                                                <div className={`w-full py-2 rounded-lg transition-colors text-xs text-center font-medium cursor-pointer ${refinedData?.planId === plan.id
-                                                    ? 'bg-[#876D4A] text-white hover:bg-[#584935]'
-                                                    : 'border border-[#876D4A] text-[#876D4A] hover:bg-[#876D4A] hover:text-white'
-                                                    }`}>
-                                                    {refinedData?.planId === plan.id ? 'Current Plan' : 'Switch to ' + plan.name}
-                                                </div>
-                                            </Link>
+                                        {CAN_EDIT.includes(userRole) ? (
+                                            plan.name === 'Free Trial' ? null :
+                                                <Link href={`/dashboard/subscription/billing/pay?plan=${plan.name.toLowerCase()}`}>
+                                                    <div className={`w-full py-2 rounded-lg transition-colors text-xs text-center font-medium cursor-pointer ${refinedData?.planId === plan.id
+                                                        ? 'bg-[#876D4A] text-white hover:bg-[#584935]'
+                                                        : 'border border-[#876D4A] text-[#876D4A] hover:bg-[#876D4A] hover:text-white'
+                                                        }`}>
+                                                        {refinedData?.planId === plan.id ? 'Current Plan' : 'Switch to ' + plan.name}
+                                                    </div>
+                                                </Link>
+                                        ) : null
                                         }
                                     </div>
                                 ))}

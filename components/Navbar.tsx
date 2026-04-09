@@ -84,7 +84,7 @@ export default function Navbar() {
                             </Link>
                         ))}
 
-                        {CAN_VIEW_REPORTS.includes(userRole) && (
+                        {/* {CAN_VIEW_REPORTS.includes(userRole) && (
                             <Link
                                 href="/dashboard/reports"
                                 className={`transition-colors cursor-pointer text-sm ${isActive('/dashboard/reports')
@@ -94,7 +94,7 @@ export default function Navbar() {
                             >
                                 Reports
                             </Link>
-                        )}
+                        )} */}
                     </div>
 
                     {/* User & Actions */}
@@ -169,6 +169,16 @@ export default function Navbar() {
                                         Billing & Subscription
                                     </Link>
 
+                                    {CAN_VIEW_REPORTS.includes(userRole) ? (
+                                        <Link
+                                            href={`/dashboard/reports`}
+                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                                            onClick={() => setIsUserMenuOpen(false)}
+                                        >
+                                            Reports
+                                        </Link>
+                                    ) : null}
+
                                     {CAN_VIEW_LOGS.includes(userRole) ? (
                                         <Link
                                             href={`/dashboard/subscription/logs`}
@@ -214,7 +224,7 @@ export default function Navbar() {
                                 </Link>
                             ))}
 
-                            {CAN_VIEW_REPORTS.includes(userRole) && (
+                            {/* {CAN_VIEW_REPORTS.includes(userRole) && (
                                 <Link
                                     href="/dashboard/reports"
                                     className={`transition-colors cursor-pointer text-sm ${isActive('/dashboard/reports')
@@ -224,7 +234,7 @@ export default function Navbar() {
                                 >
                                     Reports
                                 </Link>
-                            )}
+                            )} */}
                         </div>
 
                         {CAN_INTERACT.includes(userRole) ? (

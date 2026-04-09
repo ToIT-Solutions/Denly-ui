@@ -8,6 +8,7 @@ import { useFetchAllProperties } from '@/hooks/useProperty'
 import { useAddPayment, useFetchOnePayment } from '@/hooks/usePayment'
 import Spinner from '@/components/Spinner'
 import { useRouter, useSearchParams } from 'next/navigation'
+import useAuthStore from '@/store/useAuthStore'
 
 interface Property {
     id: string
@@ -47,6 +48,8 @@ export default function RecordPaymentPage() {
         isPending: boolean
     }
 
+    const user = useAuthStore((state) => state.user)
+    const userRole = user?.role
 
     const router = useRouter()
     const { mutate: paymentMutate, isPending } = useAddPayment()
@@ -64,6 +67,9 @@ export default function RecordPaymentPage() {
 
     // Update tenants when property changes
     useEffect(() => {
+        if (userRole !== 'Owner' && userRole !== 'Manager' && userRole !== 'Agent') {
+            return router.back()
+        }
 
         if (watchedProperty) {
             const selectedProp = propertyData?.find(p => p.id === watchedProperty)

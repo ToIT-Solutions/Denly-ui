@@ -38,7 +38,8 @@ fixed edit company
 fixed the delete invite
 fixed edit tenant and update & delete documents on edit tenant page
 fixed subscription plan order to ascending
---
+
+--paynow and rent ledger
 pay result page
 initiate payment page
 PAYEMENT PROCESSING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -52,12 +53,14 @@ ALLOW EACH COMPANY TO DECIDE ITS OWN DUE date
 rent ledger and payment separation
 error toasts now showing the error properly and only firing once
 added a progress bar for when routing between pages but not showing in dev for now
+moved reports to dropdown
+redid the viewer priveleges so they can only edit their own details
+made free trial 14 days
+pricing page now pulls data from db
 
 -----------TODO--------------
 CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
 DELETION AND CASCADING
-
-SUBSCRIPTION LIMITS
 
 LOG ACTIVITY FOR BILLING
 
