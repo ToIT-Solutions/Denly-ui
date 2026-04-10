@@ -1,7 +1,7 @@
 # Denly – Frontend
 
 ## Overview
-This is the frontend for the Denly.  
+This is the frontend for Denly.  
 It provides a clean and simple interface for landlords and property managers to manage their properties, tenants, payments, and documents from a single dashboard.
 
 The frontend communicates with the backend API and focuses on usability, performance, and clarity so users can quickly access important information about their rental portfolio.
