@@ -10,6 +10,7 @@ import Spinner from '@/components/Spinner'
 import useAuthStore from '@/store/useAuthStore'
 import { CAN_VIEW_REPORTS } from '@/lib/roles'
 import { useRouter } from 'next/navigation'
+import { useFetchSubscriptionData } from '@/hooks/useSubscription'
 
 export default function ReportsPage() {
     usePageTitle('Reports & Analytics - Denly')
@@ -30,11 +31,17 @@ export default function ReportsPage() {
     const [selectedReportType, setSelectedReportType] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
+    const { data: subPlan } = useFetchSubscriptionData()
+
     useEffect(() => {
         if (!CAN_VIEW_REPORTS.includes(userRole)) {
             return router.back()
         }
-    }, [userRole])
+
+        if (subPlan?.[0].subscriptionPlan.name === 'Free Trial') {
+            router.back()
+        }
+    }, [userRole, subPlan])
 
 
     // ============= CONSOLIDATED DATA =============

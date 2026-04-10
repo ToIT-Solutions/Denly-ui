@@ -57,6 +57,11 @@ moved reports to dropdown
 redid the viewer priveleges so they can only edit their own details
 made free trial 14 days
 pricing page now pulls data from db
+changed from pro to professional
+removed logs and reports for free trial
+basic and advanced logs when now on professional
+redid pricing features
+only frontend package limiting
 
 -----------TODO--------------
 CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
@@ -108,3 +113,9 @@ ACTIVATE ALL CRONS
 
 
 GIT MERGE WHEN NEAR PROD
+
+
+STARTER -> Professional 
+ADVANCED AND BASIC LOGS 
+ROLES ACCESS 
+

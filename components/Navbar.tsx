@@ -7,6 +7,7 @@ import useAuthStore from '@/store/useAuthStore'
 import { useRouter } from 'next/navigation'
 import logo from '@/public/img/logo.png'
 import { CAN_INTERACT, CAN_VIEW_LOGS, CAN_VIEW_REPORTS } from '@/lib/roles'
+import { useFetchSubscriptionData } from '@/hooks/useSubscription'
 
 export default function Navbar() {
     const pathname = usePathname()
@@ -19,6 +20,8 @@ export default function Navbar() {
 
     const clearUser = useAuthStore((state) => state.clearUser)
     const router = useRouter()
+
+    const { data: subPlan } = useFetchSubscriptionData()
 
     const navigation = [
         { name: 'Properties', href: `/dashboard/properties` },
@@ -169,25 +172,27 @@ export default function Navbar() {
                                         Billing & Subscription
                                     </Link>
 
-                                    {CAN_VIEW_REPORTS.includes(userRole) ? (
-                                        <Link
-                                            href={`/dashboard/reports`}
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-                                            onClick={() => setIsUserMenuOpen(false)}
-                                        >
-                                            Reports
-                                        </Link>
-                                    ) : null}
+                                    {subPlan?.[0].subscriptionPlan.name === 'Free Trial' ? null :
+                                        CAN_VIEW_REPORTS.includes(userRole) ? (
+                                            <Link
+                                                href={`/dashboard/reports`}
+                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                                                onClick={() => setIsUserMenuOpen(false)}
+                                            >
+                                                Reports
+                                            </Link>
+                                        ) : null}
 
-                                    {CAN_VIEW_LOGS.includes(userRole) ? (
-                                        <Link
-                                            href={`/dashboard/subscription/logs`}
-                                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
-                                            onClick={() => setIsUserMenuOpen(false)}
-                                        >
-                                            Logs Activity
-                                        </Link>
-                                    ) : null}
+                                    {subPlan?.[0].subscriptionPlan.name === 'Free Trial' ? null :
+                                        CAN_VIEW_LOGS.includes(userRole) ? (
+                                            <Link
+                                                href={`/dashboard/subscription/logs`}
+                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
+                                                onClick={() => setIsUserMenuOpen(false)}
+                                            >
+                                                Logs Activity
+                                            </Link>
+                                        ) : null}
 
                                     <div className="border-t border-gray-200 my-1"></div>
 

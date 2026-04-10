@@ -133,23 +133,24 @@ export default function UserManagementPage() {
                         </div>
 
                         <div className='relative group'>
-                            {CAN_MANAGE_USERS.includes(userRole) ?
+                            {subPlan?.[0].subscriptionPlan.name === 'Free Trial' || subPlan?.[0].subscriptionPlan.name === 'Starter' ? null :
+                                CAN_MANAGE_USERS.includes(userRole) ?
 
-                                isSendingInvite ?
-                                    <div className='px-9 py-2'>
-                                        <Spinner />
-                                    </div>
+                                    isSendingInvite ?
+                                        <div className='px-9 py-2'>
+                                            <Spinner />
+                                        </div>
+                                        :
+
+                                        <button
+                                            onClick={openInviteModal}
+                                            className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm w-fit font-medium"
+                                            disabled={isDisabled}
+                                        >
+                                            Invite User
+                                        </button>
                                     :
-
-                                    <button
-                                        onClick={openInviteModal}
-                                        className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm w-fit font-medium"
-                                        disabled={isDisabled}
-                                    >
-                                        Invite User
-                                    </button>
-                                :
-                                null
+                                    null
 
                             }
 
@@ -232,18 +233,19 @@ export default function UserManagementPage() {
                                                             <div className="flex items-center space-x-2">
                                                                 <p className="font-medium text-gray-900 text-sm">{user.role}</p>
 
-                                                                {CAN_CHANGE_ROLES.includes(userRole) ?
-                                                                    <button
-                                                                        onClick={() => startRoleEdit(user.id, user.role)}
-                                                                        className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-1 rounded-full hover:bg-gray-100"
-                                                                        title="Edit role"
-                                                                    >
-                                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                                        </svg>
-                                                                    </button>
-                                                                    :
-                                                                    null}
+                                                                {subPlan?.[0].subscriptionPlan.name === 'Free Trial' || subPlan?.[0].subscriptionPlan.name === 'Starter' ? null :
+                                                                    CAN_CHANGE_ROLES.includes(userRole) ?
+                                                                        <button
+                                                                            onClick={() => startRoleEdit(user.id, user.role)}
+                                                                            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-1 rounded-full hover:bg-gray-100"
+                                                                            title="Edit role"
+                                                                        >
+                                                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                                            </svg>
+                                                                        </button>
+                                                                        :
+                                                                        null}
                                                             </div>
                                                         )}
 

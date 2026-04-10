@@ -60,12 +60,12 @@ export default function PricingPage() {
                     </section>
 
                     {/* Pricing Grid */}
-                    <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 mb-16 sm:mb-20">
+                    <section className="relative z-10 max-w-8xl mx-auto px-4 sm:px-6 mb-16 sm:mb-20">
                         <div className="flex flex-col lg:grid lg:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto lg:overflow-visible pb-6 lg:pb-0">
                             {subPlan.map((plan: any) => (
                                 <div
                                     key={plan.id}
-                                    className={`relative bg-white rounded-2xl lg:rounded-3xl border ${plan.isPopular ? 'border-[#876D4A] ring-2 ring-[#876D4A]/20' : 'border-gray-200'} p-4 sm:p-6 shadow-sm flex flex-col min-w-[280px] sm:min-w-[300px] lg:min-w-0`}
+                                    className={`relative bg-white rounded-2xl lg:rounded-3xl border ${plan.isPopular ? 'border-[#876D4A] ring-5 ring-[#876D4A]/20' : 'border-gray-200'} p-4 sm:p-6 shadow-sm flex flex-col min-w-[290px] sm:min-w-[310px] lg:min-w-0`}
                                 >
                                     {/* Labels */}
                                     {plan.isPopular && <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
@@ -79,16 +79,17 @@ export default function PricingPage() {
                                     <div className="text-center mb-4 sm:mb-6 grow">
                                         <h3 className="text-lg sm:text-xl font-serif text-gray-800 mb-2">{plan.name}</h3>
                                         <div className="flex items-baseline justify-center mb-1">
-                                            <span className="text-2xl sm:text-3xl font-bold text-gray-900">{plan.priceMonthly}</span>
-                                            {plan.price !== '$0' && <span className="text-gray-600 ml-1 text-sm sm:text-base">/month</span>}
+                                            <span className="text-2xl sm:text-3xl font-bold text-gray-900">${plan.priceMonthly}</span>
+                                            {plan.priceMonthly !== 0 && <span className="text-gray-600 ml-1 text-sm sm:text-base font-medium">/month</span>}
                                         </div>
-                                        <p className="text-xs sm:text-sm text-[#876D4A] font-bold mb-2">{plan.maxProperties}  {plan.maxProperties === 1 ? 'property' : 'properties'} </p>
-                                        <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4">{plan.description}</p>
+                                        <p className={`text-md mt-2 ${plan.priceMonthly === 0 ? 'text-green-600' : 'text-[#876D4A]'} font-bold `}>{plan.maxProperties}  {plan.maxProperties === 1 ? 'property' : 'properties'} </p>
+                                        <p className={`text-md ${plan.priceMonthly === 0 ? 'text-green-600' : 'text-[#876D4A]'} font-bold mb-2`}>{plan.maxUsers}  {plan.maxUsers === 1 ? 'user' : 'users'} </p>
+                                        <p className="text-gray-600 text-xs sm:text-sm mb-3 sm:mb-4 mt-5 font-medium">{plan.description}</p>
 
-                                        <ul className="space-y-1 sm:space-y-2 text-left">
+                                        <ul className="space-y-1 sm:space-y-2 text-left font-medium">
                                             {plan.features.map((feature: any, featureIndex: any) => (
                                                 <li key={featureIndex} className="flex items-start text-xs sm:text-sm text-gray-600">
-                                                    <div className={`w-3 h-3 mt-0.5 ${plan.price === '$0' ? 'bg-green-500' : 'bg-[#876D4A]'} rounded-full mr-2 flex items-center justify-center`}>
+                                                    <div className={`w-3 h-3 mt-0.5 ${plan.priceMonthly === 0 ? 'bg-green-500' : 'bg-[#876D4A]'} rounded-full mr-2 flex items-center justify-center`}>
                                                         <div className="w-1 h-1 bg-white rounded-full"></div>
                                                     </div>
                                                     <span className="flex-1">{feature}</span>
@@ -97,17 +98,18 @@ export default function PricingPage() {
                                         </ul>
                                     </div>
 
-                                    {/* <Link
-                                        href={plan.name === 'Enterprise' ? '/contact' : '/auth/signup'}
+                                    <Link
+                                        href={`/auth/signup`}
+                                        // href={`/auth/signup?plan=${plan.name.toLowerCase()}`}
                                         className={`w-full text-center py-2 sm:py-3 rounded-full transition-colors mt-auto text-sm ${plan.popular
                                             ? 'bg-[#876D4A] text-white hover:bg-[#756045]'
-                                            : plan.price === '$0'
+                                            : plan.priceMonthly === 0
                                                 ? 'bg-green-500 text-white hover:bg-green-600'
                                                 : 'border border-[#876D4A] text-[#876D4A] hover:bg-[#876D4A] hover:text-white'
                                             }`}
                                     >
-                                        {plan.cta}
-                                    </Link> */}
+                                        Get Started
+                                    </Link>
                                 </div>
                             ))}
                         </div>
@@ -119,7 +121,7 @@ export default function PricingPage() {
                                 <div className="space-y-4 sm:space-y-6">
                                     <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200">
                                         <h3 className="font-medium text-gray-900 text-sm sm:text-base mb-2">How does the free trial work?</h3>
-                                        <p className="text-gray-600 text-xs sm:text-sm">Start with 14 days free with access to 3 properties. No credit card required. Upgrade to a paid plan after your trial ends.</p>
+                                        <p className="text-gray-600 text-xs sm:text-sm">Start with 14 days free with access to 1 property. No credit card required. Upgrade to a paid plan after your trial ends or when you are ready to upgrade.</p>
                                     </div>
                                     <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200">
                                         <h3 className="font-medium text-gray-900 text-sm sm:text-base mb-2">What happens after the trial?</h3>
@@ -133,7 +135,7 @@ export default function PricingPage() {
                                     </div>
                                     <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200">
                                         <h3 className="font-medium text-gray-900 text-sm sm:text-base mb-2">Is there a contract?</h3>
-                                        <p className="text-gray-600 text-xs sm:text-sm">No long-term contracts. All plans are month-to-month. Cancel anytime.</p>
+                                        <p className="text-gray-600 text-xs sm:text-sm">No long-term contracts. All plans are month-to-month.</p>
                                     </div>
                                 </div>
                             </div>
