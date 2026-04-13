@@ -141,10 +141,13 @@ export default function BillingPage() {
                                                         <div key={b.id} className="p-3 rounded-lg border-l-4 border-orange-400 bg-orange-50 shadow-sm">
                                                             <p className="text-md text-gray-800 font-semibold">Subscription Plan: {b.planName}</p>
                                                             <p className="text-md text-gray-700">
-                                                                Amount: ${Number(b.amount)} | Billing Period: {b.billingPeriod}
+                                                                <span className='font-bold'>Amount:</span> ${Number(b.amount)}
                                                             </p>
                                                             <p className="text-md text-gray-700">
-                                                                Starts: {formatDate(b.startDate)} | Ends: {formatDate(b.dueDate)}
+                                                                <span className='font-bold'>Starts:</span> {formatDate(b.startDate)} | <span className='font-bold'>Ends:</span>  {formatDate(b.dueDate)}
+                                                            </p>
+                                                            <p className="text-md text-gray-700">
+                                                                <span className='font-bold'>Billing Period:</span>  {b.billingPeriod}
                                                             </p>
                                                         </div>
                                                     ))}

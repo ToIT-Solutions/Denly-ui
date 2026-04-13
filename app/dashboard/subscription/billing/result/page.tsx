@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import Navbar from '@/components/Navbar'
 import { useFetchSubscriptionData } from '@/hooks/useSubscription'
-import { useFetchBillingStatus, useFetchPaynowPoll } from '@/hooks/useBilling'
+import { useFetchBillingStatus } from '@/hooks/useBilling'
 import { toast } from 'sonner'
 import { formatDate } from '@/lib/dateFormatter'
 
@@ -16,9 +16,7 @@ export default function PaymentResultPage() {
     const searchParams = useSearchParams()
     const router = useRouter()
     const [showDetails, setShowDetails] = useState(false)
-    const [countdown, setCountdown] = useState(5)
     const [shouldShow404, setShouldShow404] = useState(false)
-    const [isSyncing, setIsSyncing] = useState(false)
     const pollAttemptsRef = useRef(0)
 
     // Get status and other params
@@ -28,103 +26,27 @@ export default function PaymentResultPage() {
 
     const id = searchParams.get('bill') as string
 
-    // Poll external payment status (from Paynow)
-    const { data: poll, isPending: pollPending, refetch: refetchPoll } = useFetchPaynowPoll(id)
-
     // Fetch billing status from your database
     const { data: billing, isPending: billingPending, refetch: refetchBilling } = useFetchBillingStatus(id)
 
     const { data: subscriptionData, refetch: refetchSubscription } = useFetchSubscriptionData()
 
-    // Effect to sync poll status with billing status
-    useEffect(() => {
-        const syncPaymentStatus = async () => {
-            // If poll data exists and billing exists, check if they need syncing
-            if (poll && billing && !isSyncing) {
-                // Map external poll status to your billing status
-                let shouldUpdate = false
-                let newStatus: PaymentStatus | null = null
-
-                switch (poll?.status?.toLowerCase()) {
-                    case 'success':
-                    case 'paid':
-                    case 'completed':
-                        if (billing.status !== 'paid') {
-                            shouldUpdate = true
-                            newStatus = 'paid'
-                        }
-                        break
-                    case 'failed':
-                    case 'error':
-                        if (billing.status !== 'failed') {
-                            shouldUpdate = true
-                            newStatus = 'failed'
-                        }
-                        break
-                    case 'cancelled':
-                        if (billing.status !== 'cancelled') {
-                            shouldUpdate = true
-                            newStatus = 'cancelled'
-                        }
-                        break
-                    case 'pending':
-                        if (billing.status === 'pending') {
-                            // Still pending, continue polling
-                            break
-                        }
-                        break
-                    default:
-                        break
-                }
-
-                // If we need to update the billing status, we should wait a bit
-                // to give the webhook time to update the database
-                if (shouldUpdate && newStatus) {
-                    setIsSyncing(true)
-
-                    // Wait for 2 seconds before checking again (allows webhook to process)
-                    await new Promise(resolve => setTimeout(resolve, 2000))
-
-                    // Refetch billing to see if it's been updated
-                    const { data: updatedBilling } = await refetchBilling()
-
-                    if (updatedBilling && updatedBilling.status !== newStatus) {
-                        // Still out of sync - show a message to the user
-                        toast.warning('Payment status is updating. This may take a moment.', {
-                            duration: 5000,
-                        })
-
-                        // Try one more time after another delay
-                        setTimeout(async () => {
-                            await refetchBilling()
-                            setIsSyncing(false)
-                        }, 3000)
-                    } else {
-                        setIsSyncing(false)
-                    }
-                }
-            }
-        }
-
-        syncPaymentStatus()
-    }, [poll, billing, refetchBilling, isSyncing])
-
-    // Effect to handle polling retries and delays
+    // Effect to handle polling the database for status updates
     useEffect(() => {
         let pollInterval: NodeJS.Timeout
 
-        if (billing?.status === 'pending' && !pollPending && pollAttemptsRef.current < 10) {
+        if (billing?.status === 'pending' && pollAttemptsRef.current < 10) {
             pollInterval = setInterval(() => {
                 pollAttemptsRef.current += 1
-                refetchPoll()
+                refetchBilling()
 
                 // After 5 attempts, show a message if still pending
-                if (pollAttemptsRef.current === 5) {
-                    toast.info('Payment is taking longer than expected. We\'ll keep checking...', {
-                        duration: 5000,
-                    })
-                }
-            }) // Poll every 3 seconds
+                // if (pollAttemptsRef.current === 5) {
+                //     toast.info('Payment is taking longer than expected. We\'ll keep checking...', {
+                //         duration: 5000,
+                //     })
+                // }
+            }, 3000) // Poll every 3 seconds
         }
 
         return () => {
@@ -132,7 +54,7 @@ export default function PaymentResultPage() {
                 clearInterval(pollInterval)
             }
         }
-    }, [billing?.status, pollPending, refetchPoll])
+    }, [billing?.status, refetchBilling])
 
     // Check if billing record exists
     useEffect(() => {
@@ -150,34 +72,14 @@ export default function PaymentResultPage() {
         }
     }, [id, billing, billingPending])
 
-
     if (shouldShow404) {
         notFound()
         return null
     }
 
-    // Show loading state while checking billing status
-    if (billingPending || (pollPending && billing?.status === 'pending')) {
-        return (
-            <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
-                <Navbar />
-                <div className="pt-20 px-4 sm:px-6 lg:px-8 py-12">
-                    <div className="max-w-2xl mx-auto">
-                        <div className="bg-white rounded-2xl shadow-xl overflow-hidden p-12 text-center">
-                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                                <svg className="w-8 h-8 text-gray-400 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            </div>
-                            <p className="text-gray-600">Verifying your payment...</p>
-                            {isSyncing && (
-                                <p className="text-xs text-gray-500 mt-2">Syncing payment status...</p>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
+    // Show nothing while checking initial billing record existence
+    if (billingPending) {
+        return null
     }
 
     const currentPlan = subscriptionData?.[0]?.subscriptionPlan
@@ -313,7 +215,7 @@ export default function PaymentResultPage() {
 
     // Pending tips
     const pendingTips = [
-        { title: 'Processing Time', description: 'Payments typically take 1-5 minutes to process.' },
+        { title: 'Processing Time', description: 'Payments typically take 10 minutes to process.' },
         { title: 'Check Your Email', description: 'We\'ll send you a confirmation once the payment is complete.' },
         { title: 'Contact Support', description: 'If it takes longer than 20 minutes, please contact us.' }
     ]
@@ -413,7 +315,7 @@ export default function PaymentResultPage() {
                             )}
 
                             {/* Transaction Details (Success only) */}
-                            {billing?.status === 'paid' || billing?.status === 'success' && (
+                            {(billing?.status === 'paid' || billing?.status === 'success') && (
                                 <div className="bg-gray-50 rounded-xl p-6 mb-6">
                                     <h2 className="font-medium text-gray-900 mb-4">Transaction Details</h2>
                                     <div className="space-y-3">
@@ -539,7 +441,7 @@ export default function PaymentResultPage() {
                             )}
 
                             {/* What's Next (Success only) */}
-                            {billing?.status === 'paid' || billing?.status === 'success' && (
+                            {(billing?.status === 'paid' || billing?.status === 'success') && (
                                 <div className="mb-6">
                                     <h2 className="font-medium text-gray-900 mb-3">What's Next?</h2>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

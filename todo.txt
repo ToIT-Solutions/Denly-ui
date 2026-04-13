@@ -62,22 +62,19 @@ removed logs and reports for free trial
 basic and advanced logs when now on professional
 redid pricing features
 only frontend package limiting
+fixed last owner for sub deletion
+fixed result page and now checking billing database 
+changed emails from nodemailer to resend 
 
 -----------TODO--------------
-CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
 DELETION AND CASCADING
-
-LOG ACTIVITY FOR BILLING
-
-fix the result page since whenever i visit it then gives me an error but i will probably just need to query the db when wanting to host anyway
+AUTO START THE SUB IF COMING FROM FREE TRIAL
 
 
 ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
                 - CHANGES SNAPSHOT(WHAT WAS CHANGED WHEN EDITED FOR ANYTHING THAT IS EDITED)
                 - CHANGES JSON IN THE PRISMA
 
-
-cuid and uuid mixing
 
 OVERPAYMENT - TENANT SHOULD HAVE A FIELD OF CREDITBALANCE WHERE ANY OVERPAYMENT IS PUT INTO THEN USED FOR THE NEXT MONTH
 PENALTIES -
@@ -92,8 +89,6 @@ PARTIAL/ ADVANCED PAYMENTS  - keeping track of what percentage of the rent has b
 ---------------THINGS TO CONSIDER---------------------
 phone number for users
 unit management
-USING RESEND INSTEAD OF NODEMAILER FOR EMAILS OR I JUST USE A CRON BASED ONE THEN I ADD FIELDS TO THE SHCEMA TO TRACK IF AN EMAIL HAS BEEN SENT AND IF NOT IT WILL DO SO
-
 
 -----------------THINGS TO FIX AFTER HOSTING-----------------
 INVITE EMAIL NOT SENDING
@@ -102,20 +97,12 @@ INVITE EMAIL NOT SENDING
 
 
 ----------------------THINGS TO CHANGE WHEN NOW LIVE----------------------
-CHANGE THE POLLING FROM PER TRANSACTION TO THE CRON JOB - SO ESSENTIALLY IN THE BILLING RESULT PAGE IT SHOULD JUST CHECK FROM THE DB AND NOT ACTUALLY POLL PAYNOW
 INITAL PLAN AFTER SIGNUP IS ONLY 2 MINS SO EXTEND TO 7 DAYS
 OTHER PLANS ARE ALSO AT 2 MINS SO EXTEND TO 1 MONTH
 ACTIVATE ALL CRONS
 
 
 
-
-
-
-GIT MERGE WHEN NEAR PROD
-
-
-STARTER -> Professional 
-ADVANCED AND BASIC LOGS 
-ROLES ACCESS 
-
+------------LIVE DB--------------
+npx @railway/cli login --browserless
+THEN IN VSCODE SWITCH THE DB URL TO THE LIVE ONE THEN CONTINUE WITH NPX PRISMA BLAH BLAH

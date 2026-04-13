@@ -352,7 +352,7 @@ export default function PaymentPage() {
 
                                     {/* Features Preview */}
                                     <div className="space-y-1 mt-3">
-                                        {selectedPlan?.features?.slice(0, 4).map((feature: string, index: number) => (
+                                        {selectedPlan?.features?.slice(0, 12).map((feature: string, index: number) => (
                                             <div key={index} className="flex items-center space-x-2">
                                                 <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -360,8 +360,8 @@ export default function PaymentPage() {
                                                 <span className="text-xs text-gray-600">{feature}</span>
                                             </div>
                                         ))}
-                                        {selectedPlan?.features?.length > 4 && (
-                                            <p className="text-xs text-gray-500 mt-1">+{selectedPlan.features.length - 4} more features</p>
+                                        {selectedPlan?.features?.length > 12 && (
+                                            <p className="text-xs text-gray-500 mt-1">+{selectedPlan.features.length - 12} more features</p>
                                         )}
                                     </div>
                                 </div>
@@ -384,13 +384,13 @@ export default function PaymentPage() {
                                         <p className="text-xs text-gray-500 mt-1">
                                             {billingCycle === 'monthly'
                                                 ? 'Billed monthly'
-                                                : 'Billed annually, cancel anytime'}
+                                                : 'Billed annually'}
                                         </p>
                                     </div>
                                 </div>
 
                                 {/* Pay Button */}
-                                <button
+                                {/* <button
                                     onClick={handleSubmit}
                                     disabled={isProcessing || (paymentMethod === 'card' && (!cardNumber || !cardName || !expiryDate || !cvv))}
                                     className="w-full py-3 bg-[#876D4A] text-white rounded-xl hover:bg-[#756045] disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
@@ -406,7 +406,7 @@ export default function PaymentPage() {
                                     ) : (
                                         `Pay $${getTotal()}`
                                     )}
-                                </button>
+                                </button> */}
 
                                 <Image src={PayNow} alt='PayNow Button' className='mt-2 cursor-pointer mx-auto' onClick={handlePayment} />
 
