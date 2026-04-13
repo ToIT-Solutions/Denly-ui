@@ -12,7 +12,7 @@ export const useSignup = () => {
     return useMutation({
         mutationFn: signup,
         onSuccess: (data) => {
-            console.log(data)
+            // console.log(data)
             setUser(data)
             showSuccessToast('Account created successfully')
             router.push(`/dashboard/subscription/company`)

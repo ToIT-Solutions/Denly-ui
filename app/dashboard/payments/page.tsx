@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllPayments } from '@/hooks/usePayment'
 import { formatDate } from '@/lib/dateFormatter'
+import { useRouter } from 'next/navigation'
 import { useState, useMemo } from 'react'
 
 export default function PaymentsPage() {
@@ -15,11 +16,14 @@ export default function PaymentsPage() {
     ]
 
     const { data, isLoading, error } = useFetchAllPayments()
+    console.log(data)
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState('All Status')
     const [monthFilter, setMonthFilter] = useState('')
 
     const paymentData = data || payments
+
+    const router = useRouter()
 
     const filteredPayments = useMemo(() => {
         let filtered = paymentData
@@ -204,14 +208,14 @@ export default function PaymentsPage() {
                                         ? `${payment.tenant.firstName || ''} ${payment.tenant.lastName || ''}`.trim()
                                         : payment.tenant || 'Unknown Tenant'
 
-                                    const propertyName = payment.property?.name || payment.property || 'Unknown Property'
-                                    const paymentMethod = payment.paymentMethod || payment.method || 'Unknown Method'
+                                    const propertyName = payment.rentLedger?.property.name || 'Unknown Property'
+                                    const paymentMethod = payment.paymentMethod || payment.method || 'Not Paid'
                                     const paymentDate = payment.createdAt || payment.date || 'No date'
-                                    const paymentStatus = payment.status || 'Unknown'
-                                    const paymentAmount = Number(payment.amount) || 0
+                                    // const paymentStatus = payment.status || 'Unknown'
+                                    const paymentAmount = Number(payment.amountPaid) || 0
 
                                     return (
-                                        <div key={payment.id} className="p-4 sm:p-6 hover:bg-gray-50 transition-colors cursor-pointer">
+                                        <div onClick={() => router.push(`/dashboard/payments/new?id=${payment.id}`)} key={payment.id} className="p-4 sm:p-6 hover:bg-gray-200 transition-colors cursor-pointer">
                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                                                 <div className="flex items-center space-x-3 sm:space-x-4">
                                                     <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#876D4A] rounded-lg flex items-center justify-center text-white text-sm sm:text-base">💰</div>
@@ -224,7 +228,7 @@ export default function PaymentsPage() {
                                                     <p className="text-[#876D4A] font-medium text-lg sm:text-lg">${paymentAmount.toLocaleString()}</p>
                                                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end space-y-1 sm:space-y-0 sm:space-x-2 mt-1">
                                                         <p className="text-gray-600 text-xs sm:text-sm">{formatDate(paymentDate, 'long')}</p>
-                                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${paymentStatus.toLowerCase() === 'paid'
+                                                        {/* <span className={`px-2 py-1 rounded-full text-xs font-medium ${paymentStatus.toLowerCase() === 'paid'
                                                             ? 'bg-green-100 text-green-800'
                                                             : paymentStatus.toLowerCase() === 'overdue'
                                                                 ? 'bg-red-100 text-red-800'
@@ -233,7 +237,7 @@ export default function PaymentsPage() {
                                                                     : 'bg-gray-100 text-gray-800'
                                                             }`}>
                                                             {paymentStatus}
-                                                        </span>
+                                                        </span> */}
                                                     </div>
                                                 </div>
                                             </div>

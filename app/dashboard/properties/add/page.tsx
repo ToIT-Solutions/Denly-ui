@@ -4,7 +4,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 import { usePageTitle } from '@/hooks/usePageTitle'
-import { useAddProperty } from '@/hooks/useProperty'
+import { useAddProperty, useCheckProperties } from '@/hooks/useProperty'
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import Spinner from '@/components/Spinner'
@@ -38,6 +38,9 @@ interface PropertyForm {
 
 export default function AddPropertyPage() {
     usePageTitle('Add Property - Denly')
+
+    const { data: check } = useCheckProperties()
+    // console.log(check)
 
     const user = useAuthStore((state) => state.user)
     const userRole = user?.role
@@ -107,159 +110,168 @@ export default function AddPropertyPage() {
                         <p className="text-gray-600 text-sm">Add a new property to your portfolio</p>
                     </div>
 
-                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
-                            {/* Property Type Selection */}
-                            <div>
-                                <h2 className="font-medium text-gray-900 mb-3">Property Category</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <label className={`flex items-center p-3 border rounded-2xl cursor-pointer transition-all ${propertyType === 'residential' ? 'border-[#876D4A] bg-[#876D4A]/5' : 'border-gray-200 hover:border-gray-300'
-                                        }`}>
-                                        <input
-                                            type="radio"
-                                            value="residential"
-                                            {...register('propertyType')}
-                                            className="sr-only"
-                                        />
-                                        <div className="flex items-center space-x-3">
-                                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${propertyType === 'residential' ? 'border-[#876D4A]' : 'border-gray-300'
-                                                }`}>
-                                                {propertyType === 'residential' && <div className="w-2 h-2 bg-[#876D4A] rounded-full"></div>}
-                                            </div>
-                                            <div>
-                                                <div className="font-medium text-gray-900 text-sm">Residential</div>
-                                                <div className="text-xs text-gray-600">Houses, apartments, flats</div>
-                                            </div>
-                                        </div>
-                                    </label>
-                                    <label className={`flex items-center p-3 border rounded-2xl cursor-pointer transition-all ${propertyType === 'commercial' ? 'border-[#876D4A] bg-[#876D4A]/5' : 'border-gray-200 hover:border-gray-300'
-                                        }`}>
-                                        <input
-                                            type="radio"
-                                            value="commercial"
-                                            {...register('propertyType')}
-                                            className="sr-only"
-                                        />
-                                        <div className="flex items-center space-x-3">
-                                            <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${propertyType === 'commercial' ? 'border-[#876D4A]' : 'border-gray-300'
-                                                }`}>
-                                                {propertyType === 'commercial' && <div className="w-2 h-2 bg-[#876D4A] rounded-full"></div>}
-                                            </div>
-                                            <div>
-                                                <div className="font-medium text-gray-900 text-sm">Commercial</div>
-                                                <div className="text-xs text-gray-600">Offices, retail, industrial</div>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
+                    {check === true ?
+                        <div className="bg-red-300 rounded-xl border border-gray-200 shadow-sm p-6 text-black mb-4">
+                            You have reached the maximum number of properties for your subscription, upgrade now to manage more properties
+                        </div>
+                        :
+                        null}
 
-                            {/* Basic Information */}
-                            <div>
-                                <h2 className="font-medium text-gray-900 mb-4">Basic Information</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Property Name *</label>
-                                        <input
-                                            type="text"
-                                            {...register('name', { required: 'Property name is required' })}
-                                            placeholder="e.g., Downtown Loft"
-                                            className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.name ? 'border-red-500' : 'border-gray-300'
-                                                }`}
-                                        />
-                                        {errors.name && (
-                                            <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
-                                        )}
+                    {check === true ?
+                        null :
+                        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6" >
+                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate >
+                                {/* Property Type Selection */}
+                                <div>
+                                    <h2 className="font-medium text-gray-900 mb-3">Property Category</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <label className={`flex items-center p-3 border rounded-2xl cursor-pointer transition-all ${propertyType === 'residential' ? 'border-[#876D4A] bg-[#876D4A]/5' : 'border-gray-200 hover:border-gray-300'
+                                            }`}>
+                                            <input
+                                                type="radio"
+                                                value="residential"
+                                                {...register('propertyType')}
+                                                className="sr-only"
+                                            />
+                                            <div className="flex items-center space-x-3">
+                                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${propertyType === 'residential' ? 'border-[#876D4A]' : 'border-gray-300'
+                                                    }`}>
+                                                    {propertyType === 'residential' && <div className="w-2 h-2 bg-[#876D4A] rounded-full"></div>}
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-gray-900 text-sm">Residential</div>
+                                                    <div className="text-xs text-gray-600">Houses, apartments, flats</div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                        <label className={`flex items-center p-3 border rounded-2xl cursor-pointer transition-all ${propertyType === 'commercial' ? 'border-[#876D4A] bg-[#876D4A]/5' : 'border-gray-200 hover:border-gray-300'
+                                            }`}>
+                                            <input
+                                                type="radio"
+                                                value="commercial"
+                                                {...register('propertyType')}
+                                                className="sr-only"
+                                            />
+                                            <div className="flex items-center space-x-3">
+                                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${propertyType === 'commercial' ? 'border-[#876D4A]' : 'border-gray-300'
+                                                    }`}>
+                                                    {propertyType === 'commercial' && <div className="w-2 h-2 bg-[#876D4A] rounded-full"></div>}
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-gray-900 text-sm">Commercial</div>
+                                                    <div className="text-xs text-gray-600">Offices, retail, industrial</div>
+                                                </div>
+                                            </div>
+                                        </label>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Property Type *</label>
-                                        <select
-                                            {...register('type', { required: 'Property type is required' })}
-                                            className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black ${errors.type ? 'border-red-500' : 'border-gray-300'
-                                                }`}
-                                        >
-                                            <option value="">Select type</option>
-                                            {propertyType === 'residential' ? (
-                                                <>
-                                                    <option value="apartment">Apartment</option>
-                                                    <option value="house">House</option>
-                                                    <option value="condo">Condo</option>
-                                                    <option value="townhouse">Townhouse</option>
-                                                    <option value="duplex">Duplex</option>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <option value="office">Office Space</option>
-                                                    <option value="retail">Retail</option>
-                                                    <option value="industrial">Industrial</option>
-                                                    <option value="warehouse">Warehouse</option>
-                                                    <option value="mixed-use">Mixed-Use</option>
-                                                </>
+                                </div>
+
+                                {/* Basic Information */}
+                                <div>
+                                    <h2 className="font-medium text-gray-900 mb-4">Basic Information</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Property Name *</label>
+                                            <input
+                                                type="text"
+                                                {...register('name', { required: 'Property name is required' })}
+                                                placeholder="e.g., Downtown Loft"
+                                                className={`w-full border rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.name ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                            />
+                                            {errors.name && (
+                                                <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>
                                             )}
-                                        </select>
-                                        {errors.type && (
-                                            <p className="mt-1 text-xs text-red-600">{errors.type.message}</p>
-                                        )}
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
-                                        <input
-                                            type="text"
-                                            {...register('address', { required: 'Address is required' })}
-                                            placeholder="Street address"
-                                            className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.address ? 'border-red-500' : 'border-gray-300'
-                                                }`}
-                                        />
-                                        {errors.address && (
-                                            <p className="mt-1 text-xs text-red-600">{errors.address.message}</p>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
-                                        <input
-                                            type="text"
-                                            {...register('city', { required: 'City is required' })}
-                                            placeholder="City"
-                                            className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.city ? 'border-red-500' : 'border-gray-300'
-                                                }`}
-                                        />
-                                        {errors.city && (
-                                            <p className="mt-1 text-xs text-red-600">{errors.city.message}</p>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">State/Province *</label>
-                                        <input
-                                            type="text"
-                                            {...register('state', { required: 'State is required' })}
-                                            placeholder="State"
-                                            className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.state ? 'border-red-500' : 'border-gray-300'
-                                                }`}
-                                        />
-                                        {errors.state && (
-                                            <p className="mt-1 text-xs text-red-600">{errors.state.message}</p>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">ZIP/Postal Code *</label>
-                                        <input
-                                            type="text"
-                                            {...register('zipCode', {
-                                                required: 'ZIP code is required',
-                                                pattern: {
-                                                    value: /^\d{5}(-\d{4})?$/,
-                                                    message: 'Invalid ZIP code format'
-                                                }
-                                            })}
-                                            placeholder="ZIP code"
-                                            className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.zipCode ? 'border-red-500' : 'border-gray-300'
-                                                }`}
-                                        />
-                                        {errors.zipCode && (
-                                            <p className="mt-1 text-xs text-red-600">{errors.zipCode.message}</p>
-                                        )}
-                                    </div>
-                                    {/* <div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Property Type *</label>
+                                            <select
+                                                {...register('type', { required: 'Property type is required' })}
+                                                className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black ${errors.type ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                            >
+                                                <option value="">Select type</option>
+                                                {propertyType === 'residential' ? (
+                                                    <>
+                                                        <option value="apartment">Apartment</option>
+                                                        <option value="house">House</option>
+                                                        <option value="condo">Condo</option>
+                                                        <option value="townhouse">Townhouse</option>
+                                                        <option value="duplex">Duplex</option>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <option value="office">Office Space</option>
+                                                        <option value="retail">Retail</option>
+                                                        <option value="industrial">Industrial</option>
+                                                        <option value="warehouse">Warehouse</option>
+                                                        <option value="mixed-use">Mixed-Use</option>
+                                                    </>
+                                                )}
+                                            </select>
+                                            {errors.type && (
+                                                <p className="mt-1 text-xs text-red-600">{errors.type.message}</p>
+                                            )}
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+                                            <input
+                                                type="text"
+                                                {...register('address', { required: 'Address is required' })}
+                                                placeholder="Street address"
+                                                className={`w-full border rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.address ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                            />
+                                            {errors.address && (
+                                                <p className="mt-1 text-xs text-red-600">{errors.address.message}</p>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+                                            <input
+                                                type="text"
+                                                {...register('city', { required: 'City is required' })}
+                                                placeholder="City"
+                                                className={`w-full border rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.city ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                            />
+                                            {errors.city && (
+                                                <p className="mt-1 text-xs text-red-600">{errors.city.message}</p>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">State/Province *</label>
+                                            <input
+                                                type="text"
+                                                {...register('state', { required: 'State is required' })}
+                                                placeholder="State"
+                                                className={`w-full border rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.state ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                            />
+                                            {errors.state && (
+                                                <p className="mt-1 text-xs text-red-600">{errors.state.message}</p>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">ZIP/Postal Code *</label>
+                                            <input
+                                                type="text"
+                                                {...register('zipCode', {
+                                                    required: 'ZIP code is required',
+                                                    pattern: {
+                                                        value: /^\d{5}(-\d{4})?$/,
+                                                        message: 'Invalid ZIP code format'
+                                                    }
+                                                })}
+                                                placeholder="ZIP code"
+                                                className={`w-full border rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.zipCode ? 'border-red-500' : 'border-gray-300'
+                                                    }`}
+                                            />
+                                            {errors.zipCode && (
+                                                <p className="mt-1 text-xs text-red-600">{errors.zipCode.message}</p>
+                                            )}
+                                        </div>
+                                        {/* <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
                                         <input
                                             type="text"
@@ -272,303 +284,304 @@ export default function AddPropertyPage() {
                                             <p className="mt-1 text-xs text-red-600">{errors.country.message}</p>
                                         )}
                                     </div> */}
-                                </div>
-                            </div>
-
-                            {/* Property Details - Residential */}
-                            {propertyType === 'residential' && (
-                                <div>
-                                    <h2 className="font-medium text-gray-900 mb-4">Residential Details</h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
-                                            <input
-                                                type="text"
-                                                {...register('bedrooms', {
-                                                    min: { value: 0, message: 'Bedrooms cannot be negative' },
-                                                    pattern: {
-                                                        value: /^\d+$/,
-                                                        message: 'Please enter a valid number'
-                                                    },
-                                                })}
-                                                placeholder="0"
-                                                className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
-                                            />
-                                            {errors.bedrooms && (
-                                                <p className="mt-1 text-xs text-red-600">{errors.bedrooms.message}</p>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
-                                            <input
-                                                type="text"
-                                                {...register('bathrooms', {
-                                                    min: { value: 0, message: 'Bathrooms cannot be negative' },
-                                                    pattern: {
-                                                        value: /^\d+$/,
-                                                        message: 'Please enter a valid number'
-                                                    },
-                                                })}
-                                                placeholder="0"
-                                                className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
-                                            />
-                                            {errors.bathrooms && (
-                                                <p className="mt-1 text-xs text-red-600">{errors.bathrooms.message}</p>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Square Meter</label>
-                                            <input
-                                                type="text"
-                                                {...register('squareMeter', {
-                                                    min: { value: 0, message: 'Square Meter cannot be negative' },
-                                                    pattern: {
-                                                        value: /^\d+$/,
-                                                        message: 'Please enter a valid number'
-                                                    },
-                                                })}
-                                                placeholder="0"
-                                                className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
-                                            />
-                                            {errors.squareMeter && (
-                                                <p className="mt-1 text-xs text-red-600">{errors.squareMeter.message}</p>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
-                                            <input
-                                                type="text"
-                                                {...register('monthlyRent', {
-                                                    required: 'Monthly rent is required',
-                                                    pattern: {
-                                                        value: /^\d+$/,
-                                                        message: 'Please enter a valid number'
-                                                    },
-                                                    min: { value: 0, message: 'Rent must be positive' },
-                                                })}
-                                                placeholder="0.00"
-                                                className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.monthlyRent ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            />
-                                            {errors.monthlyRent && (
-                                                <p className="mt-1 text-xs text-red-600">{errors.monthlyRent.message}</p>
-                                            )}
-                                        </div>
-                                        {/* Max Tenants Field - Residential */}
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Maximum Number of Tenants *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                {...register('maxTenants', {
-                                                    required: 'Maximum tenants is required',
-                                                    pattern: {
-                                                        value: /^\d+$/,
-                                                        message: 'Please enter a valid number'
-                                                    },
-                                                    min: { value: 1, message: 'Must allow at least 1 tenant' },
-                                                    max: { value: 20, message: 'Maximum tenants cannot exceed 20' },
-                                                })}
-                                                placeholder="e.g., 4"
-                                                className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            />
-                                            {errors.maxTenants && (
-                                                <p className="mt-1 text-xs text-red-600">{errors.maxTenants.message}</p>
-                                            )}
-                                            <p className="mt-1 text-xs text-gray-500">
-                                                Maximum number of tenants that can occupy this residential property
-                                            </p>
-                                        </div>
                                     </div>
                                 </div>
-                            )}
 
-                            {/* Property Details - Commercial */}
-                            {propertyType === 'commercial' && (
-                                <div>
-                                    <h2 className="font-medium text-gray-900 mb-4">Commercial Details</h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Business Type</label>
-                                            <select
-                                                {...register('businessType')}
-                                                className="w-full border border-gray-300 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black"
-                                            >
-                                                <option value="">Select business type</option>
-                                                <option value="office">Office</option>
-                                                <option value="retail">Retail</option>
-                                                <option value="restaurant">Restaurant</option>
-                                                <option value="industrial">Industrial</option>
-                                                <option value="medical">Medical</option>
-                                                <option value="other">Other</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Lease Type</label>
-                                            <select
-                                                {...register('leaseType')}
-                                                className="w-full border border-gray-300 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black"
-                                            >
-                                                <option value="">Select lease type</option>
-                                                <option value="gross">Gross Lease</option>
-                                                <option value="net">Net Lease</option>
-                                                <option value="triple-net">Triple Net (NNN)</option>
-                                                <option value="modified-gross">Modified Gross</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Total Units</label>
-                                            <input
-                                                type="text"
-                                                {...register('totalUnits', {
-                                                    min: { value: 1, message: 'Must have at least 1 unit' },
-                                                    pattern: {
-                                                        value: /^\d+$/,
-                                                        message: 'Please enter a valid number'
-                                                    },
-                                                })}
-                                                placeholder="1"
-                                                className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Parking Spaces</label>
-                                            <input
-                                                type="text"
-                                                {...register('parkingSpaces', {
-                                                    min: { value: 0, message: 'Cannot be negative' },
-                                                    pattern: {
-                                                        value: /^\d+$/,
-                                                        message: 'Please enter a valid number'
-                                                    },
-                                                })}
-                                                placeholder="0"
-                                                className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
-                                            />
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Square Meter</label>
-                                            <input
-                                                type="text"
-                                                {...register('squareMeter', {
-                                                    min: { value: 0, message: 'Square Meter cannot be negative' },
-                                                    pattern: {
-                                                        value: /^\d+$/,
-                                                        message: 'Please enter a valid number'
-                                                    },
-                                                })}
-                                                placeholder="0"
-                                                className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
-                                            />
-                                        </div>
-                                        {/* Max Tenants Field - Commercial */}
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                Maximum Number of Tenants *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                {...register('maxTenants', {
-                                                    required: 'Maximum tenants is required',
-                                                    min: { value: 1, message: 'Must allow at least 1 tenant' },
-                                                    max: { value: 50, message: 'Maximum tenants cannot exceed 50' },
-                                                    pattern: {
-                                                        value: /^\d+$/,
-                                                        message: 'Please enter a valid number'
-                                                    },
-                                                })}
-                                                placeholder="e.g., 10"
-                                                className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            />
-                                            {errors.maxTenants && (
-                                                <p className="mt-1 text-xs text-red-600">{errors.maxTenants.message}</p>
-                                            )}
-                                            <p className="mt-1 text-xs text-gray-500">
-                                                Maximum number of tenants/occupants for this commercial space
-                                            </p>
-                                        </div>
-                                        <div className="md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
-                                            <input
-                                                type="text"
-                                                step="0.01"
-                                                {...register('monthlyRent', {
-                                                    required: 'Monthly rent is required',
-                                                    min: { value: 0, message: 'Rent must be positive' },
-                                                    pattern: {
-                                                        value: /^\d+$/,
-                                                        message: 'Please enter a valid number'
-                                                    },
-                                                })}
-                                                placeholder="0.00"
-                                                className={`w-full border rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.monthlyRent ? 'border-red-500' : 'border-gray-300'
-                                                    }`}
-                                            />
-                                            {errors.monthlyRent && (
-                                                <p className="mt-1 text-xs text-red-600">{errors.monthlyRent.message}</p>
-                                            )}
+                                {/* Property Details - Residential */}
+                                {propertyType === 'residential' && (
+                                    <div>
+                                        <h2 className="font-medium text-gray-900 mb-4">Residential Details</h2>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Bedrooms</label>
+                                                <input
+                                                    type="text"
+                                                    {...register('bedrooms', {
+                                                        min: { value: 0, message: 'Bedrooms cannot be negative' },
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
+                                                    })}
+                                                    placeholder="0"
+                                                    className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
+                                                />
+                                                {errors.bedrooms && (
+                                                    <p className="mt-1 text-xs text-red-600">{errors.bedrooms.message}</p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Bathrooms</label>
+                                                <input
+                                                    type="text"
+                                                    {...register('bathrooms', {
+                                                        min: { value: 0, message: 'Bathrooms cannot be negative' },
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
+                                                    })}
+                                                    placeholder="0"
+                                                    className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
+                                                />
+                                                {errors.bathrooms && (
+                                                    <p className="mt-1 text-xs text-red-600">{errors.bathrooms.message}</p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Square Meter</label>
+                                                <input
+                                                    type="text"
+                                                    {...register('squareMeter', {
+                                                        min: { value: 0, message: 'Square Meter cannot be negative' },
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
+                                                    })}
+                                                    placeholder="0"
+                                                    className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
+                                                />
+                                                {errors.squareMeter && (
+                                                    <p className="mt-1 text-xs text-red-600">{errors.squareMeter.message}</p>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
+                                                <input
+                                                    type="text"
+                                                    {...register('monthlyRent', {
+                                                        required: 'Monthly rent is required',
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
+                                                        min: { value: 0, message: 'Rent must be positive' },
+                                                    })}
+                                                    placeholder="0.00"
+                                                    className={`w-full border rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.monthlyRent ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
+                                                />
+                                                {errors.monthlyRent && (
+                                                    <p className="mt-1 text-xs text-red-600">{errors.monthlyRent.message}</p>
+                                                )}
+                                            </div>
+                                            {/* Max Tenants Field - Residential */}
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Maximum Number of Tenants *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    {...register('maxTenants', {
+                                                        required: 'Maximum tenants is required',
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
+                                                        min: { value: 1, message: 'Must allow at least 1 tenant' },
+                                                        max: { value: 20, message: 'Maximum tenants cannot exceed 20' },
+                                                    })}
+                                                    placeholder="e.g., 4"
+                                                    className={`w-full border rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
+                                                />
+                                                {errors.maxTenants && (
+                                                    <p className="mt-1 text-xs text-red-600">{errors.maxTenants.message}</p>
+                                                )}
+                                                <p className="mt-1 text-xs text-gray-500">
+                                                    Maximum number of tenants that can occupy this residential property
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {/* Features & Amenities */}
-                            <div>
-                                <h2 className="font-medium text-gray-900 mb-4">Features & Amenities</h2>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                                    {(propertyType === 'residential' ? residentialFeatures : commercialFeatures).map((feature) => (
-                                        <label key={feature} className="flex items-center space-x-2 cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                value={feature}
-                                                {...register('features')}
-                                                className="rounded border-gray-300 text-[#876D4A] focus:ring-[#876D4A] cursor-pointer w-4 h-4"
-                                            />
-                                            <span className="text-sm text-gray-700 cursor-pointer">{feature}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
+                                {/* Property Details - Commercial */}
+                                {propertyType === 'commercial' && (
+                                    <div>
+                                        <h2 className="font-medium text-gray-900 mb-4">Commercial Details</h2>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Business Type</label>
+                                                <select
+                                                    {...register('businessType')}
+                                                    className="w-full border border-gray-300 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black"
+                                                >
+                                                    <option value="">Select business type</option>
+                                                    <option value="office">Office</option>
+                                                    <option value="retail">Retail</option>
+                                                    <option value="restaurant">Restaurant</option>
+                                                    <option value="industrial">Industrial</option>
+                                                    <option value="medical">Medical</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Lease Type</label>
+                                                <select
+                                                    {...register('leaseType')}
+                                                    className="w-full border border-gray-300 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black"
+                                                >
+                                                    <option value="">Select lease type</option>
+                                                    <option value="gross">Gross Lease</option>
+                                                    <option value="net">Net Lease</option>
+                                                    <option value="triple-net">Triple Net (NNN)</option>
+                                                    <option value="modified-gross">Modified Gross</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Total Units</label>
+                                                <input
+                                                    type="text"
+                                                    {...register('totalUnits', {
+                                                        min: { value: 1, message: 'Must have at least 1 unit' },
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
+                                                    })}
+                                                    placeholder="1"
+                                                    className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Parking Spaces</label>
+                                                <input
+                                                    type="text"
+                                                    {...register('parkingSpaces', {
+                                                        min: { value: 0, message: 'Cannot be negative' },
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
+                                                    })}
+                                                    placeholder="0"
+                                                    className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
+                                                />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Square Meter</label>
+                                                <input
+                                                    type="text"
+                                                    {...register('squareMeter', {
+                                                        min: { value: 0, message: 'Square Meter cannot be negative' },
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
+                                                    })}
+                                                    placeholder="0"
+                                                    className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
+                                                />
+                                            </div>
+                                            {/* Max Tenants Field - Commercial */}
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                    Maximum Number of Tenants *
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    {...register('maxTenants', {
+                                                        required: 'Maximum tenants is required',
+                                                        min: { value: 1, message: 'Must allow at least 1 tenant' },
+                                                        max: { value: 50, message: 'Maximum tenants cannot exceed 50' },
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
+                                                    })}
+                                                    placeholder="e.g., 10"
+                                                    className={`w-full border rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.maxTenants ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
+                                                />
+                                                {errors.maxTenants && (
+                                                    <p className="mt-1 text-xs text-red-600">{errors.maxTenants.message}</p>
+                                                )}
+                                                <p className="mt-1 text-xs text-gray-500">
+                                                    Maximum number of tenants/occupants for this commercial space
+                                                </p>
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Rent ($) *</label>
+                                                <input
+                                                    type="text"
+                                                    step="0.01"
+                                                    {...register('monthlyRent', {
+                                                        required: 'Monthly rent is required',
+                                                        min: { value: 0, message: 'Rent must be positive' },
+                                                        pattern: {
+                                                            value: /^\d+$/,
+                                                            message: 'Please enter a valid number'
+                                                        },
+                                                    })}
+                                                    placeholder="0.00"
+                                                    className={`w-full border rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 ${errors.monthlyRent ? 'border-red-500' : 'border-gray-300'
+                                                        }`}
+                                                />
+                                                {errors.monthlyRent && (
+                                                    <p className="mt-1 text-xs text-red-600">{errors.monthlyRent.message}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
-                            {/* Description */}
-                            <div>
-                                <h2 className="font-medium text-gray-900 mb-3">Description</h2>
-                                <textarea
-                                    rows={3}
-                                    {...register('description')}
-                                    placeholder={
-                                        propertyType === 'residential'
-                                            ? "Describe the property, its features, neighborhood, and any important details..."
-                                            : "Describe the commercial space, business suitability, location advantages, and any important details..."
-                                    }
-                                    className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
-                                />
-                            </div>
-
-                            {/* Actions */}
-                            {isPending ?
-                                <Spinner /> :
-                                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-                                    <button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 transition-colors cursor-pointer text-sm font-medium"
-                                    >
-                                        {isSubmitting ? 'Adding Property...' : 'Add Property'}
-                                    </button>
-                                    <Link
-                                        href="/dashboard/properties"
-                                        className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-300 transition-colors cursor-pointer text-sm text-center font-medium"
-                                    >
-                                        Cancel
-                                    </Link>
+                                {/* Features & Amenities */}
+                                <div>
+                                    <h2 className="font-medium text-gray-900 mb-4">Features & Amenities</h2>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                                        {(propertyType === 'residential' ? residentialFeatures : commercialFeatures).map((feature) => (
+                                            <label key={feature} className="flex items-center space-x-2 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    value={feature}
+                                                    {...register('features')}
+                                                    className="rounded border-gray-300 accent-[#876D4A] text-[#876D4A] focus:ring-[#876D4A] focus:border-[#876D4A] cursor-pointer w-4 h-4 outline-0"
+                                                />
+                                                <span className="text-sm text-gray-700 cursor-pointer">{feature}</span>
+                                            </label>
+                                        ))}
+                                    </div>
                                 </div>
-                            }
-                        </form>
-                    </div>
+
+                                {/* Description */}
+                                <div>
+                                    <h2 className="font-medium text-gray-900 mb-3">Description</h2>
+                                    <textarea
+                                        rows={3}
+                                        {...register('description')}
+                                        placeholder={
+                                            propertyType === 'residential'
+                                                ? "Describe the property, its features, neighborhood, and any important details..."
+                                                : "Describe the commercial space, business suitability, location advantages, and any important details..."
+                                        }
+                                        className="w-full border border-gray-300 text-black placeholder-gray-400 rounded-2xl px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors"
+                                    />
+                                </div>
+
+                                {/* Actions */}
+                                {isPending ?
+                                    <Spinner /> :
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] disabled:bg-gray-400 transition-colors cursor-pointer text-sm font-medium"
+                                        >
+                                            {isSubmitting ? 'Adding Property...' : 'Add Property'}
+                                        </button>
+                                        <Link
+                                            href="/dashboard/properties"
+                                            className="border border-gray-300 text-gray-700 px-5 py-2 rounded-2xl hover:bg-gray-300 transition-colors cursor-pointer text-sm text-center font-medium"
+                                        >
+                                            Cancel
+                                        </Link>
+                                    </div>
+                                }
+                            </form>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

@@ -85,6 +85,16 @@ function ErrorContent() {
 
     const config = getErrorConfig()
 
+    const routing = () => {
+        const statusNum = status ? parseInt(status) : 500
+
+        if (statusNum === 0) {
+            window.history.go(-2)
+        } else {
+            router.back()
+        }
+    }
+
     return (
         <div className="min-h-screen bg-[#876D4A] flex items-center justify-center px-4 py-12 relative overflow-hidden">
             {/* Decorative Background Elements */}
@@ -184,7 +194,7 @@ function ErrorContent() {
 
                         {/* Action Buttons */}
                         <div className="space-y-3">
-                            <button
+                            {/* <button
                                 onClick={() => window.location.reload()}
                                 className="group w-full px-4 py-3 bg-linear-to-r from-[#876D4A] to-[#b89a6e] cursor-pointer text-white rounded-2xl hover:shadow-lg transition-all duration-300 font-medium flex items-center justify-center gap-2"
                             >
@@ -192,10 +202,10 @@ function ErrorContent() {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
                                 Try Again
-                            </button>
+                            </button> */}
 
                             <button
-                                onClick={() => router.back()}
+                                onClick={routing}
                                 className="w-full px-4 py-3 border-2 border-[#e9e0d5] text-gray-600 rounded-2xl cursor-pointer hover:bg-[#f8f6f2] hover:border-[#876D4A] transition-all duration-300 font-medium flex items-center justify-center gap-2"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

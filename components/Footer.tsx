@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import logoWhite from '@/public/img/logoWhite.png'
+import toit from '@/public/img/toit.png'
 
 export default function Footer() {
     return (
@@ -81,12 +82,12 @@ export default function Footer() {
                             </li>
                             <li>
                                 <Link href="/terms" className="text-gray-300 hover:text-[#876D4A] transition-colors">
-                                    Terms
+                                    Terms of Service
                                 </Link>
                             </li>
                             <li>
                                 <Link href="/privacy-policy" className="text-gray-300 hover:text-[#876D4A] transition-colors">
-                                    Privacy
+                                    Privacy Policy
                                 </Link>
                             </li>
                         </ul>
@@ -96,16 +97,23 @@ export default function Footer() {
                 {/* Bottom */}
                 <div className="border-t border-gray-700 mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
                     <p className="text-gray-400 text-sm">
-                        © {new Date().getFullYear()} Denly. All rights reserved.
+                        <div className='flex'>
+                            <p>© {new Date().getFullYear()} Denly. a product of</p>
+                            <Link href={'https://toitsolutions.co.zw'} target='_blank'>
+                                <Image src={toit} alt='Toit Logo' className='ml-1 w-10 ' style={{ marginTop: '-15px' }} />
+                            </Link>
+                        </div>
+                        <p> All rights reserved.</p>
+
                     </p>
 
                     <div className="flex flex-wrap justify-center sm:justify-end gap-6">
-                        <Link href="/terms" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
-                            Terms
+                        {/* <Link href="/terms" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
+                            Terms of Service
                         </Link>
                         <Link href="/privacy-policy" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
-                            Privacy
-                        </Link>
+                            Privacy Policy
+                        </Link> */}
                         {/* <Link href="/cookies" className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm">
                             Cookies
                         </Link> */}
@@ -116,6 +124,6 @@ export default function Footer() {
                 </div>
 
             </div>
-        </footer>
+        </footer >
     )
 }

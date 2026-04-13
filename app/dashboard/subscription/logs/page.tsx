@@ -7,6 +7,7 @@ import { useFetchAllLogs } from '@/hooks/useLogs'
 import { showErrorToast } from '@/lib/toast'
 import { useRouter } from 'next/navigation'
 import useAuthStore from '@/store/useAuthStore'
+import { useFetchSubscriptionData } from '@/hooks/useSubscription'
 
 export default function LogsPage() {
     usePageTitle('Activity Logs - Denly')
@@ -24,6 +25,8 @@ export default function LogsPage() {
     const userRole = user?.role
 
     const { data, isLoading, error, isError } = useFetchAllLogs(currentPage)
+    const { data: subPlan } = useFetchSubscriptionData()
+    // console.log(subPlan?.[0].subscriptionPlan.name)
     // console.log(error?.message)
     const logs = data?.logs || []
     const totalLogs = data?.total || 0
@@ -36,6 +39,10 @@ export default function LogsPage() {
             router.back()
         }
 
+        if (subPlan?.[0].subscriptionPlan.name === 'Free Trial') {
+            router.back()
+        }
+
         if (error) {
             showErrorToast(error?.message || error)
         }
@@ -43,9 +50,9 @@ export default function LogsPage() {
         if (currentPageFromServer !== currentPage) {
             setCurrentPage(currentPageFromServer)
         }
-    }, [currentPageFromServer, error])
+    }, [userRole, currentPageFromServer, error, subPlan])
 
-    console.log(logs)
+    // console.log(logs)
 
     // Get unique actions for filters (from current page data)
     const uniqueActions = useMemo(() => {
@@ -560,25 +567,27 @@ export default function LogsPage() {
                                 </div>
 
                                 {/* IP Address & User Agent */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    {selectedLog.ipAddress && (
-                                        <div>
-                                            <label className="block text-xs text-gray-500 mb-1">IP Address</label>
-                                            <p className="text-gray-900 text-sm font-mono bg-gray-50 p-2 rounded-lg">
-                                                {selectedLog.ipAddress}
-                                            </p>
-                                        </div>
-                                    )}
+                                {subPlan?.[0].subscriptionPlan.name === 'Free Trial' || subPlan?.[0].subscriptionPlan.name === 'Starter' ? null :
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {selectedLog.ipAddress && (
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">IP Address</label>
+                                                <p className="text-gray-900 text-sm font-mono bg-gray-50 p-2 rounded-lg">
+                                                    {selectedLog.ipAddress}
+                                                </p>
+                                            </div>
+                                        )}
 
-                                    {selectedLog.userAgent && (
-                                        <div>
-                                            <label className="block text-xs text-gray-500 mb-1">User Agent</label>
-                                            <p className="text-gray-900 text-xs bg-gray-50 p-2 rounded-lg wrap-break-word">
-                                                {selectedLog.userAgent}
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
+                                        {selectedLog.userAgent && (
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">User Agent</label>
+                                                <p className="text-gray-900 text-xs bg-gray-50 p-2 rounded-lg wrap-break-word">
+                                                    {selectedLog.userAgent}
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                }
 
                                 {/* Metadata/Changes */}
                                 {(selectedLog.metadata || selectedLog.changes) && (

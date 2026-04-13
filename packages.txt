@@ -1,0 +1,17 @@
+const defaultFeatures = [
+            "Tenant Management",
+            "Rent Tracking",
+            "Invoice Generation",
+            "Basic Reporting",
+            "Document Storage",
+            "Activity Logs"
+        ];
+
+        const plans = [
+            { name: "N/A", description: "N/A", priceMonthly: 0, priceYearly: 0, maxProperties: 0, maxUsers: 0, features: [], isPopular: false, isActive: true },
+            { name: "Free Trial", description: "Free trial for testing", priceMonthly: 0, priceYearly: 0, maxProperties: 1, maxUsers: 1, features: [...defaultFeatures], isPopular: false, isActive: true },
+            { name: "Starter", description: "Basic plan for small companies", priceMonthly: 15, priceYearly: 150, maxProperties: 3, maxUsers: 2, features: [...defaultFeatures, "Email Support"], isPopular: false, isActive: true },
+            { name: "Pro", description: "For growing property businesses", priceMonthly: 30, priceYearly: 300, maxProperties: 10, maxUsers: 5, features: [...defaultFeatures, "Advanced Reporting", "Bulk Payment Import", "Priority Email Support"], isPopular: true, isActive: true },
+            { name: "Business", description: "Scaling operations plan", priceMonthly: 60, priceYearly: 600, maxProperties: 25, maxUsers: 15, features: [...defaultFeatures, "Advanced Reporting", "Custom Branding", "API Access"], isPopular: false, isActive: true },
+            { name: "Enterprise", description: "Enterprise-grade management suite", priceMonthly: 100, priceYearly: 1000, maxProperties: 50, maxUsers: 50, features: [...defaultFeatures, "Custom Branding", "API Access", "Dedicated Account Manager", "Multi-Branch Management"], isPopular: false, isActive: true }
+        ];

@@ -8,6 +8,7 @@ import Spinner from '@/components/Spinner'
 import useAuthStore from '@/store/useAuthStore'
 import { CAN_CHANGE_ROLES, CAN_DELETE, CAN_MANAGE_USERS } from '@/lib/roles'
 import { formatDate } from '@/lib/dateFormatter'
+import { useFetchSubscriptionData } from '@/hooks/useSubscription'
 
 export default function UserManagementPage() {
     usePageTitle('User Management - Denly')
@@ -30,7 +31,9 @@ export default function UserManagementPage() {
 
     const { data, isLoading: isLoadingUsers } = useFetchAllUsers()
     const { data: invites, isLoading: isLoadingInvites } = useFetchAllInvites()
-    console.log(invites)
+    const { data: subPlan } = useFetchSubscriptionData()
+    console.log(subPlan?.[0]?.subscriptionPlan?.maxUsers)
+    // console.log(invites)
 
     const { mutate: updateRole, isPending: isUpdatingRole } = useEditUserRole()
     const { mutate: sendInvite, isPending: isSendingInvite } = useInviteUser()
@@ -114,6 +117,7 @@ export default function UserManagementPage() {
         updateRole({ userId, data: { role: selectedRole } })
     }
 
+    const isDisabled = data?.length >= subPlan?.[0]?.subscriptionPlan?.maxUsers
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -128,23 +132,37 @@ export default function UserManagementPage() {
                             <p className="text-gray-600 text-sm">Manage team members and their permissions</p>
                         </div>
 
-                        {CAN_MANAGE_USERS.includes(userRole) ?
+                        <div className='relative group'>
+                            {subPlan?.[0].subscriptionPlan.name === 'Free Trial' || subPlan?.[0].subscriptionPlan.name === 'Starter' ? null :
+                                CAN_MANAGE_USERS.includes(userRole) ?
 
-                            isSendingInvite ?
-                                <div className='px-9 py-2'>
-                                    <Spinner />
+                                    isSendingInvite ?
+                                        <div className='px-9 py-2'>
+                                            <Spinner />
+                                        </div>
+                                        :
+
+                                        <button
+                                            onClick={openInviteModal}
+                                            className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm w-fit font-medium"
+                                            disabled={isDisabled}
+                                        >
+                                            Invite User
+                                        </button>
+                                    :
+                                    null
+
+                            }
+
+                            {isDisabled && (
+                                <div className="absolute top-full left-1/3 mt-1 transform -translate-x-1/2 mb-2 px-3 py-3 bg-[#756045] text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 w-48 text-center">
+                                    <p className="font-medium mb-1 underline">User Limit Reached</p>
+                                    <p className="text-gray-100">
+                                        You have reached the maximum number of users for your subscription
+                                    </p>
                                 </div>
-                                :
-
-                                <button
-                                    onClick={openInviteModal}
-                                    className="bg-[#876D4A] text-white px-5 py-2 rounded-2xl hover:bg-[#756045] transition-colors cursor-pointer text-sm w-fit font-medium"
-                                >
-                                    Invite User
-                                </button>
-                            :
-                            null
-                        }
+                            )}
+                        </div>
                     </div>
 
                     {isLoadingUsers ?
@@ -215,18 +233,19 @@ export default function UserManagementPage() {
                                                             <div className="flex items-center space-x-2">
                                                                 <p className="font-medium text-gray-900 text-sm">{user.role}</p>
 
-                                                                {CAN_CHANGE_ROLES.includes(userRole) ?
-                                                                    <button
-                                                                        onClick={() => startRoleEdit(user.id, user.role)}
-                                                                        className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-1 rounded-full hover:bg-gray-100"
-                                                                        title="Edit role"
-                                                                    >
-                                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                                                                        </svg>
-                                                                    </button>
-                                                                    :
-                                                                    null}
+                                                                {subPlan?.[0].subscriptionPlan.name === 'Free Trial' || subPlan?.[0].subscriptionPlan.name === 'Starter' ? null :
+                                                                    CAN_CHANGE_ROLES.includes(userRole) ?
+                                                                        <button
+                                                                            onClick={() => startRoleEdit(user.id, user.role)}
+                                                                            className="text-gray-400 hover:text-gray-600 transition-colors cursor-pointer p-1 rounded-full hover:bg-gray-100"
+                                                                            title="Edit role"
+                                                                        >
+                                                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                                            </svg>
+                                                                        </button>
+                                                                        :
+                                                                        null}
                                                             </div>
                                                         )}
 
@@ -368,7 +387,7 @@ export default function UserManagementPage() {
                                         </div>
                                         <div className="flex justify-between items-center">
                                             <span className="text-gray-600 text-xs">Seats Used</span>
-                                            <span className="font-medium text-gray-900 text-sm">{data?.length}/10</span>
+                                            <span className="font-medium text-gray-900 text-sm">{data?.length}/{subPlan?.[0]?.subscriptionPlan?.maxUsers || 1}</span>
                                         </div>
                                     </div>
                                 </div>

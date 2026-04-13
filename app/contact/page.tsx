@@ -149,7 +149,7 @@ export default function ContactPage() {
             <section className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 mb-16 text-center">
                 <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
                     <h2 className="text-2xl font-serif text-gray-800 mb-4">Ready to Simplify Property Management?</h2>
-                    <p className="text-gray-600 mb-6">Start your free 30-day trial today. No credit card required.</p>
+                    <p className="text-gray-600 mb-6">Start your free 14-day trial today. No credit card required.</p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
                             href="/auth/signup"

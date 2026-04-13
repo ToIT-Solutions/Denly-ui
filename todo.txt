@@ -39,13 +39,36 @@ fixed the delete invite
 fixed edit tenant and update & delete documents on edit tenant page
 fixed subscription plan order to ascending
 
+--paynow and rent ledger
+pay result page
+initiate payment page
+PAYEMENT PROCESSING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+integration with paynow and routing after paynow
+subscription stacking so that it depends on duedate if there is an active sub
+automated subscription switching
+subscription limits(front and backend) - inviting user, adding property
+grace period before marking subscription as expired
+changed payments structure so that they always auto generate then landlord changes whether they have been paid or not
+ALLOW EACH COMPANY TO DECIDE ITS OWN DUE date
+rent ledger and payment separation
+error toasts now showing the error properly and only firing once
+added a progress bar for when routing between pages but not showing in dev for now
+moved reports to dropdown
+redid the viewer priveleges so they can only edit their own details
+made free trial 14 days
+pricing page now pulls data from db
+changed from pro to professional
+removed logs and reports for free trial
+basic and advanced logs when now on professional
+redid pricing features
+only frontend package limiting
+fixed last owner for sub deletion
+fixed result page and now checking billing database 
+changed emails from nodemailer to resend 
+
 -----------TODO--------------
-CREATE SLUG FOR PAYMENTS TO VIEW ONE AND THEN ALSO DELETE FUNCTION
 DELETION AND CASCADING
-
-PAYEMNTS PAYMENTS PAYEMNTS PAYEMNTS PAYEMNTS PAYEMNTS
-
-payment processing fee on checkout
+AUTO START THE SUB IF COMING FROM FREE TRIAL
 
 
 ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
@@ -53,19 +76,33 @@ ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
                 - CHANGES JSON IN THE PRISMA
 
 
+OVERPAYMENT - TENANT SHOULD HAVE A FIELD OF CREDITBALANCE WHERE ANY OVERPAYMENT IS PUT INTO THEN USED FOR THE NEXT MONTH
+PENALTIES -
+
 ------------CONTROLS----------------------
 PARTIAL/ ADVANCED PAYMENTS  - keeping track of what percentage of the rent has been paid... if that is even a thing
                             - how many months rent has been paid
                             - leftovers/ spillages
 
-log activity for auth/invitation controller
 
 
 ---------------THINGS TO CONSIDER---------------------
 phone number for users
 unit management
 
-
-
 -----------------THINGS TO FIX AFTER HOSTING-----------------
 INVITE EMAIL NOT SENDING
+
+
+
+
+----------------------THINGS TO CHANGE WHEN NOW LIVE----------------------
+INITAL PLAN AFTER SIGNUP IS ONLY 2 MINS SO EXTEND TO 7 DAYS
+OTHER PLANS ARE ALSO AT 2 MINS SO EXTEND TO 1 MONTH
+ACTIVATE ALL CRONS
+
+
+
+------------LIVE DB--------------
+npx @railway/cli login --browserless
+THEN IN VSCODE SWITCH THE DB URL TO THE LIVE ONE THEN CONTINUE WITH NPX PRISMA BLAH BLAH

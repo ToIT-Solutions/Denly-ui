@@ -14,6 +14,7 @@ export default function DashboardPage() {
     const user = useAuthStore((state) => state.user)
 
     const { data, isLoading, error } = useFetchCompanyStats()
+    console.log(data)
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -110,13 +111,13 @@ export default function DashboardPage() {
                                                         💰
                                                     </div>
                                                     <div className="flex-1">
-                                                        <p className="text-gray-900 font-medium text-sm sm:text-base">Payment received for {payment.property?.name || 'Unknown Property'}</p>
+                                                        <p className="text-gray-900 font-medium text-sm sm:text-base">Payment received for {payment.propertyName || 'Unknown Property'}</p>
                                                         <p className="text-gray-500 text-xs sm:text-sm">
-                                                            {payment.createdAt ? formatDate(payment.createdAt, 'short') : 'Recent'} •
-                                                            Tenant: {payment.tenant?.firstName || 'Unknown'} {payment.tenant?.lastName || ''}
+                                                            {payment.paymentDate ? formatDate(payment.paymentDate, 'short') : 'Recent'} •
+                                                            Tenant: {payment.tenantName || 'Unknown'}
                                                         </p>
                                                     </div>
-                                                    <span className="text-[#876D4A] font-medium text-sm sm:text-base">${payment.amount || 0}</span>
+                                                    <span className="text-[#876D4A] font-medium text-sm sm:text-base">${payment.amountPaid || 0}</span>
                                                 </div>
                                             ))}
                                         </div>

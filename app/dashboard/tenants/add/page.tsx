@@ -334,7 +334,7 @@ export default function AddTenantPage() {
                                                 }
                                             })}
                                             placeholder="John"
-                                            className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.firstName ? 'border-red-600' : 'border-gray-300'
+                                            className={`w-full border rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.firstName ? 'border-red-600' : 'border-gray-300'
                                                 }`}
                                         />
                                         {errors.firstName && (
@@ -353,7 +353,7 @@ export default function AddTenantPage() {
                                                 }
                                             })}
                                             placeholder="Smith"
-                                            className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.lastName ? 'border-red-600' : 'border-gray-300'
+                                            className={`w-full border rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.lastName ? 'border-red-600' : 'border-gray-300'
                                                 }`}
                                         />
                                         {errors.lastName && (
@@ -372,7 +372,7 @@ export default function AddTenantPage() {
                                                 }
                                             })}
                                             placeholder="john.smith@email.com"
-                                            className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.email ? 'border-red-600' : 'border-gray-300'
+                                            className={`w-full border rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.email ? 'border-red-600' : 'border-gray-300'
                                                 }`}
                                         />
                                         {errors.email && (
@@ -391,7 +391,7 @@ export default function AddTenantPage() {
                                                 }
                                             })}
                                             placeholder="0771 234 567"
-                                            className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.phone ? 'border-red-600' : 'border-gray-300'
+                                            className={`w-full border rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.phone ? 'border-red-600' : 'border-gray-300'
                                                 }`}
                                         />
                                         {errors.phone && (
@@ -404,7 +404,7 @@ export default function AddTenantPage() {
                                             type="text"
                                             {...register('emergencyContactName')}
                                             placeholder="Emergency contact name"
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
                                         />
                                     </div>
                                     <div>
@@ -413,7 +413,7 @@ export default function AddTenantPage() {
                                             type="tel"
                                             {...register('emergencyContactPhone')}
                                             placeholder="0778 234 567"
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
                                         />
                                     </div>
                                 </div>
@@ -429,14 +429,14 @@ export default function AddTenantPage() {
                                             type="text"
                                             {...register('nextOfKinName')}
                                             placeholder="Next of kin full name"
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
                                         />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Relationship</label>
                                         <select
                                             {...register('nextOfKinRelationship')}
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm"
                                         >
                                             <option value="">Select relationship</option>
                                             <option value="Spouse">Spouse</option>
@@ -454,7 +454,7 @@ export default function AddTenantPage() {
                                             type="tel"
                                             {...register('nextOfKinPhone')}
                                             placeholder="Next of kin phone number"
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
                                         />
                                     </div>
                                     <div>
@@ -463,7 +463,7 @@ export default function AddTenantPage() {
                                             type="email"
                                             {...register('nextOfKinEmail')}
                                             placeholder="Next of kin email address"
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
                                         />
                                     </div>
                                     <div className="md:col-span-2">
@@ -472,7 +472,7 @@ export default function AddTenantPage() {
                                             rows={2}
                                             {...register('nextOfKinAddress')}
                                             placeholder="Next of kin full address"
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
                                         />
                                     </div>
                                 </div>
@@ -489,7 +489,7 @@ export default function AddTenantPage() {
                                                 required: 'Property selection is required',
                                                 onChange: updateRentFromProperty
                                             })}
-                                            className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm ${errors.propertyId ? 'border-red-600' : 'border-gray-300'
+                                            className={`w-full border rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm ${errors.propertyId ? 'border-red-600' : 'border-gray-300'
                                                 }`}
                                         >
                                             <option value="">Select property</option>
@@ -516,7 +516,7 @@ export default function AddTenantPage() {
                                                 min: { value: 0, message: 'Rent must be positive' },
                                             })}
                                             placeholder="0.00"
-                                            className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.actualRent ? 'border-red-600' : 'border-gray-300'
+                                            className={`w-full border rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm ${errors.actualRent ? 'border-red-600' : 'border-gray-300'
                                                 }`}
                                         />
                                         {errors.actualRent && (
@@ -528,7 +528,7 @@ export default function AddTenantPage() {
                                         <input
                                             type="date"
                                             {...register('leaseStart', { required: 'Lease start date is required' })}
-                                            className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm ${errors.leaseStart ? 'border-red-600' : 'border-gray-300'
+                                            className={`w-full border rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm ${errors.leaseStart ? 'border-red-600' : 'border-gray-300'
                                                 }`}
                                         />
                                         {errors.leaseStart && (
@@ -540,7 +540,7 @@ export default function AddTenantPage() {
                                         <input
                                             type="date"
                                             {...register('leaseEnd', { required: 'Lease end date is required' })}
-                                            className={`w-full border rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm ${errors.leaseEnd ? 'border-red-600' : 'border-gray-300'
+                                            className={`w-full border rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm ${errors.leaseEnd ? 'border-red-600' : 'border-gray-300'
                                                 }`}
                                         />
                                         {errors.leaseEnd && (
@@ -551,7 +551,7 @@ export default function AddTenantPage() {
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                                         <select
                                             {...register('status')}
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black text-sm"
                                         >
                                             <option value="active">Active</option>
                                             <option value="pending">Pending</option>
@@ -572,7 +572,7 @@ export default function AddTenantPage() {
                                             type="text"
                                             {...register('occupation')}
                                             placeholder="e.g., Software Engineer"
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
                                         />
                                     </div>
                                     <div>
@@ -581,7 +581,7 @@ export default function AddTenantPage() {
                                             type="text"
                                             {...register('employer')}
                                             placeholder="e.g., Tech Company Inc."
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
                                         />
                                     </div>
                                     <div className="md:col-span-2">
@@ -590,7 +590,7 @@ export default function AddTenantPage() {
                                             rows={2}
                                             {...register('notes')}
                                             placeholder="Any additional notes about the tenant..."
-                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
+                                            className="w-full border border-gray-300 rounded-2xl px-3 py-2 outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-colors text-black placeholder-gray-400 text-sm"
                                         />
                                     </div>
                                 </div>

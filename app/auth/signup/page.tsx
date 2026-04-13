@@ -9,7 +9,7 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useSignup } from '@/hooks/useAuth'
 import { toast } from "sonner"
 import Spinner from '@/components/Spinner'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface SignupForm {
     firstName: string
@@ -19,6 +19,7 @@ interface SignupForm {
     confirmPassword: string
     // company?: string
     terms: boolean
+    state?: string
 }
 
 export default function SignupPage() {
@@ -40,6 +41,10 @@ export default function SignupPage() {
     const [serverError, setserverError] = useState<string | null>(null)
 
     const { mutate: signupMutate, isPending, error } = useSignup()
+
+    // const params = useSearchParams()
+    // const state = params.get('plan')
+    // console.log(state)
 
 
     const onSubmit = async (data: SignupForm) => {

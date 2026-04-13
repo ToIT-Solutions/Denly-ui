@@ -142,7 +142,7 @@ export default function FeaturesPage() {
                 <div className="bg-[#876D4A] rounded-3xl p-8 sm:p-12 text-white">
                     <h2 className="text-2xl sm:text-3xl font-serif mb-4">Ready to Simplify Your Property Management?</h2>
                     <p className="text-white/80 mb-6 sm:mb-8 max-w-2xl mx-auto text-sm sm:text-base">
-                        Join thousands of landlords who have found their peace of mind with Denly.
+                        Join other landlords who have found their peace of mind with Denly.
                     </p>
                     <Link href="/auth/signup" className="inline-flex items-center space-x-3 bg-white text-[#876D4A] px-6 sm:px-10 py-3 sm:py-4 rounded-full hover:bg-gray-100 transition-colors">
                         <span>Start Free Trial</span>
