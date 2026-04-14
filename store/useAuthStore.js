@@ -10,6 +10,7 @@ const useAuthStore = create(
             // Set user and token
             setUser: (data) => set(data),
 
+
             // Clear user and token (logout)
             clearUser: () => set({ user: null, token: null }),
         }),
@@ -17,6 +18,7 @@ const useAuthStore = create(
             name: 'auth-storage', // key in localStorage
         }
     )
+
 );
 
 export default useAuthStore;

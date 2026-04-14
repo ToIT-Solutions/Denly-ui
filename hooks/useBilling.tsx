@@ -1,43 +1,30 @@
-import { createBilling, fetchAllBilling, fetchBillingStatus, fetchPaynowPoll } from "@/api/billing";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { showErrorToast, showSuccessToast } from "@/lib/toast";
-import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAllBilling, fetchFailedBilling, fetchPendingBilling, fetchBillingStats } from "@/api/admin/adminBilling";
 
-
-export const useCreatePayment = () => {
-    const router = useRouter()
-    return useMutation({
-        mutationFn: (data: any) => createBilling(data),
-        onSuccess: (data) => {
-            console.log(data)
-            router.push(data.redirectUrl)
-        },
-        onError: (error: any) => {
-            showErrorToast(error)
-        }
-    })
-}
-
-export const useFetchAllBilling = () => {
+export const useFetchAllBilling = (status?: string) => {
     return useQuery({
-        queryKey: ["allBilling"],
-        queryFn: () => fetchAllBilling(),
+        queryKey: ["adminBilling", status],
+        queryFn: () => fetchAllBilling(status),
     })
 }
 
-export const useFetchBillingStatus = (billingId: string) => {
+export const useFetchFailedBilling = () => {
     return useQuery({
-        queryKey: ["billing", billingId],
-        queryFn: () => fetchBillingStatus(billingId),
-        enabled: !!billingId,
+        queryKey: ["adminFailedBilling"],
+        queryFn: () => fetchFailedBilling(),
     })
 }
 
-export const useFetchPaynowPoll = (billingId: string) => {
+export const useFetchPendingBilling = () => {
     return useQuery({
-        queryKey: ["poll", billingId],
-        queryFn: () => fetchPaynowPoll(billingId),
-        enabled: !!billingId,
+        queryKey: ["adminPendingBilling"],
+        queryFn: () => fetchPendingBilling(),
     })
 }
 
+export const useFetchBillingStats = () => {
+    return useQuery({
+        queryKey: ["adminBillingStats"],
+        queryFn: () => fetchBillingStats(),
+    })
+}

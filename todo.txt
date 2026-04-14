@@ -38,8 +38,6 @@ fixed edit company
 fixed the delete invite
 fixed edit tenant and update & delete documents on edit tenant page
 fixed subscription plan order to ascending
-
---paynow and rent ledger
 pay result page
 initiate payment page
 PAYEMENT PROCESSING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -65,10 +63,20 @@ only frontend package limiting
 fixed last owner for sub deletion
 fixed result page and now checking billing database 
 changed emails from nodemailer to resend 
+fixed rentDueDay not updating error
+
+
+----changelog and admin-----
+created changelog table
+added admin portal and secure login
+can see billing, users, changelog and other stats from an admin view
+
 
 -----------TODO--------------
 DELETION AND CASCADING
 AUTO START THE SUB IF COMING FROM FREE TRIAL
+
+logout for admin 
 
 
 ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
@@ -92,7 +100,8 @@ unit management
 
 -----------------THINGS TO FIX AFTER HOSTING-----------------
 INVITE EMAIL NOT SENDING
-
+Rent due day is causing error
+should remove all the console logs for both front and back except payment and errors
 
 
 
@@ -100,6 +109,7 @@ INVITE EMAIL NOT SENDING
 INITAL PLAN AFTER SIGNUP IS ONLY 2 MINS SO EXTEND TO 7 DAYS
 OTHER PLANS ARE ALSO AT 2 MINS SO EXTEND TO 1 MONTH
 ACTIVATE ALL CRONS
+UPDATE .ENV
 
 
 
