@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import logo from '@/public/img/logo.png';
 import logoWhite from '@/public/img/logoWhite.png'; // Import white logo for dark mode
-import { BlockSpinner } from './Spinner';
+import { BlockAdminSpinner, BlockSpinner } from './Spinner';
 
 export default function SplashScreen() {
     const [visible, setVisible] = useState(true);
@@ -40,9 +40,14 @@ export default function SplashScreen() {
                 priority
             />
             {showSpinner && (
-                <div className="animate-fadeIn">
-                    <BlockSpinner size='lg' />
-                </div>
+                isSecretPanel ?
+                    <div className="animate-fadeIn">
+                        <BlockAdminSpinner size='lg' />
+                    </div>
+                    :
+                    <div className="animate-fadeIn">
+                        <BlockSpinner size='lg' />
+                    </div>
             )}
         </div>
     );

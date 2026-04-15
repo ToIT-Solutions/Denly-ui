@@ -1,30 +1,42 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchAllBilling, fetchFailedBilling, fetchPendingBilling, fetchBillingStats } from "@/api/admin/adminBilling";
+import { createBilling, fetchAllBilling, fetchBillingStatus, fetchPaynowPoll } from "@/api/billing";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
+import { useRouter } from "next/navigation";
 
-export const useFetchAllBilling = (status?: string) => {
-    return useQuery({
-        queryKey: ["adminBilling", status],
-        queryFn: () => fetchAllBilling(status),
+
+export const useCreatePayment = () => {
+    const router = useRouter()
+    return useMutation({
+        mutationFn: (data: any) => createBilling(data),
+        onSuccess: (data) => {
+            console.log(data)
+            router.push(data.redirectUrl)
+        },
+        onError: (error: any) => {
+            showErrorToast(error)
+        }
     })
 }
 
-export const useFetchFailedBilling = () => {
+export const useFetchAllBilling = () => {
     return useQuery({
-        queryKey: ["adminFailedBilling"],
-        queryFn: () => fetchFailedBilling(),
+        queryKey: ["allBilling"],
+        queryFn: () => fetchAllBilling(),
     })
 }
 
-export const useFetchPendingBilling = () => {
+export const useFetchBillingStatus = (billingId: string) => {
     return useQuery({
-        queryKey: ["adminPendingBilling"],
-        queryFn: () => fetchPendingBilling(),
+        queryKey: ["billing", billingId],
+        queryFn: () => fetchBillingStatus(billingId),
+        enabled: !!billingId,
     })
 }
 
-export const useFetchBillingStats = () => {
+export const useFetchPaynowPoll = (billingId: string) => {
     return useQuery({
-        queryKey: ["adminBillingStats"],
-        queryFn: () => fetchBillingStats(),
+        queryKey: ["poll", billingId],
+        queryFn: () => fetchPaynowPoll(billingId),
+        enabled: !!billingId,
     })
 }

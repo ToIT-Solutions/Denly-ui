@@ -1,4 +1,4 @@
-import { fetchAllBilling, fetchFailedBilling, fetchPendingBilling, fetchBillingStats } from "@/api/admin/adminBilling";
+import { fetchFailedBilling, fetchPendingBilling, fetchBillingStats } from "@/api/admin/adminBilling";
 import { useQuery } from "@tanstack/react-query";
 
 

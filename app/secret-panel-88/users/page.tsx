@@ -1,26 +1,46 @@
 // secret-panel-88/users/page.tsx
 'use client'
+import { useFetchAllUsers } from '@/hooks/admin/useAdminUsers'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useState } from 'react'
+import { formatDate } from '@/lib/dateFormatter'
+import useAuthStore from '@/store/useAuthStore'
 
 interface User {
-    id: number
-    name: string
+    id: string
+    firstName: string
+    lastName: string
     email: string
-    plan: string
     role: string
-    status: 'active' | 'suspended' | 'pending'
-    joinDate: string
-    properties: number
-    lastLogin: string
-    avatar?: string
+    status: string
+    createdAt: string
+    lastLogin: string | null
+    profileImageUrl: string | null
+    companyId: string | null
+    subscriptionId: string | null
+    company?: {
+        id: string
+        name: string
+        email: string
+        phone: string
+        address: string
+    }
+    subscription?: {
+        id: string
+        status: string
+        planId: string
+        currentPeriodStart: string
+        currentPeriodEnd: string
+    }
 }
 
 export default function UsersPage() {
     usePageTitle('User Management - Admin')
 
+    const currentUser = useAuthStore((state) => state.user)
+    const currentUserRole = currentUser?.role
+
     const [searchTerm, setSearchTerm] = useState('')
-    const [selectedPlan, setSelectedPlan] = useState('all')
     const [selectedRole, setSelectedRole] = useState('all')
     const [selectedStatus, setSelectedStatus] = useState('all')
     const [showEditModal, setShowEditModal] = useState(false)
@@ -28,110 +48,45 @@ export default function UsersPage() {
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 10
 
-    // Mock user data - replace with your API calls
-    const [users, setUsers] = useState<User[]>([
-        {
-            id: 1,
-            name: 'John Doe',
-            email: 'john@example.com',
-            plan: 'Pro',
-            role: 'user',
-            status: 'active',
-            joinDate: '2024-01-01',
-            properties: 3,
-            lastLogin: '2024-01-15 10:30 AM'
-        },
-        {
-            id: 2,
-            name: 'Sarah Smith',
-            email: 'sarah@example.com',
-            plan: 'Business',
-            role: 'admin',
-            status: 'active',
-            joinDate: '2023-12-15',
-            properties: 12,
-            lastLogin: '2024-01-15 09:15 AM'
-        },
-        {
-            id: 3,
-            name: 'Mike Johnson',
-            email: 'mike@example.com',
-            plan: 'Basic',
-            role: 'user',
-            status: 'suspended',
-            joinDate: '2024-01-10',
-            properties: 1,
-            lastLogin: '2024-01-14 02:20 PM'
-        },
-        {
-            id: 4,
-            name: 'Emily Brown',
-            email: 'emily@example.com',
-            plan: 'Pro',
-            role: 'moderator',
-            status: 'active',
-            joinDate: '2023-11-20',
-            properties: 5,
-            lastLogin: '2024-01-15 11:45 AM'
-        },
-        {
-            id: 5,
-            name: 'Chris Wilson',
-            email: 'chris@example.com',
-            plan: 'Basic',
-            role: 'user',
-            status: 'pending',
-            joinDate: '2024-01-14',
-            properties: 0,
-            lastLogin: 'Never'
-        },
-        {
-            id: 6,
-            name: 'Jessica Lee',
-            email: 'jessica@example.com',
-            plan: 'Business',
-            role: 'user',
-            status: 'active',
-            joinDate: '2023-10-05',
-            properties: 8,
-            lastLogin: '2024-01-15 08:30 AM'
-        },
-        {
-            id: 7,
-            name: 'David Chen',
-            email: 'david@example.com',
-            plan: 'Pro',
-            role: 'moderator',
-            status: 'active',
-            joinDate: '2023-09-12',
-            properties: 6,
-            lastLogin: '2024-01-14 04:15 PM'
-        },
-        {
-            id: 8,
-            name: 'Amanda Garcia',
-            email: 'amanda@example.com',
-            plan: 'Basic',
-            role: 'user',
-            status: 'suspended',
-            joinDate: '2024-01-05',
-            properties: 2,
-            lastLogin: '2024-01-10 01:20 PM'
-        }
-    ])
+    const { data: usersData, isLoading, refetch } = useFetchAllUsers()
 
-    const plans = ['all', 'Basic', 'Pro', 'Business']
-    const roles = ['all', 'user', 'moderator', 'admin']
-    const statuses = ['all', 'active', 'suspended', 'pending']
+    // Extract users array from response - handle both array and object responses
+    const usersList = Array.isArray(usersData) ? usersData : usersData?.users || []
+    const users: User[] = usersList
+
+    // Role options based on current user's role
+    const getAvailableRoles = () => {
+        if (currentUserRole === 'Admin') {
+            return ['Owner', 'Manager', 'Agent', 'Viewer']
+        }
+        // Super admin can assign any role including Admin
+        return ['Admin', 'Owner', 'Manager', 'Agent', 'Viewer']
+    }
+
+    const roles = ['all', ...getAvailableRoles()]
+    const statuses = ['all', 'active', 'inactive', 'suspended', 'pending']
+
+    // Check if user can be edited (prevent editing admin if not super admin)
+    const canEditUser = (user: User) => {
+        if (user.role === 'Admin' && currentUserRole !== 'SuperAdmin') {
+            return false
+        }
+        return true
+    }
+
+    // Check if current user is the one being edited
+    const isCurrentUser = (user: User) => {
+        return user.id === currentUser?.id
+    }
 
     // Filter users
     const filteredUsers = users.filter(user => {
-        const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase())
-        const matchesPlan = selectedPlan === 'all' || user.plan === selectedPlan
+        const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase()
+        const matchesSearch = fullName.includes(searchTerm.toLowerCase()) ||
+            user.email?.toLowerCase().includes(searchTerm.toLowerCase())
         const matchesRole = selectedRole === 'all' || user.role === selectedRole
         const matchesStatus = selectedStatus === 'all' || user.status === selectedStatus
-        return matchesSearch && matchesPlan && matchesRole && matchesStatus
+        return matchesSearch && matchesRole && matchesStatus
     })
 
     // Pagination
@@ -145,67 +100,113 @@ export default function UsersPage() {
     const stats = {
         total: users.length,
         active: users.filter(u => u.status === 'active').length,
-        admins: users.filter(u => u.role === 'admin').length,
+        admins: users.filter(u => u.role === 'Admin').length,
+        owners: users.filter(u => u.role === 'Owner').length,
+        managers: users.filter(u => u.role === 'Manager').length,
+        agents: users.filter(u => u.role === 'Agent').length,
+        viewers: users.filter(u => u.role === 'Viewer').length,
         suspended: users.filter(u => u.status === 'suspended').length,
         pending: users.filter(u => u.status === 'pending').length,
-        totalProperties: users.reduce((sum, u) => sum + u.properties, 0)
+        withSubscription: users.filter(u => u.subscriptionId).length,
+        withoutSubscription: users.filter(u => !u.subscriptionId).length
     }
 
     // Actions
-    const handleRoleChange = (userId: number, newRole: string) => {
-        setUsers(users.map(user =>
-            user.id === userId ? { ...user, role: newRole } : user
-        ))
+    const handleRoleChange = async (userId: string, newRole: string) => {
+        const userToUpdate = users.find(u => u.id === userId)
+        if (userToUpdate?.role === 'Admin' && currentUserRole !== 'SuperAdmin') {
+            alert('Cannot modify Admin users')
+            return
+        }
+        if (isCurrentUser(userToUpdate!)) {
+            alert('Cannot change your own role')
+            return
+        }
+        console.log('Update role:', userId, newRole)
+        // await updateUserRole(userId, newRole)
+        refetch()
     }
 
-    const handlePlanChange = (userId: number, newPlan: string) => {
-        setUsers(users.map(user =>
-            user.id === userId ? { ...user, plan: newPlan } : user
-        ))
+    const handleStatusToggle = async (userId: string, currentStatus: string) => {
+        const userToUpdate = users.find(u => u.id === userId)
+        if (userToUpdate?.role === 'Admin' && currentUserRole !== 'SuperAdmin') {
+            alert('Cannot modify Admin users')
+            return
+        }
+        if (isCurrentUser(userToUpdate!)) {
+            alert('Cannot modify your own account status')
+            return
+        }
+        const newStatus = currentStatus === 'active' ? 'suspended' : 'active'
+        console.log('Update status:', userId, newStatus)
+        // await updateUserStatus(userId, newStatus)
+        refetch()
     }
 
-    const handleStatusToggle = (userId: number) => {
-        setUsers(users.map(user =>
-            user.id === userId
-                ? { ...user, status: user.status === 'active' ? 'suspended' : 'active' }
-                : user
-        ))
-    }
-
-    const handleDeleteUser = (userId: number) => {
+    const handleDeleteUser = async (userId: string) => {
+        const userToDelete = users.find(u => u.id === userId)
+        if (userToDelete?.role === 'Admin' && currentUserRole !== 'SuperAdmin') {
+            alert('Cannot delete Admin users')
+            return
+        }
+        if (isCurrentUser(userToDelete!)) {
+            alert('Cannot delete your own account')
+            return
+        }
         if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-            setUsers(users.filter(user => user.id !== userId))
+            console.log('Delete user:', userId)
+            // await deleteUser(userId)
+            refetch()
         }
     }
 
     const handleSendResetEmail = (email: string) => {
-        // API call to send password reset email
         alert(`Password reset email sent to ${email}`)
     }
 
     const clearFilters = () => {
         setSearchTerm('')
-        setSelectedPlan('all')
         setSelectedRole('all')
         setSelectedStatus('all')
         setCurrentPage(1)
     }
 
     const getStatusColor = (status: string) => {
-        switch (status) {
+        switch (status?.toLowerCase()) {
             case 'active': return 'bg-green-900/50 text-green-400'
             case 'suspended': return 'bg-red-900/50 text-red-400'
             case 'pending': return 'bg-yellow-900/50 text-yellow-400'
+            case 'inactive': return 'bg-gray-900/50 text-gray-400'
             default: return 'bg-slate-800 text-slate-400'
         }
     }
 
     const getRoleBadgeColor = (role: string) => {
         switch (role) {
-            case 'admin': return 'bg-purple-900/50 text-purple-400'
-            case 'moderator': return 'bg-blue-900/50 text-blue-400'
+            case 'Admin': return 'bg-purple-900/50 text-purple-400'
+            case 'Owner': return 'bg-amber-900/50 text-amber-400'
+            case 'Manager': return 'bg-blue-900/50 text-blue-400'
+            case 'Agent': return 'bg-cyan-900/50 text-cyan-400'
+            case 'Viewer': return 'bg-gray-900/50 text-gray-400'
             default: return 'bg-slate-800 text-slate-400'
         }
+    }
+
+    const getFullName = (user: User) => {
+        return `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'No Name'
+    }
+
+    if (isLoading) {
+        return (
+            <div className="p-6">
+                <div className="flex items-center justify-center h-64">
+                    <div className="text-center">
+                        <div className="w-12 h-12 border-4 border-amber-700 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-slate-400">Loading users...</p>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -214,17 +215,20 @@ export default function UsersPage() {
             <div className="mb-6">
                 <h1 className="text-2xl font-semibold text-white">User Management</h1>
                 <p className="text-sm text-slate-400 mt-1">Manage users, roles, subscriptions, and permissions</p>
+                {currentUserRole !== 'SuperAdmin' && (
+                    <p className="text-xs text-amber-600 mt-2">⚠️ Admin users cannot be modified</p>
+                )}
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
                 <div className="bg-slate-900 rounded-lg border border-slate-800 p-4">
                     <div className="flex items-center justify-between mb-2">
                         <p className="text-sm text-slate-400">Total Users</p>
                         <span className="text-lg">👥</span>
                     </div>
                     <p className="text-2xl font-semibold text-white">{stats.total}</p>
-                    <p className="text-xs text-slate-500 mt-2">Across all plans</p>
+                    <p className="text-xs text-slate-500 mt-2">All registered users</p>
                 </div>
 
                 <div className="bg-slate-900 rounded-lg border border-slate-800 p-4">
@@ -233,7 +237,7 @@ export default function UsersPage() {
                         <span className="text-lg">✅</span>
                     </div>
                     <p className="text-2xl font-semibold text-green-500">{stats.active}</p>
-                    <p className="text-xs text-slate-500 mt-2">{((stats.active / stats.total) * 100).toFixed(1)}% of total</p>
+                    <p className="text-xs text-slate-500 mt-2">{stats.total ? ((stats.active / stats.total) * 100).toFixed(1) : 0}% of total</p>
                 </div>
 
                 <div className="bg-slate-900 rounded-lg border border-slate-800 p-4">
@@ -241,32 +245,41 @@ export default function UsersPage() {
                         <p className="text-sm text-slate-400">Admins</p>
                         <span className="text-lg">👑</span>
                     </div>
-                    <p className="text-2xl font-semibold text-[#876D4A]">{stats.admins}</p>
+                    <p className="text-2xl font-semibold text-purple-500">{stats.admins}</p>
                     <p className="text-xs text-slate-500 mt-2">Platform managers</p>
                 </div>
 
                 <div className="bg-slate-900 rounded-lg border border-slate-800 p-4">
                     <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm text-slate-400">Suspended</p>
-                        <span className="text-lg">🚫</span>
+                        <p className="text-sm text-slate-400">Owners</p>
+                        <span className="text-lg">🏢</span>
                     </div>
-                    <p className="text-2xl font-semibold text-red-500">{stats.suspended}</p>
-                    <p className="text-xs text-slate-500 mt-2">Need review</p>
+                    <p className="text-2xl font-semibold text-amber-500">{stats.owners}</p>
+                    <p className="text-xs text-slate-500 mt-2">Property owners</p>
                 </div>
 
                 <div className="bg-slate-900 rounded-lg border border-slate-800 p-4">
                     <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm text-slate-400">Properties</p>
-                        <span className="text-lg">🏢</span>
+                        <p className="text-sm text-slate-400">Managers</p>
+                        <span className="text-lg">📊</span>
                     </div>
-                    <p className="text-2xl font-semibold text-white">{stats.totalProperties}</p>
-                    <p className="text-xs text-slate-500 mt-2">Total managed</p>
+                    <p className="text-2xl font-semibold text-blue-500">{stats.managers}</p>
+                    <p className="text-xs text-slate-500 mt-2">Property managers</p>
+                </div>
+
+                <div className="bg-slate-900 rounded-lg border border-slate-800 p-4">
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm text-slate-400">With Subscription</p>
+                        <span className="text-lg">💰</span>
+                    </div>
+                    <p className="text-2xl font-semibold text-amber-500">{stats.withSubscription}</p>
+                    <p className="text-xs text-slate-500 mt-2">Active paying users</p>
                 </div>
             </div>
 
             {/* Filters */}
             <div className="bg-slate-900 rounded-lg border border-slate-800 p-4 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="lg:col-span-2">
                         <label className="block text-sm font-medium text-slate-300 mb-1">Search</label>
                         <input
@@ -277,25 +290,8 @@ export default function UsersPage() {
                                 setSearchTerm(e.target.value)
                                 setCurrentPage(1)
                             }}
-                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#876D4A]"
+                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700"
                         />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-1">Subscription Plan</label>
-                        <select
-                            value={selectedPlan}
-                            onChange={(e) => {
-                                setSelectedPlan(e.target.value)
-                                setCurrentPage(1)
-                            }}
-                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#876D4A]"
-                        >
-                            {plans.map(plan => (
-                                <option key={plan} value={plan}>
-                                    {plan === 'all' ? 'All Plans' : plan}
-                                </option>
-                            ))}
-                        </select>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-slate-300 mb-1">Role</label>
@@ -305,11 +301,11 @@ export default function UsersPage() {
                                 setSelectedRole(e.target.value)
                                 setCurrentPage(1)
                             }}
-                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#876D4A]"
+                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700"
                         >
                             {roles.map(role => (
                                 <option key={role} value={role}>
-                                    {role === 'all' ? 'All Roles' : role.charAt(0).toUpperCase() + role.slice(1)}
+                                    {role === 'all' ? 'All Roles' : role}
                                 </option>
                             ))}
                         </select>
@@ -322,7 +318,7 @@ export default function UsersPage() {
                                 setSelectedStatus(e.target.value)
                                 setCurrentPage(1)
                             }}
-                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#876D4A]"
+                            className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700"
                         >
                             {statuses.map(status => (
                                 <option key={status} value={status}>
@@ -350,90 +346,127 @@ export default function UsersPage() {
                             <tr>
                                 <th className="text-left p-4 text-sm font-medium text-slate-400">User</th>
                                 <th className="text-left p-4 text-sm font-medium text-slate-400">Email</th>
-                                <th className="text-left p-4 text-sm font-medium text-slate-400">Plan</th>
+                                <th className="text-left p-4 text-sm font-medium text-slate-400">Company</th>
                                 <th className="text-left p-4 text-sm font-medium text-slate-400">Role</th>
                                 <th className="text-left p-4 text-sm font-medium text-slate-400">Status</th>
-                                <th className="text-left p-4 text-sm font-medium text-slate-400">Properties</th>
+                                <th className="text-left p-4 text-sm font-medium text-slate-400">Subscription</th>
                                 <th className="text-left p-4 text-sm font-medium text-slate-400">Join Date</th>
                                 <th className="text-left p-4 text-sm font-medium text-slate-400">Last Login</th>
                                 <th className="text-left p-4 text-sm font-medium text-slate-400">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800">
-                            {paginatedUsers.map((user) => (
-                                <tr key={user.id} className="hover:bg-slate-800/30 transition-colors">
-                                    <td className="p-4">
-                                        <div className="flex items-center space-x-3">
-                                            <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                                                {user.name.charAt(0)}
+                            {paginatedUsers.map((user) => {
+                                const isAdminUser = user.role === 'Admin'
+                                const isCurrentUserAccount = isCurrentUser(user)
+                                const canEdit = canEditUser(user) && !isCurrentUserAccount
+
+                                return (
+                                    <tr key={user.id} className="hover:bg-slate-800/30 transition-colors">
+                                        <td className="p-4">
+                                            <div className="flex items-center space-x-3">
+                                                <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                                    {user.firstName?.charAt(0) || user.email?.charAt(0) || '?'}
+                                                </div>
+                                                <span className="text-sm font-medium text-white">
+                                                    {getFullName(user)}
+                                                    {isCurrentUserAccount && (
+                                                        <span className="ml-2 text-xs text-amber-500">(You)</span>
+                                                    )}
+                                                </span>
                                             </div>
-                                            <span className="text-sm font-medium text-white">{user.name}</span>
-                                        </div>
-                                    </td>
-                                    <td className="p-4 text-sm text-slate-400">{user.email}</td>
-                                    <td className="p-4">
-                                        <select
-                                            value={user.plan}
-                                            onChange={(e) => handlePlanChange(user.id, e.target.value)}
-                                            className="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#876D4A]"
-                                        >
-                                            <option value="Basic">Basic</option>
-                                            <option value="Pro">Pro</option>
-                                            <option value="Business">Business</option>
-                                        </select>
-                                    </td>
-                                    <td className="p-4">
-                                        <select
-                                            value={user.role}
-                                            onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                                            className={`bg-slate-800 border border-slate-700 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#876D4A] ${getRoleBadgeColor(user.role)}`}
-                                        >
-                                            <option value="user">User</option>
-                                            <option value="moderator">Moderator</option>
-                                            <option value="admin">Admin</option>
-                                        </select>
-                                    </td>
-                                    <td className="p-4">
-                                        <button
-                                            onClick={() => handleStatusToggle(user.id)}
-                                            className={`inline-flex px-2 py-1 rounded text-xs font-medium transition-colors ${getStatusColor(user.status)} hover:opacity-80`}
-                                        >
-                                            {user.status}
-                                        </button>
-                                    </td>
-                                    <td className="p-4 text-sm text-white">{user.properties}</td>
-                                    <td className="p-4 text-sm text-slate-400">{user.joinDate}</td>
-                                    <td className="p-4 text-sm text-slate-400">{user.lastLogin}</td>
-                                    <td className="p-4">
-                                        <div className="flex space-x-2">
+                                        </td>
+                                        <td className="p-4 text-sm text-slate-400">{user.email}</td>
+                                        <td className="p-4 text-sm text-slate-400">{user.company?.name || '-'}</td>
+                                        <td className="p-4">
+                                            {isAdminUser && currentUserRole !== 'SuperAdmin' ? (
+                                                <span className={`inline-flex px-2 py-1 rounded text-xs font-medium ${getRoleBadgeColor(user.role)}`}>
+                                                    {user.role}
+                                                </span>
+                                            ) : (
+                                                <select
+                                                    value={user.role}
+                                                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                                                    disabled={!canEdit}
+                                                    className={`bg-slate-800 border border-slate-700 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-amber-700 ${getRoleBadgeColor(user.role)} ${!canEdit ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                >
+                                                    <option value="Owner">Owner</option>
+                                                    <option value="Manager">Manager</option>
+                                                    <option value="Agent">Agent</option>
+                                                    <option value="Viewer">Viewer</option>
+                                                </select>
+                                            )}
+                                        </td>
+                                        <td className="p-4">
                                             <button
-                                                onClick={() => {
-                                                    setSelectedUser(user)
-                                                    setShowEditModal(true)
-                                                }}
-                                                className="text-xs text-amber-600 hover:text-amber-900 transition-colors"
+                                                onClick={() => handleStatusToggle(user.id, user.status)}
+                                                disabled={!canEdit}
+                                                className={`inline-flex px-2 py-1 rounded text-xs font-medium transition-colors ${getStatusColor(user.status)} ${!canEdit ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-80'}`}
                                             >
-                                                Edit
+                                                {user.status || 'unknown'}
                                             </button>
-                                            <button
-                                                onClick={() => handleSendResetEmail(user.email)}
-                                                className="text-xs text-slate-400 hover:text-white transition-colors"
-                                            >
-                                                Reset PW
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteUser(user.id)}
-                                                className="text-xs text-red-500 hover:text-red-400 transition-colors"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td className="p-4">
+                                            {user.subscriptionId ? (
+                                                <span className="inline-flex px-2 py-1 rounded text-xs font-medium bg-green-900/50 text-green-400">
+                                                    Active
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex px-2 py-1 rounded text-xs font-medium bg-slate-800 text-slate-400">
+                                                    No Plan
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="p-4 text-sm text-slate-400">
+                                            {user.createdAt ? formatDate(user.createdAt, 'short') : 'Unknown'}
+                                        </td>
+                                        <td className="p-4 text-sm text-slate-400">
+                                            {user.lastLogin ? formatDate(user.lastLogin, 'long') : 'Never'}
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedUser(user)
+                                                        setShowEditModal(true)
+                                                    }}
+                                                    disabled={!canEdit}
+                                                    className={`text-xs transition-colors ${canEdit ? 'text-amber-600 hover:text-amber-900' : 'text-slate-500 cursor-not-allowed'}`}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleSendResetEmail(user.email)}
+                                                    className="text-xs text-slate-400 hover:text-white transition-colors"
+                                                >
+                                                    Reset PW
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteUser(user.id)}
+                                                    disabled={!canEdit}
+                                                    className={`text-xs transition-colors ${canEdit ? 'text-red-500 hover:text-red-400' : 'text-slate-500 cursor-not-allowed'}`}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
                         </tbody>
                     </table>
                 </div>
+
+                {/* Empty State */}
+                {filteredUsers.length === 0 && (
+                    <div className="text-center py-12">
+                        <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span className="text-2xl">👥</span>
+                        </div>
+                        <h3 className="text-lg font-medium text-white mb-2">No users found</h3>
+                        <p className="text-slate-400 text-sm">Try adjusting your filters or search criteria</p>
+                    </div>
+                )}
 
                 {/* Pagination */}
                 {totalPages > 1 && (
@@ -470,15 +503,31 @@ export default function UsersPage() {
                     <div className="bg-slate-900 rounded-lg border border-slate-800 max-w-md w-full">
                         <div className="p-5 border-b border-slate-800">
                             <h2 className="text-lg font-medium text-white">Edit User</h2>
-                            <p className="text-sm text-slate-400 mt-1">Manage {selectedUser.name}'s account</p>
+                            <p className="text-sm text-slate-400 mt-1">Manage {getFullName(selectedUser)}'s account</p>
+                            {selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin' && (
+                                <p className="text-xs text-red-400 mt-2">⚠️ Admin users cannot be modified</p>
+                            )}
+                            {isCurrentUser(selectedUser) && (
+                                <p className="text-xs text-amber-400 mt-2">⚠️ You are editing your own account</p>
+                            )}
                         </div>
                         <div className="p-5 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-1">Full Name</label>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">First Name</label>
                                 <input
                                     type="text"
-                                    defaultValue={selectedUser.name}
-                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#876D4A]"
+                                    defaultValue={selectedUser.firstName || ''}
+                                    disabled={selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin'}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Last Name</label>
+                                <input
+                                    type="text"
+                                    defaultValue={selectedUser.lastName || ''}
+                                    disabled={selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin'}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                             </div>
                             <div>
@@ -486,36 +535,37 @@ export default function UsersPage() {
                                 <input
                                     type="email"
                                     defaultValue={selectedUser.email}
-                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#876D4A]"
+                                    disabled={selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin'}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-300 mb-1">Plan</label>
-                                <select
-                                    defaultValue={selectedUser.plan}
-                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#876D4A]"
-                                >
-                                    <option value="Basic">Basic</option>
-                                    <option value="Pro">Pro</option>
-                                    <option value="Business">Business</option>
-                                </select>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-1">Role</label>
                                 <select
                                     defaultValue={selectedUser.role}
-                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#876D4A]"
+                                    disabled={selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin'}
+                                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <option value="user">User</option>
-                                    <option value="moderator">Moderator</option>
-                                    <option value="admin">Admin</option>
+                                    <option value="Owner">Owner</option>
+                                    <option value="Manager">Manager</option>
+                                    <option value="Agent">Agent</option>
+                                    <option value="Viewer">Viewer</option>
                                 </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-300 mb-1">Company</label>
+                                <input
+                                    type="text"
+                                    defaultValue={selectedUser.company?.name || 'No Company'}
+                                    disabled
+                                    className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-slate-400 text-sm"
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-300 mb-1">Join Date</label>
                                 <input
                                     type="text"
-                                    value={selectedUser.joinDate}
+                                    value={selectedUser.createdAt ? formatDate(selectedUser.createdAt, 'long') : 'Unknown'}
                                     disabled
                                     className="w-full bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-2 text-slate-400 text-sm"
                                 />

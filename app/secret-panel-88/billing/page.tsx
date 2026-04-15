@@ -1,6 +1,6 @@
 // app/admin/billing/page.jsx
 'use client'
-import { useFetchBillingStats } from '@/hooks/useBilling'
+import { useFetchBillingStats } from '@/hooks/admin/useAdminBilling'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { formatDate } from '@/lib/dateFormatter'
 import { useState } from 'react'

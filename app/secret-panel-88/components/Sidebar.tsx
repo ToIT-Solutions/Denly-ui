@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
+import useAuthStore from '@/store/useAuthStore'
+import { useRouter } from 'next/navigation'
 
 interface NavItem {
     href: string
@@ -20,6 +22,12 @@ export default function Sidebar({ onCollapseChange }: SidebarProps) {
     const [isCollapsed, setIsCollapsed] = useState<boolean>(false)
     const [isMobile, setIsMobile] = useState<boolean>(false)
     const [mobileOpen, setMobileOpen] = useState<boolean>(false)
+
+    const user = useAuthStore((state) => state.user)
+    // console.log(user)
+
+    const clearUser = useAuthStore((state) => state.clearUser)
+    const router = useRouter()
 
     const navItems: NavItem[] = [
         { href: '/secret-panel-88/dashboard', label: 'Dashboard', icon: '📊', description: 'Overview & stats' },
@@ -70,6 +78,19 @@ export default function Sidebar({ onCollapseChange }: SidebarProps) {
     const sidebarClass = isMobile
         ? `${mobileOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-30`
         : `fixed left-0 top-0 h-full z-20`
+
+    function getInitials(name: string) {
+        if (!name) return ''
+        const namesArray = name.split(' ')
+        const initials = namesArray.map((n) => n[0]?.toUpperCase()).join('')
+        return initials.slice(0, 2)
+    }
+
+    const handleLogout = () => {
+        clearUser()
+        // setIsLogoutModalOpen(false)
+        router.push('/auth/login')
+    }
 
     return (
         <>
@@ -174,11 +195,11 @@ export default function Sidebar({ onCollapseChange }: SidebarProps) {
                     {!isCollapsed && (
                         <div className="flex items-center space-x-3 px-3 py-2 mb-2">
                             <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                                A
+                                {getInitials(user?.firstName + ' ' + user?.lastName)}
                             </div>
                             <div className="flex-1">
-                                <p className="text-sm font-medium text-white">Admin User</p>
-                                <p className="text-xs text-slate-400">admin@denly.com</p>
+                                <p className="text-sm font-medium text-white">{user?.firstName + ' ' + user?.lastName}</p>
+                                <p className="text-xs text-slate-400">{user?.email}</p>
                             </div>
                         </div>
                     )}
@@ -186,7 +207,7 @@ export default function Sidebar({ onCollapseChange }: SidebarProps) {
                     {isCollapsed && !isMobile && (
                         <div className="flex justify-center mb-2">
                             <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                                A
+                                {getInitials(user?.firstName + ' ' + user?.lastName)}
                             </div>
                         </div>
                     )}
@@ -202,15 +223,15 @@ export default function Sidebar({ onCollapseChange }: SidebarProps) {
                         {!isCollapsed && <span className="text-sm font-medium">Settings</span>}
                     </Link>
 
-                    <Link
-                        href="/secret-panel-88/login"
-                        onClick={() => isMobile && setMobileOpen(false)}
-                        className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors`}
+                    <div
+
+                        onClick={handleLogout}
+                        className={`flex items-center ${isCollapsed ? 'justify-center' : 'space-x-3'} cursor-pointer px-3 py-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors`}
                         aria-label={isCollapsed ? 'Logout' : ''}
                     >
                         <span className="text-lg" aria-hidden="true">🚪</span>
                         {!isCollapsed && <span className="text-sm font-medium">Logout</span>}
-                    </Link>
+                    </div>
                 </div>
             </aside>
         </>

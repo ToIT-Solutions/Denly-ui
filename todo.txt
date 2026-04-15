@@ -65,18 +65,27 @@ fixed result page and now checking billing database
 changed emails from nodemailer to resend 
 fixed rentDueDay not updating error
 
-
 ----changelog and admin-----
 created changelog table
 added admin portal and secure login
 can see billing, users, changelog and other stats from an admin view
-
+admin logout
+removed isMajor and put releaseType for changelog
+changelog with markdown
+create and view changelog
 
 -----------TODO--------------
 DELETION AND CASCADING
 AUTO START THE SUB IF COMING FROM FREE TRIAL
+ 
+edit, delete changelog
+changelog view for users
 
-logout for admin 
+future planning for billing table (reference, payment type) and things that are important in the future
+
+major seed
+
+activity log for admin if possible
 
 
 ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
