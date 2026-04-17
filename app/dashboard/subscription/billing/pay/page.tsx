@@ -30,7 +30,7 @@ export default function PaymentPage() {
 
     const { data: plans, isLoading, error } = useFetchSubscriptionPlans()
     const { mutate, isPending } = useCreatePayment()
-    // console.log(plans)
+    // //console.log(plans)
 
     // Find the selected plan
     const selectedPlan = plans?.find(
@@ -41,7 +41,7 @@ export default function PaymentPage() {
         (plan: any) => plan.name.toLowerCase() === planName
     )
 
-    // console.log(selectedPlanId?.id) //id that will then be sent to the backend
+    // //console.log(selectedPlanId?.id) //id that will then be sent to the backend
 
     const handlePayment = () => {
         const data = {
@@ -50,7 +50,7 @@ export default function PaymentPage() {
         }
 
         mutate(data)
-        // console.log(data)
+        // //console.log(data)
     }
 
     // If plan not found, show error

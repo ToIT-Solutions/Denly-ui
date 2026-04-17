@@ -40,7 +40,7 @@ export default function AddPropertyPage() {
     usePageTitle('Add Property - Denly')
 
     const { data: check } = useCheckProperties()
-    // console.log(check)
+    // //console.log(check)
 
     const user = useAuthStore((state) => state.user)
     const userRole = user?.role
@@ -75,7 +75,7 @@ export default function AddPropertyPage() {
     })
 
     const onSubmit = async (data: PropertyForm) => {
-        console.log('📝 Property form submitted with data:', data)
+        //console.log('📝 Property form submitted with data:', data)
 
         const payload = {
             ...data,

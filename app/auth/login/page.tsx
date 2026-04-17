@@ -35,7 +35,7 @@ export default function LoginPage() {
     const { mutate: loginMutate, isPending, error } = useLogin()
 
     const onSubmit = async (data: LoginForm) => {
-        console.log('📝 Login form submitted with data:', data)
+        //console.log('📝 Login form submitted with data:', data)
         setShowAllErrors(true)
 
         loginMutate(data)

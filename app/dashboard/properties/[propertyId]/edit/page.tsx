@@ -24,7 +24,7 @@ export default function EditPropertyPage() {
     const router = useRouter()
 
     const { data, isLoading, error } = useFetchOneProperty(propertyId)
-    console.log(data)
+    //console.log(data)
 
     const { mutate: editMutate, isPending: isEditPending, error: editError } = useEditProperty()
 
@@ -134,7 +134,7 @@ export default function EditPropertyPage() {
     }
 
     const onSubmit = (data: any) => {
-        console.log('Updated property:', data)
+        //console.log('Updated property:', data)
 
         const payload = {
             ...data,

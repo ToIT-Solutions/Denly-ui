@@ -33,7 +33,7 @@ export default function ForgotPasswordPage() {
     const [showAllErrors, setShowAllErrors] = useState(false)
 
     const onSubmit = async (data: ForgotPasswordForm) => {
-        console.log('📝 Forgot password form submitted with data:', data)
+        //console.log('📝 Forgot password form submitted with data:', data)
 
         mutate(data)
     }

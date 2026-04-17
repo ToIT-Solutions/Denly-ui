@@ -26,8 +26,8 @@ export default function LogsPage() {
 
     const { data, isLoading, error, isError } = useFetchAllLogs(currentPage)
     const { data: subPlan } = useFetchSubscriptionData()
-    // console.log(subPlan?.[0].subscriptionPlan.name)
-    // console.log(error?.message)
+    // //console.log(subPlan?.[0].subscriptionPlan.name)
+    // //console.log(error?.message)
     const logs = data?.logs || []
     const totalLogs = data?.total || 0
     const totalPages = data?.totalPages || 1
@@ -52,7 +52,7 @@ export default function LogsPage() {
         }
     }, [userRole, currentPageFromServer, error, subPlan])
 
-    // console.log(logs)
+    // //console.log(logs)
 
     // Get unique actions for filters (from current page data)
     const uniqueActions = useMemo(() => {

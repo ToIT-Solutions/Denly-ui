@@ -12,7 +12,7 @@ export default function PricingPage() {
 
 
     const { data: subPlan, isLoading } = useFetchSubscriptionPlansWithFree()
-    // console.log(subPlan)
+    // //console.log(subPlan)
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6] relative">

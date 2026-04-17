@@ -32,8 +32,8 @@ export default function UserManagementPage() {
     const { data, isLoading: isLoadingUsers } = useFetchAllUsers()
     const { data: invites, isLoading: isLoadingInvites } = useFetchAllInvites()
     const { data: subPlan } = useFetchSubscriptionData()
-    console.log(subPlan?.[0]?.subscriptionPlan?.maxUsers)
-    // console.log(invites)
+    //console.log(subPlan?.[0]?.subscriptionPlan?.maxUsers)
+    // //console.log(invites)
 
     const { mutate: updateRole, isPending: isUpdatingRole } = useEditUserRole()
     const { mutate: sendInvite, isPending: isSendingInvite } = useInviteUser()
@@ -93,14 +93,14 @@ export default function UserManagementPage() {
     const handleCancelInvite = () => {
         // const data = { id: inviteToCancelId }
         deleteInvite(inviteToCancelId)
-        // console.log(inviteToCancelId)
+        // //console.log(inviteToCancelId)
         closeCancelInviteModal()
     }
 
     const handleResendInvite = (inviteEmail: string) => {
         const data = { email: inviteEmail }
         resendInvite(data)
-        // console.log(data)
+        // //console.log(data)
     }
 
     const startRoleEdit = (userId: string, currentRole: string) => {

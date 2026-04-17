@@ -10,7 +10,7 @@ export const useAddPayment = () => {
     return useMutation({
         mutationFn: addPayment,
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             router.push('/dashboard/payments')
             showSuccessToast('Payment added successfully')
         },
@@ -39,7 +39,7 @@ export const useFetchOnePayment = (paymentId: string) => {
 //     return useMutation({
 //         mutationFn: ({ paymentId, data }: { paymentId: string; data: any }) => editPayment(paymentId, data),
 //         onSuccess: (data) => {
-//             console.log(data)
+//             //console.log(data)
 //         }
 //     })
 // }
@@ -48,7 +48,7 @@ export const useFetchOnePayment = (paymentId: string) => {
 //     return useMutation({
 //         mutationFn: (paymentId: string) => deletePayment(paymentId),
 //         onSuccess: (data) => {
-//             console.log(data)
+//             //console.log(data)
 //         }
 //     })
 // }

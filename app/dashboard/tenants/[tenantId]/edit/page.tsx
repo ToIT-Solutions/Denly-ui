@@ -123,7 +123,7 @@ export default function EditTenantPage() {
 
 
     const { data, isLoading } = useFetchOneTenant(tenantId)
-    // console.log(data)
+    // //console.log(data)
     const { data: properties, isLoading: propertiesLoading } = useFetchAllProperties()
     const { data: payments } = useFetchAllPayments()
 
@@ -437,7 +437,7 @@ export default function EditTenantPage() {
 
         // No warnings, proceed with update
         executeUpdate(formattedData);
-        // console.log(formattedData)
+        // //console.log(formattedData)
     };
 
     const executeUpdate = (formattedData: TenantForm) => {
@@ -447,7 +447,7 @@ export default function EditTenantPage() {
 
         // If no document changes, send as regular JSON
         if (!hasNewDocuments && !hasDocumentsToDelete) {
-            // console.log('Sending as JSON:', formattedData);
+            // //console.log('Sending as JSON:', formattedData);
             editMutate({ tenantId, data: formattedData }, {
                 onSuccess: () => {
                     router.push(`/dashboard/tenants/${tenantId}`);
@@ -460,41 +460,41 @@ export default function EditTenantPage() {
         const formDataToSend = new FormData()
 
         // IMPORTANT: Make sure formattedData is not empty
-        // console.log('Formatted data being sent:', formattedData);
+        // //console.log('Formatted data being sent:', formattedData);
 
         // Convert to JSON string and append
         const jsonString = JSON.stringify(formattedData);
-        // console.log('JSON string length:', jsonString.length);
+        // //console.log('JSON string length:', jsonString.length);
         formDataToSend.append('data', jsonString);
 
         // Append documents to delete
         if (documentsToDelete.length > 0) {
             const deleteJson = JSON.stringify(documentsToDelete);
-            // console.log('Delete documents JSON:', deleteJson);
+            // //console.log('Delete documents JSON:', deleteJson);
             formDataToSend.append('deleteDocuments', deleteJson);
         }
 
         // Append all new documents
         if (newDocuments.length > 0) {
-            // console.log('Number of new documents:', newDocuments.length);
+            // //console.log('Number of new documents:', newDocuments.length);
             newDocuments.forEach((doc, index) => {
-                // console.log(`Adding file ${index}:`, doc.file.name, doc.file.size);
+                // //console.log(`Adding file ${index}:`, doc.file.name, doc.file.size);
                 formDataToSend.append('documents', doc.file);
             });
 
             // Append categories
             const categories = newDocuments.map(doc => doc.category);
             const categoriesJson = JSON.stringify(categories);
-            // console.log('Categories JSON:', categoriesJson);
+            // //console.log('Categories JSON:', categoriesJson);
             formDataToSend.append('categories', categoriesJson);
         }
 
         // TEST: Verify FormData contents by getting them
-        // console.log('Verifying FormData contents:');
+        // //console.log('Verifying FormData contents:');
         const dataValue = formDataToSend.get('data');
-        // console.log('Data field exists:', !!dataValue);
+        // //console.log('Data field exists:', !!dataValue);
         if (dataValue) {
-            // console.log('Data field length:', dataValue.toString().length);
+            // //console.log('Data field length:', dataValue.toString().length);
         }
 
         // Send to backend

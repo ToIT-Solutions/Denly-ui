@@ -10,7 +10,7 @@ export const useAddProperty = () => {
     return useMutation({
         mutationFn: addProperty,
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             router.back()
             showSuccessToast("Property added successfully")
         },
@@ -42,7 +42,7 @@ export const useEditProperty = () => {
     return useMutation({
         mutationFn: ({ propertyId, data }: { propertyId: string; data: any }) => editProperty(propertyId, data),
         onSuccess: (data, propertyId) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('Property edited successfully')
             router.push('/dashboard/properties')
             queryClient.invalidateQueries({ queryKey: ["Property", propertyId] });
@@ -60,7 +60,7 @@ export const useDeleteProperty = () => {
     return useMutation({
         mutationFn: (propertyId: string) => deleteProperty(propertyId),
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('Property deleted successfully')
             router.push('/dashboard/properties')
             queryClient.invalidateQueries({ queryKey: ["allProperties"] });

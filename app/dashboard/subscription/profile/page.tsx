@@ -76,7 +76,7 @@ export default function ProfileSettingsPage() {
             ...data,
             userId: user.id
         }
-        // console.log("Change password payload:", payload)
+        // //console.log("Change password payload:", payload)
         passwordMutate(payload)
         resetPasswordForm()
         setIsPasswordModalOpen(false)

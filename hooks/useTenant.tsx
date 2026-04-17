@@ -9,7 +9,7 @@ export const useAddTenant = () => {
     return useMutation({
         mutationFn: addTenant,
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             router.push(`/dashboard/tenants`)
             showSuccessToast('Tenant added successfully!')
         },
@@ -40,7 +40,7 @@ export const useEditTenant = () => {
     return useMutation({
         mutationFn: ({ tenantId, data }: { tenantId: string; data: any }) => editTenant(data, tenantId),
         onSuccess: (data, tenantId) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('Tenant edited successfully')
             queryClient.invalidateQueries({ queryKey: ["Tenant", tenantId] });
             router.push(`/dashboard/tenants`)
@@ -57,7 +57,7 @@ export const useDeleteTenant = () => {
     return useMutation({
         mutationFn: (tenantId: string) => deleteTenant(tenantId),
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             router.push(`/dashboard/tenants/`)
             showSuccessToast('Tenant deleted successfully')
             queryClient.invalidateQueries({ queryKey: ["allTenants"] });
