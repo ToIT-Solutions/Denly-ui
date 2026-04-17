@@ -44,11 +44,11 @@ export default function SignupPage() {
 
     // const params = useSearchParams()
     // const state = params.get('plan')
-    // console.log(state)
+    // //console.log(state)
 
 
     const onSubmit = async (data: SignupForm) => {
-        // console.log('📝 Form submitted with data:', data)
+        // //console.log('📝 Form submitted with data:', data)
         setShowAllErrors(true)
 
         signupMutate(data)

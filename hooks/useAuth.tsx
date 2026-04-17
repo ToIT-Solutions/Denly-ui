@@ -12,13 +12,13 @@ export const useSignup = () => {
     return useMutation({
         mutationFn: signup,
         onSuccess: (data) => {
-            // console.log(data)
+            // //console.log(data)
             setUser(data)
             showSuccessToast('Account created successfully')
             router.push(`/dashboard/subscription/company`)
         },
         onError: (error: any) => {
-            console.log(error)
+            //console.log(error)
             showErrorToast(error)
         }
     })
@@ -31,13 +31,13 @@ export const useLogin = () => {
     return useMutation({
         mutationFn: login,
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('You have logged in successfully')
             setUser(data)
             router.push(`/dashboard`)
         },
         onError: (error: any) => {
-            console.log(error)
+            //console.log(error)
             showErrorToast(error)
         }
     })
@@ -49,11 +49,11 @@ export const useChangePassword = () => {
     return useMutation({
         mutationFn: changePassword,
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('Your password has been changed successfully')
         },
         onError: (error: any) => {
-            console.log(error)
+            //console.log(error)
             showErrorToast(error)
         }
     })
@@ -65,12 +65,12 @@ export const useForgotPassword = () => {
     return useMutation({
         mutationFn: forgotPassword,
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('Your password reset request has been sent successfully, check your email')
             router.push(`/auth/login`)
         },
         onError: (error: any) => {
-            console.log(error)
+            //console.log(error)
             showErrorToast(error)
         }
     })
@@ -82,12 +82,12 @@ export const useResetPassword = () => {
     return useMutation({
         mutationFn: resetPassword,
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('You have successfully reset your password')
             router.push(`/auth/login`)
         },
         onError: (error: any) => {
-            console.log(error)
+            //console.log(error)
             showErrorToast(error)
         }
     })

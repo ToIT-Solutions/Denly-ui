@@ -17,7 +17,7 @@ export default function Navbar() {
 
     const user = useAuthStore((state) => state.user)
     const userRole = user?.role
-    // console.log(user)
+    // //console.log(user)
 
     const clearUser = useAuthStore((state) => state.clearUser)
     const router = useRouter()

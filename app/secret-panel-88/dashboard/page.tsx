@@ -11,7 +11,7 @@ export default function AdminDashboardPage() {
     const [selectedPeriod, setSelectedPeriod] = useState('week')
 
     const { data, isPending } = useFetchAdminStats()
-    console.log(data)
+    //console.log(data)
 
     // Helper function to extract numeric value from latency/response time string
     const parseTimeValue = (timeStr: string | number): number => {

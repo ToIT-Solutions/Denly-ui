@@ -19,7 +19,7 @@ export const useProcessInvite = () => {
     return useMutation({
         mutationFn: processInvite,
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             setUser(data)
             showSuccessToast('Account created successfully')
             router.push(`/dashboard`)
@@ -37,7 +37,7 @@ export const useInviteUser = () => {
     return useMutation({
         mutationFn: (data: any) => inviteUser(data),
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('Invitation sent successfully')
             queryClient.invalidateQueries({ queryKey: ["allInvites"] });
         },
@@ -54,7 +54,7 @@ export const useResendInvite = () => {
     return useMutation({
         mutationFn: (data: any) => resendInvite(data),
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('Invitation resent successfully')
             queryClient.invalidateQueries({ queryKey: ["allInvites"] });
         },
@@ -71,7 +71,7 @@ export const useDeleteInvite = () => {
     return useMutation({
         mutationFn: (inviteId: any) => deleteInvite(inviteId),
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('Invitation removed successfully')
             queryClient.invalidateQueries({ queryKey: ["allInvites"] });
         },

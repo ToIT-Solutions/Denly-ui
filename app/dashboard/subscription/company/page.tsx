@@ -29,7 +29,7 @@ export default function CompanyPage() {
     const userRole = user?.role
 
     const { data, isLoading, error } = useFetchCompanyData()
-    console.log(data)
+    //console.log(data)
 
     const { mutate: companyMutate, isPending, error: companyError } = useEditCompany()
 
@@ -69,7 +69,7 @@ export default function CompanyPage() {
 
 
     const onSubmit = async (data: CompanyFormData) => {
-        console.log('Form submitted:', data)
+        //console.log('Form submitted:', data)
 
         companyMutate(data)
     }

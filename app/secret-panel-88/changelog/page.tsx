@@ -44,7 +44,7 @@ export default function ChangelogPage() {
     ])
 
     const { data, isLoading } = useFetchChangelogs()
-    console.log(data)
+    //console.log(data)
 
     const router = useRouter()
 

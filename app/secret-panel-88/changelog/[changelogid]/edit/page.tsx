@@ -66,7 +66,7 @@ export default function EditChangelogPage() {
                 setValue('isPublished', mockData.isPublished)
                 setOriginalDate(mockData.date)
 
-                console.log('Data loaded:', mockData)
+                //console.log('Data loaded:', mockData)
             } catch (error) {
                 console.error('Error fetching changelog:', error)
             } finally {
@@ -80,11 +80,11 @@ export default function EditChangelogPage() {
     }, [params.id, setValue])
 
     const onSubmit = async (data: ChangelogFormData) => {
-        console.log('Submitting:', data)
+        //console.log('Submitting:', data)
         try {
             // Simulate API call
             await new Promise(resolve => setTimeout(resolve, 1000))
-            console.log('Updated changelog:', data)
+            //console.log('Updated changelog:', data)
 
             // Redirect to view page
             router.push(`/secret-panel-88/changelog/${params.id}`)
@@ -166,8 +166,8 @@ export default function EditChangelogPage() {
                                     type="button"
                                     onClick={() => setValue('type', type.value)}
                                     className={`p-3 rounded-lg border transition-all ${watchType === type.value
-                                            ? `border-${type.color}-500 bg-${type.color}-900/20 text-${type.color}-400`
-                                            : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
+                                        ? `border-${type.color}-500 bg-${type.color}-900/20 text-${type.color}-400`
+                                        : 'border-slate-700 bg-slate-800 text-slate-400 hover:border-slate-600'
                                         }`}
                                 >
                                     <div className="text-2xl mb-1">{type.icon}</div>

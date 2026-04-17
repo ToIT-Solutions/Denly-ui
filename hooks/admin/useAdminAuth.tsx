@@ -13,7 +13,7 @@ export const useAdminLogin = () => {
         onSuccess: (data) => {
             showSuccessToast('Welcome back admin')
             setUser(data)
-            console.log(data)
+            //console.log(data)
             router.push('/secret-panel-88/dashboard')
         },
         onError: (error: any) => {

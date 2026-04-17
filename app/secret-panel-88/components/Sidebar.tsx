@@ -24,7 +24,7 @@ export default function Sidebar({ onCollapseChange }: SidebarProps) {
     const [mobileOpen, setMobileOpen] = useState<boolean>(false)
 
     const user = useAuthStore((state) => state.user)
-    // console.log(user)
+    // //console.log(user)
 
     const clearUser = useAuthStore((state) => state.clearUser)
     const router = useRouter()

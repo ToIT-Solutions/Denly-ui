@@ -23,15 +23,15 @@ export default function ViewTenantPage() {
     const tenantId = params.tenantId as string
 
     const { data, isLoading } = useFetchOneTenant(tenantId)
-    console.log(data)
+    //console.log(data)
 
     const { data: ledger } = useFetchOneRentLedger(tenantId)
-    console.log(ledger)
+    //console.log(ledger)
 
     usePageTitle(`${data?.firstName + ' ' + data?.lastName} - Denly`)
 
     // const { data: properties, isLoading: propertyLoading } = useFetchAllProperties()
-    // console.log(properties)
+    // //console.log(properties)
 
     // Use the combined hook for document actions
     const {

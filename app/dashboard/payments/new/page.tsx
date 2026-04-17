@@ -55,7 +55,7 @@ export default function RecordPaymentPage() {
     const { mutate: paymentMutate, isPending } = useAddPayment()
 
     // const { data, isPending: dataPending } = useFetchOnePayment(id as string)
-    // console.log(data)
+    // //console.log(data)
 
     const [availableTenants, setAvailableTenants] = useState<Tenant[]>([])
     const [expectedAmount, setExpectedAmount] = useState<number | null>(null)
@@ -101,7 +101,7 @@ export default function RecordPaymentPage() {
         }
 
         paymentMutate(payload)
-        // console.log(payload)
+        // //console.log(payload)
     }
 
     const months = Array.from({ length: 12 }, (_, i) => i + 1)

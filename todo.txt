@@ -73,6 +73,9 @@ admin logout
 removed isMajor and put releaseType for changelog
 changelog with markdown
 create and view changelog
+major seed and prod seed
+commented out all console.logs
+changed fields from paynow specifics to allow continuity for when we expand payment options
 
 -----------TODO--------------
 DELETION AND CASCADING
@@ -83,7 +86,7 @@ changelog view for users
 
 future planning for billing table (reference, payment type) and things that are important in the future
 
-major seed
+
 
 activity log for admin if possible
 

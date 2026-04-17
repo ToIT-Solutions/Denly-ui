@@ -21,7 +21,7 @@ export default function SinglePropertyPage() {
     }
 
     const { data, isLoading, error } = useFetchOneProperty(propertyId)
-    console.log(data)
+    // //console.log(data)
 
     usePageTitle(`${data?.name} - Denly`)
 

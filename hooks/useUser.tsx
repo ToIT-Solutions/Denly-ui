@@ -26,7 +26,7 @@ export const useEditUser = () => {
     return useMutation({
         mutationFn: ({ userId, data }: { userId: string; data: any }) => editUser(userId, data),
         onSuccess: (data, userId) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('User edited successfully')
             // router.push('/dashboard/properties')
             queryClient.invalidateQueries({ queryKey: ["user", userId] });
@@ -45,7 +45,7 @@ export const useEditUserRole = () => {
     return useMutation({
         mutationFn: ({ userId, data }: { userId: string; data: any }) => editUserRole(userId, data),
         onSuccess: (data, userId) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('User role changed successfully')
             // router.push('/dashboard/properties')
             queryClient.invalidateQueries({ queryKey: ["user", userId] });
@@ -64,7 +64,7 @@ export const useDeleteUser = () => {
     return useMutation({
         mutationFn: (propertyId: string) => deleteUser(propertyId),
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('User deleted successfully')
             // router.push('/dashboard/properties')
             queryClient.invalidateQueries({ queryKey: ["allUsers"] });

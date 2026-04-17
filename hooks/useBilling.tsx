@@ -9,7 +9,7 @@ export const useCreatePayment = () => {
     return useMutation({
         mutationFn: (data: any) => createBilling(data),
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             router.push(data.redirectUrl)
         },
         onError: (error: any) => {

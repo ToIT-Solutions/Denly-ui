@@ -48,12 +48,12 @@ export default function ResetPasswordPage() {
     const { mutate, isPending } = useResetPassword()
 
     const onSubmit = async (data: ResetPasswordForm) => {
-        console.log('📝 Reset password form submitted with data:', data)
+        //console.log('📝 Reset password form submitted with data:', data)
         setShowAllErrors(true)
         // Add your logic here
 
         const payload = { ...data, token }
-        console.log(payload)
+        //console.log(payload)
 
         mutate(payload)
     }

@@ -10,7 +10,7 @@ export default function BillingPage() {
 
 
     const { data, isPending } = useFetchBillingStats()
-    console.log(data)
+    //console.log(data)
 
     return (
         <div className="min-h-screen bg-slate-950 p-6">

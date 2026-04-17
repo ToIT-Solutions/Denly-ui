@@ -23,7 +23,7 @@ export default function TenantsPage() {
 
     const { data: tenants, isLoading, error } = useFetchAllTenants()
     const { data: allPayments, isLoading: paymentsLoading } = useFetchAllPayments() // Fetch all payments
-    console.log(tenants)
+    //console.log(tenants)
     // Calculate overdue status for each tenant
     const tenantsWithOverdueStatus = useMemo(() => {
         if (!tenants || !allPayments) return []

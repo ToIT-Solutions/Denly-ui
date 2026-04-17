@@ -16,7 +16,7 @@ export default function PaymentsPage() {
     ]
 
     const { data, isLoading, error } = useFetchAllPayments()
-    console.log(data)
+    //console.log(data)
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState('All Status')
     const [monthFilter, setMonthFilter] = useState('')

@@ -14,7 +14,7 @@ export default function DashboardPage() {
     const user = useAuthStore((state) => state.user)
 
     const { data, isLoading, error } = useFetchCompanyStats()
-    console.log(data)
+    //console.log(data)
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">

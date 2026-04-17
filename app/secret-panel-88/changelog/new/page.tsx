@@ -60,7 +60,7 @@ export default function CreateChangelogPage() {
     const { mutate, isPending } = useCreateChangelog()
 
     const onSubmit = async (data: ChangelogFormData) => {
-        console.log('Creating:', data)
+        //console.log('Creating:', data)
         mutate(data)
     }
 

@@ -47,7 +47,7 @@ api.interceptors.response.use(
             if (!isHandlingNetworkError) {
                 isHandlingNetworkError = true
 
-                console.log('Network error')
+                //console.log('Network error')
 
                 const message = encodeURIComponent(
                     'Unable to connect to the server. Please check your internet connection.'
@@ -64,7 +64,7 @@ api.interceptors.response.use(
             if (!isHandlingAuthError) {
                 isHandlingAuthError = true
 
-                console.log('Authentication error')
+                //console.log('Authentication error')
 
                 showErrorToast('Your session has expired. Please log in again.')
                 
@@ -84,7 +84,7 @@ api.interceptors.response.use(
             if (!isHandlingSubscriptionError) {
                 isHandlingSubscriptionError = true
 
-                console.log('Subscription error')
+                //console.log('Subscription error')
 
                 showErrorToast('Your subscription has expired or is inactive.')
                 
@@ -101,7 +101,7 @@ api.interceptors.response.use(
             if (!isHandlingServerError) {
                 isHandlingServerError = true
 
-                console.log('Server error')
+                //console.log('Server error')
                 
                 // Encode the error message to safely pass in URL
                 const encodedMessage = encodeURIComponent(
@@ -121,7 +121,7 @@ api.interceptors.response.use(
             errorCode === 'RATE_LIMIT_EXCEEDED' ||
             errorCode === 'MAINTENANCE_MODE'
         ) {
-            console.log('Specific backend error')
+            //console.log('Specific backend error')
 
             const encodedMessage = encodeURIComponent(
                 errorMessage || `Error: ${errorCode}`
@@ -134,7 +134,7 @@ api.interceptors.response.use(
 
         // Handle Network Errors (no response from server)
         if (error.code === 'ECONNABORTED' || error.code === 'ERR_NETWORK') {
-            console.log('Network error')
+            //console.log('Network error')
             const message = encodeURIComponent(
                 'Unable to connect to the server. Please check your internet connection.'
             )
@@ -147,7 +147,7 @@ api.interceptors.response.use(
 
         // Handle Toast Errors (400, 404, 409, 422, etc.)
         if (TOAST_ERROR_STATUSES.includes(status)) {
-            console.log('Client error - showing toast')
+            //console.log('Client error - showing toast')
 
             showErrorToast(errorMessage || 'An error occurred. Please try again.')
 
@@ -155,7 +155,7 @@ api.interceptors.response.use(
         }
 
         // Handle any other unhandled errors - redirect to error page
-        console.log('Unhandled error:', error)
+        //console.log('Unhandled error:', error)
 
         const encodedMessage = encodeURIComponent(
             errorMessage || error.message || 'An unexpected error occurred'

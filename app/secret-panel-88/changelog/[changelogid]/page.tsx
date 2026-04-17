@@ -17,7 +17,7 @@ export default function ViewChangelogPage() {
     const router = useRouter()
     const params = useParams()
     const changelogId = params.changelogid as string
-    console.log(changelogId)
+    //console.log(changelogId)
 
 
     const getTypeColor = (type: string) => {
@@ -71,7 +71,7 @@ export default function ViewChangelogPage() {
     }
 
     const { data: changelog, isLoading } = useFetchOneChangelog(changelogId)
-    // console.log(changelog)
+    // //console.log(changelog)
 
     return (
         // <></>

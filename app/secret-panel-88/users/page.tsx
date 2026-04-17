@@ -122,7 +122,7 @@ export default function UsersPage() {
             alert('Cannot change your own role')
             return
         }
-        console.log('Update role:', userId, newRole)
+        //console.log('Update role:', userId, newRole)
         // await updateUserRole(userId, newRole)
         refetch()
     }
@@ -138,7 +138,7 @@ export default function UsersPage() {
             return
         }
         const newStatus = currentStatus === 'active' ? 'suspended' : 'active'
-        console.log('Update status:', userId, newStatus)
+        //console.log('Update status:', userId, newStatus)
         // await updateUserStatus(userId, newStatus)
         refetch()
     }
@@ -154,7 +154,7 @@ export default function UsersPage() {
             return
         }
         if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-            console.log('Delete user:', userId)
+            //console.log('Delete user:', userId)
             // await deleteUser(userId)
             refetch()
         }

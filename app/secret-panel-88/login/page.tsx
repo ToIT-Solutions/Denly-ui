@@ -32,7 +32,7 @@ export default function AdminLoginPage() {
     const onSubmit = async (data: AdminLoginForm) => {
         setError('')
 
-        console.log(data)
+        //console.log(data)
         mutate(data)
     }
 

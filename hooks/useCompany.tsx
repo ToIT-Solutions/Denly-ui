@@ -32,7 +32,7 @@ export const useEditCompany = () => {
     return useMutation({
         mutationFn: (data: CompanyData) => editCompanyData(data),
         onSuccess: (data) => {
-            console.log(data)
+            //console.log(data)
             showSuccessToast('Company edited successfully')
             // router.push('/subscription/company')
             queryClient.invalidateQueries({ queryKey: ["companyData"] });
