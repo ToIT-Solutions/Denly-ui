@@ -47,6 +47,7 @@ export default function RecordPaymentPage() {
         data: Property[] | undefined
         isPending: boolean
     }
+    console.log(propertyData)
 
     const user = useAuthStore((state) => state.user)
     const userRole = user?.role
@@ -54,8 +55,6 @@ export default function RecordPaymentPage() {
     const router = useRouter()
     const { mutate: paymentMutate, isPending } = useAddPayment()
 
-    // const { data, isPending: dataPending } = useFetchOnePayment(id as string)
-    // //console.log(data)
 
     const [availableTenants, setAvailableTenants] = useState<Tenant[]>([])
     const [expectedAmount, setExpectedAmount] = useState<number | null>(null)

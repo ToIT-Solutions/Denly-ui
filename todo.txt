@@ -64,8 +64,6 @@ fixed last owner for sub deletion
 fixed result page and now checking billing database 
 changed emails from nodemailer to resend 
 fixed rentDueDay not updating error
-
-----changelog and admin-----
 created changelog table
 added admin portal and secure login
 can see billing, users, changelog and other stats from an admin view
@@ -76,16 +74,15 @@ create and view changelog
 major seed and prod seed
 commented out all console.logs
 changed fields from paynow specifics to allow continuity for when we expand payment options
+fixed minor errors on add tenant and add payment
+edit, delete changelog
+edit user from admin
 
 -----------TODO--------------
 DELETION AND CASCADING
 AUTO START THE SUB IF COMING FROM FREE TRIAL
  
-edit, delete changelog
 changelog view for users
-
-future planning for billing table (reference, payment type) and things that are important in the future
-
 
 
 activity log for admin if possible

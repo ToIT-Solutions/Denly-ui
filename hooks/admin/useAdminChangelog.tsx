@@ -50,14 +50,16 @@ export const useUpdateChangelog = () => {
     })
 }
 
-export const useDeleteChangelog = () => {
+export const useDeleteChangelog = (id: string) => {
     const queryClient = useQueryClient()
+    const router = useRouter()
 
     return useMutation({
-        mutationFn: (id: string) => deleteChangelog(id),
+        mutationFn: () => deleteChangelog(id),
         onSuccess: () => {
             showSuccessToast('Changelog deleted successfully')
             queryClient.invalidateQueries({ queryKey: ["adminChangelogs"] })
+            router.push('/secret-panel-88/changelog')
         },
         onError: (error: any) => {
             showErrorToast(error)

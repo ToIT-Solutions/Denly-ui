@@ -13,32 +13,15 @@ export const fetchAllUsers = async () => {
     }
 };
 
-export const updateUserRole = async (id: string, role: string) => {
+export const updateUser = async (id: string, data: any) => {
     try {
-        const response = await api.patch(`/v1/admin/users/${id}/role`, {
-            role
-        });
+        const response = await api.patch(`/v1/admin/users/edit/${id}`, data);
         return response.data;
     } catch (error: any) {
         const message =
             error.response?.data?.message ||
             error.message ||
-            "Error updating user role";
-        throw new Error(message);
-    }
-};
-
-export const updateUserStatus = async (id: string, status: string) => {
-    try {
-        const response = await api.patch(`/v1/admin/users/${id}/status`, {
-            status
-        });
-        return response.data;
-    } catch (error: any) {
-        const message =
-            error.response?.data?.message ||
-            error.message ||
-            "Error updating user status";
+            "Error updating user";
         throw new Error(message);
     }
 };

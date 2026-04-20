@@ -1164,7 +1164,7 @@ export default function ReportsPage() {
                         </div>
 
                         {/* Quick Generate Reports */}
-                        <div className="mt-8 bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+                        {/* <div className="mt-8 bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
                             <h3 className="font-serif text-lg text-gray-900 mb-4">⚡ Quick Generate Reports</h3>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {[
@@ -1185,7 +1185,7 @@ export default function ReportsPage() {
                                     </button>
                                 ))}
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 }
             </div>

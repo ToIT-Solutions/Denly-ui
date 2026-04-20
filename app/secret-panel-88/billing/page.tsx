@@ -87,7 +87,7 @@ export default function BillingPage() {
                                     <p className="text-xs text-slate-400">{plan.totalSubscriptions} total subscriptions</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-lg font-semibold text-white">${plan.totalRevenue.toLocaleString()}</p>
+                                    <p className="text-lg font-semibold text-white">${plan.totalRevenue}</p>
                                     {/* <p className="text-xs text-slate-400">${(plan.revenue / plan.count).toFixed(2)} avg/user</p> */}
                                 </div>
                             </div>
@@ -141,7 +141,7 @@ export default function BillingPage() {
                                     <td className="p-4 text-sm text-slate-300">{transaction.planName}</td>
                                     <td className="p-4 text-sm text-white">${transaction.amount}</td>
                                     <td className="p-4">
-                                        <span className={`inline-flex px-2 py-1 rounded text-xs font-medium ${transaction.status === 'paid' ? 'bg-green-900/50 text-green-400' :
+                                        <span className={`inline-flex px-2 py-1 rounded text-xs font-medium ${transaction.status === 'paid' || transaction.status === 'success' ? 'bg-green-900/50 text-green-400' :
                                             transaction.status === 'pending' ? 'bg-yellow-900/50 text-yellow-400' :
                                                 'bg-red-900/50 text-red-400'
                                             }`}>

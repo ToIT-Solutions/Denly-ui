@@ -338,7 +338,13 @@ export default function PaymentResultPage() {
                                             </span>
                                         </div>
                                         <div className="flex justify-between items-center pb-2 border-b border-gray-200">
-                                            <span className="text-sm text-gray-600">Provider Reference</span>
+                                            <span className="text-sm text-gray-600">Payment Method</span>
+                                            <span className="text-sm font-mono text-gray-900">
+                                                {billing?.provider}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+                                            <span className="text-sm text-gray-600">Payment Reference</span>
                                             <span className="text-sm font-mono text-gray-900">
                                                 {billing?.providerReference}
                                             </span>
