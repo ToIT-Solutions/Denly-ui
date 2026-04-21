@@ -9,40 +9,40 @@ export default function ContactPage() {
     const contactMethods = [
         {
             icon: '💬',
-            title: 'Chat Support',
-            description: 'Get instant answers from our AI assistant',
-            action: 'Start Chat',
+            title: 'Whatsapp Support',
+            description: 'Get instant answers from us',
+            action: '0781 926 018',
             link: '#chat',
-            available: '24/7',
-            color: 'from-blue-500 to-cyan-500'
+            // available: '18-hour response',
+            color: 'from-green-500 to-emerald-500'
         },
         {
             icon: '📧',
             title: 'Email',
             description: 'Send us an email for detailed inquiries',
-            action: 'hello@denly.com',
-            link: 'mailto:hello@denly.com',
+            action: 'admin@toitsolutions.co.zw',
+            link: 'mailto:admin@toitsolutions.co.zw',
             available: '24-hour response',
-            color: 'from-green-500 to-emerald-500'
+            color: 'from-blue-500 to-cyan-500'
         },
-        {
-            icon: '📞',
-            title: 'Schedule Call',
-            description: 'Book a demo or consultation call',
-            action: 'Book Now',
-            link: 'https://calendly.com/denly/demo',
-            available: 'Mon-Fri, 9AM-6PM EST',
-            color: 'from-purple-500 to-pink-500'
-        },
-        {
-            icon: '🐦',
-            title: 'Twitter/X',
-            description: 'Quick questions and updates',
-            action: '@denlyapp',
-            link: 'https://twitter.com/denlyapp',
-            available: 'Fast responses',
-            color: 'from-black to-gray-800'
-        }
+        // {
+        //     icon: '📞',
+        //     title: 'Schedule Call',
+        //     description: 'Book a demo or consultation call',
+        //     action: 'Book Now',
+        //     link: 'https://calendly.com/denly/demo',
+        //     available: 'Mon-Fri, 9AM-6PM EST',
+        //     color: 'from-purple-500 to-pink-500'
+        // },
+        // {
+        //     icon: '🐦',
+        //     title: 'Twitter/X',
+        //     description: 'Quick questions and updates',
+        //     action: '@denlyapp',
+        //     link: 'https://twitter.com/denlyapp',
+        //     available: 'Fast responses',
+        //     color: 'from-black to-gray-800'
+        // }
     ]
 
     const faqs = [

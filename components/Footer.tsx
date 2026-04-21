@@ -169,15 +169,24 @@ export default function Footer() {
 
                     {/* Bottom */}
                     <div className="border-t border-gray-700 mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
-                        <p className="text-gray-400 text-sm">
+                        <div className="text-gray-400 text-sm">
                             <div className='flex'>
-                                <p>© {new Date().getFullYear()} Denly. a product of</p>
-                                <Link href={'https://toitsolutions.co.zw'} target='_blank'>
-                                    <Image src={toit} alt='Toit Logo' className='ml-1 w-10 ' style={{ marginTop: '-15px' }} />
+                                <div>© {new Date().getFullYear()} Denly.
+
+                                    All rights reserved.
+                                </div>
+                            </div>
+                            <div>
+                                Denly is a product of
+                                <Link
+                                    href="https://toitsolutions.co.zw"
+                                    target="_blank"
+                                    className="transition duration-300 hover:bg-linear-to-r hover:from-blue-400 hover:to-green-400 hover:bg-clip-text hover:text-transparent"
+                                >
+                                    {" "} Toit Solutions (Pvt) Ltd.
                                 </Link>
                             </div>
-                            <p> All rights reserved.</p>
-                        </p>
+                        </div>
 
                         <div className="flex flex-wrap justify-center sm:justify-end gap-4 items-center">
                             {latestVersion ? (
