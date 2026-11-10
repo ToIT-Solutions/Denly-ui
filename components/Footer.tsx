@@ -197,13 +197,6 @@ export default function Footer() {
                                     >
                                         Version: {latestVersion.version}
                                     </button>
-                                    {/* <span className="text-gray-600">|</span> */}
-                                    {/* <Link
-                                        href="/changelog"
-                                        className="text-gray-400 hover:text-[#876D4A] transition-colors text-sm hover:underline"
-                                    >
-                                        View all release notes →
-                                    </Link> */}
                                 </>
                             ) : (
                                 <span className="text-gray-500 text-sm"></span>
