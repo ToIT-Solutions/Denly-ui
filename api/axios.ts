@@ -71,7 +71,7 @@ api.interceptors.response.use(
         clearUser();
 
         setTimeout(() => {
-          window.location.href = "/auth/login";
+          window.location.href = window.location.pathname?.startsWith('/secret-panel-88') ? '/secret-panel-88/login' : '/auth/login';
         }, 1400);
       }
 

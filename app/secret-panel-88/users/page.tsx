@@ -65,7 +65,7 @@ export default function UsersPage() {
 
     // Role options based on current user's role
     const getAvailableRoles = () => {
-        if (currentUserRole === 'Admin') {
+        if (currentUserRole !== 'Super_Admin') {
             return ['Owner', 'Manager', 'Agent', 'Viewer']
         }
         // Super admin can assign any role including Admin
@@ -77,10 +77,9 @@ export default function UsersPage() {
 
     // Check if user can be edited (prevent editing admin if not super admin)
     const canEditUser = (user: User) => {
-        if (user.role === 'Admin' && currentUserRole !== 'SuperAdmin') {
-            return false
-        }
-        return true
+        if (!['Admin', 'Super_Admin'].includes(currentUserRole)) return false
+        if (user.role === 'Super_Admin') return false
+        return user.role !== 'Admin' || currentUserRole === 'Super_Admin' || user.id === currentUser?.id
     }
 
     // Check if current user is the one being edited
@@ -123,7 +122,7 @@ export default function UsersPage() {
     // Actions
     const handleRoleChange = async (userId: string, newRole: string) => {
         const userToUpdate = users.find(u => u.id === userId)
-        if (userToUpdate?.role === 'Admin' && currentUserRole !== 'SuperAdmin') {
+        if (userToUpdate && !canEditUser(userToUpdate)) {
             alert('Cannot modify Admin users')
             return
         }
@@ -138,7 +137,7 @@ export default function UsersPage() {
 
     const handleStatusChange = async (userId: string, newStatus: string) => {
         const userToUpdate = users.find(u => u.id === userId)
-        if (userToUpdate?.role === 'Admin' && currentUserRole !== 'SuperAdmin') {
+        if (userToUpdate && !canEditUser(userToUpdate)) {
             alert('Cannot modify Admin users')
             return
         }
@@ -165,6 +164,13 @@ export default function UsersPage() {
 
     const handleSaveEdit = async () => {
         if (!selectedUser) return
+
+        // Match backend hierarchy checks before submitting the existing edit payload.
+        if (!canEditUser(selectedUser)) return
+        if (isCurrentUser(selectedUser) && (editFormData.role !== selectedUser.role || editFormData.status !== selectedUser.status)) {
+            alert('Cannot change your own role or status')
+            return
+        }
 
         if (editFormData.role !== selectedUser.role) {
             await handleRoleChange(selectedUser.id, editFormData.role)
@@ -225,7 +231,7 @@ export default function UsersPage() {
             <div className="mb-6">
                 <h1 className="text-2xl font-semibold text-white">User Management</h1>
                 <p className="text-sm text-slate-400 mt-1">Manage users, roles, subscriptions, and permissions</p>
-                {currentUserRole !== 'SuperAdmin' && (
+                {currentUserRole !== 'Super_Admin' && (
                     <p className="text-xs text-amber-600 mt-2">⚠️ Admin users cannot be modified</p>
                 )}
             </div>
@@ -482,7 +488,7 @@ export default function UsersPage() {
                                 <div className="p-5 border-b border-slate-800">
                                     <h2 className="text-lg font-medium text-white">Edit User</h2>
                                     <p className="text-sm text-slate-400 mt-1">Manage {getFullName(selectedUser)}'s account</p>
-                                    {selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin' && (
+                                    {!canEditUser(selectedUser) && (
                                         <p className="text-xs text-red-400 mt-2">⚠️ Admin users cannot be modified</p>
                                     )}
                                     {isCurrentUser(selectedUser) && (
@@ -496,7 +502,7 @@ export default function UsersPage() {
                                             type="text"
                                             value={editFormData.firstName}
                                             onChange={(e) => setEditFormData({ ...editFormData, firstName: e.target.value })}
-                                            disabled={selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin'}
+                                            disabled={!canEditUser(selectedUser)}
                                             className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                         />
                                     </div>
@@ -506,7 +512,7 @@ export default function UsersPage() {
                                             type="text"
                                             value={editFormData.lastName}
                                             onChange={(e) => setEditFormData({ ...editFormData, lastName: e.target.value })}
-                                            disabled={selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin'}
+                                            disabled={!canEditUser(selectedUser)}
                                             className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                         />
                                     </div>
@@ -516,7 +522,7 @@ export default function UsersPage() {
                                             type="email"
                                             value={editFormData.email}
                                             onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
-                                            disabled={selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin'}
+                                            disabled={!canEditUser(selectedUser)}
                                             className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
                                         />
                                     </div>
@@ -525,10 +531,10 @@ export default function UsersPage() {
                                         <select
                                             value={editFormData.role}
                                             onChange={(e) => setEditFormData({ ...editFormData, role: e.target.value })}
-                                            disabled={selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin'}
+                                            disabled={!canEditUser(selectedUser) || isCurrentUser(selectedUser)}
                                             className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                         >
-                                            {getAvailableRoles().map(role => (
+                                            {(isCurrentUser(selectedUser) ? [selectedUser.role] : getAvailableRoles()).map(role => (
                                                 <option key={role} value={role}>{role}</option>
                                             ))}
                                         </select>
@@ -538,7 +544,7 @@ export default function UsersPage() {
                                         <select
                                             value={editFormData.status}
                                             onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
-                                            disabled={selectedUser.role === 'Admin' && currentUserRole !== 'SuperAdmin'}
+                                            disabled={!canEditUser(selectedUser) || isCurrentUser(selectedUser)}
                                             className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-amber-700 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                         >
                                             <option value="active">Active</option>

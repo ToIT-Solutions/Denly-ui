@@ -189,6 +189,11 @@ export default function PaymentResultPage() {
                 return failedContent
             case 'cancelled':
                 return cancelledContent
+            // Provider reversals are final results rather than payments still processing.
+            case 'refunded':
+                return { ...cancelledContent, title: 'Payment Refunded', subtitle: 'The payment provider has reported a refund.', mainButtonText: 'Back to Billing', mainButtonLink: '/dashboard/subscription/billing' }
+            case 'disputed':
+                return { ...cancelledContent, title: 'Payment Disputed', subtitle: 'The payment provider has reported a dispute. Contact support for assistance.', mainButtonText: 'Back to Billing', mainButtonLink: '/dashboard/subscription/billing' }
             case 'pending':
             default:
                 return pendingContent

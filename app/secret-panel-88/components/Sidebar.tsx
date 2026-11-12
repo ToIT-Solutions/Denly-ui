@@ -1,5 +1,7 @@
 // secret-panel-88/components/Sidebar.tsx
 'use client'
+import { adminLogput } from '@/api/admin/adminAuth'
+import { showErrorToast } from '@/lib/toast'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
@@ -88,10 +90,15 @@ export default function Sidebar({ onCollapseChange }: SidebarProps) {
         return initials.slice(0, 2)
     }
 
-    const handleLogout = () => {
-        clearUser()
-        // setIsLogoutModalOpen(false)
-        router.push('/auth/login')
+    const handleLogout = async () => {
+        try {
+            await adminLogput()
+        } catch {
+            showErrorToast('Server sign-out could not be confirmed. Your local session will be cleared.')
+        } finally {
+            clearUser()
+            router.push('/secret-panel-88/login')
+        }
     }
 
     return (

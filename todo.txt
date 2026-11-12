@@ -77,12 +77,15 @@ changed fields from paynow specifics to allow continuity for when we expand paym
 fixed minor errors on add tenant and add payment
 edit, delete changelog
 edit user from admin
+admin able to view all logs for the system
 
 -----------TODO--------------
 DELETION AND CASCADING
 AUTO START THE SUB IF COMING FROM FREE TRIAL
  
 changelog view for users
+proper and better reports
+changelog to greet new user once and new changelog to greet returning user once
 
 
 activity log for admin if possible

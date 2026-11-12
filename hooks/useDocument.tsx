@@ -21,10 +21,11 @@ export const useFetchOneDocument = (documentId: string) => {
 }
 
 // ✅ For fetching ALL documents metadata
-export const useFetchAllDocuments = () => {
+export const useFetchAllDocuments = (tenantId: string) => {
     return useQuery({
-        queryKey: ["documents", "all"],
-        queryFn: () => fetchAllDocuments(),
+        queryKey: ["documents", tenantId],
+        queryFn: () => fetchAllDocuments(tenantId),
+        enabled: !!tenantId,
     })
 }
 

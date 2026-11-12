@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation'
 import logo from '@/public/img/logo.png'
 import { CAN_INTERACT, CAN_VIEW_LOGS, CAN_VIEW_REPORTS } from '@/lib/roles'
 import { useFetchSubscriptionData } from '@/hooks/useSubscription'
+import { logout } from '@/api/auth'
+import { showErrorToast } from '@/lib/toast'
 
 export default function Navbar() {
     const pathname = usePathname()
@@ -39,10 +41,16 @@ export default function Navbar() {
         return initials.slice(0, 2)
     }
 
-    const handleLogout = () => {
-        clearUser()
-        setIsLogoutModalOpen(false)
-        router.push('/auth/login')
+    const handleLogout = async () => {
+        try {
+            await logout()
+        } catch {
+            showErrorToast('Server sign-out could not be confirmed. Your local session will be cleared.')
+        } finally {
+            clearUser()
+            setIsLogoutModalOpen(false)
+            router.push('/auth/login')
+        }
     }
 
     return (

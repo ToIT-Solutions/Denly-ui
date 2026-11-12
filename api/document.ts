@@ -10,9 +10,9 @@ import {api} from './axios'
 //     }
 // }
 
-export const fetchAllDocuments = async() => {
+export const fetchAllDocuments = async(tenantId: string) => {
     try {
-        const response = await api.get(`/v1/document/viewAll`);
+        const response = await api.get(`/v1/document/viewAll/${encodeURIComponent(tenantId)}`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured when fetching properties";
