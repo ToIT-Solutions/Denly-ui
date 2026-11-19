@@ -48,9 +48,8 @@ export const fetchOneProperty = async(propertyId: string) => {
     try {
         const response = await api.get(`/v1/property/viewOne/${propertyId}`);
         return response.data;
-    } catch (error: any) {
-        const message = error.response?.data?.message || error.message || "An error occured when fetching property";
-        throw new Error(message);
+    } catch (error) {
+        throw error;
     }
 }
 

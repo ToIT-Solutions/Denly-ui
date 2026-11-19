@@ -31,30 +31,39 @@ export default function PaymentResultPage() {
 
     const { data: subscriptionData, refetch: refetchSubscription } = useFetchSubscriptionData()
 
-    // Effect to handle polling the database for status updates
+    const polledBillRef = useRef(id)
+
+    // Bound database-only refreshes per bill; provider verification stays server-side.
     useEffect(() => {
-        let pollInterval: NodeJS.Timeout
-
-        if (billing?.status === 'pending' && pollAttemptsRef.current < 10) {
-            pollInterval = setInterval(() => {
-                pollAttemptsRef.current += 1
-                refetchBilling()
-
-                // After 5 attempts, show a message if still pending
-                // if (pollAttemptsRef.current === 5) {
-                //     toast.info('Payment is taking longer than expected. We\'ll keep checking...', {
-                //         duration: 5000,
-                //     })
-                // }
-            }, 3000) // Poll every 3 seconds
+        if (polledBillRef.current !== id) {
+            polledBillRef.current = id
+            pollAttemptsRef.current = 0
         }
-
-        return () => {
-            if (pollInterval) {
+        if (!id || billing?.status !== 'pending' || pollAttemptsRef.current >= 10) return
+        let inFlight = false
+        let cancelled = false
+        const pollInterval = setInterval(async () => {
+            if (cancelled || inFlight) return
+            if (pollAttemptsRef.current >= 10) {
                 clearInterval(pollInterval)
+                return
             }
+            inFlight = true
+            pollAttemptsRef.current += 1
+            if (pollAttemptsRef.current >= 10) clearInterval(pollInterval)
+            try {
+                await refetchBilling()
+            } catch {
+                // A failed status read must never infer payment success or cancellation.
+            } finally {
+                inFlight = false
+            }
+        }, 3000)
+        return () => {
+            cancelled = true
+            clearInterval(pollInterval)
         }
-    }, [billing?.status, refetchBilling])
+    }, [id, billing?.status, refetchBilling])
 
     // Check if billing record exists
     useEffect(() => {

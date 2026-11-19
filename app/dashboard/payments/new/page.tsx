@@ -33,7 +33,7 @@ interface PaymentFormData {
     // id?: string
     propertyId: string
     tenantId: string
-    amountPaid: number
+    amountPaid: string
     paymentDate: string
     paymentMethod?: string
     notes?: string
@@ -47,10 +47,10 @@ export default function RecordPaymentPage() {
         data: Property[] | undefined
         isPending: boolean
     }
-    console.log(propertyData)
 
     const user = useAuthStore((state) => state.user)
     const userRole = user?.role
+    const [hydrated, setHydrated] = useState(false)
 
     const router = useRouter()
     const { mutate: paymentMutate, isPending } = useAddPayment()
@@ -64,8 +64,16 @@ export default function RecordPaymentPage() {
     const watchedProperty = watch('propertyId')
     const watchedDuration = watch('duration')
 
+    // Wait for stored authentication before applying the existing financial-role restriction.
+    useEffect(() => {
+        const unsubscribe = useAuthStore.persist.onFinishHydration(() => setHydrated(true))
+        setHydrated(useAuthStore.persist.hasHydrated())
+        return unsubscribe
+    }, [])
+
     // Update tenants when property changes
     useEffect(() => {
+        if (!hydrated) return
         if (userRole !== 'Owner' && userRole !== 'Manager' && userRole !== 'Agent') {
             return router.back()
         }
@@ -77,7 +85,7 @@ export default function RecordPaymentPage() {
         } else {
             setAvailableTenants([])
         }
-    }, [watchedProperty, propertyData, setValue])
+    }, [hydrated, userRole, router, watchedProperty, propertyData, setValue])
 
     // Calculate expected amount
     useEffect(() => {
@@ -86,7 +94,7 @@ export default function RecordPaymentPage() {
             const monthlyRent = selectedProp?.tenants?.[0]?.actualRent || parseFloat(selectedProp?.monthlyRent || '0')
             const totalAmount = monthlyRent * watchedDuration
             setExpectedAmount(totalAmount)
-            setValue('amountPaid', totalAmount)
+            setValue('amountPaid', totalAmount.toFixed(2))
         } else {
             setExpectedAmount(null)
         }
@@ -96,7 +104,7 @@ export default function RecordPaymentPage() {
 
         const payload: PaymentFormData = {
             ...data,
-            amountPaid: Number(data.amountPaid),
+            amountPaid: data.amountPaid,
         }
 
         paymentMutate(payload)
@@ -104,6 +112,8 @@ export default function RecordPaymentPage() {
     }
 
     const months = Array.from({ length: 12 }, (_, i) => i + 1)
+
+    if (!hydrated || !['Owner', 'Manager', 'Agent'].includes(userRole)) return null
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -190,11 +200,15 @@ export default function RecordPaymentPage() {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Amount ($)*</label>
                                 <input
                                     type="text"
-                                    {...register('amountPaid', { required: true, min: 0 })}
+                                    inputMode="decimal"
+                                    {...register('amountPaid', {
+                                        required: 'Amount is required',
+                                        validate: (value) => /^\d+(\.\d{1,2})?$/.test(value) && Number(value) > 0 && Number(value) <= 99999999.99 || 'Enter a positive amount with at most two decimal places (maximum 99999999.99)'
+                                    })}
                                     className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                     // value={expectedAmount || ''}
-                                    onChange={(e) => setValue('amountPaid', Number(e.target.value))}
                                 />
+                                {errors.amountPaid && <p className="text-red-600 text-xs mt-1">{errors.amountPaid.message}</p>}
                                 {/* {expectedAmount && (
                                     <p className="text-md text-orange-800 mt-1">
                                         Expected: ${expectedAmount.toFixed(2)}

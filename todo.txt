@@ -82,11 +82,14 @@ admin able to view all logs for the system
 -----------TODO--------------
 DELETION AND CASCADING
 AUTO START THE SUB IF COMING FROM FREE TRIAL
+being able to see the password(hide and unhide)
  
 changelog view for users
 proper and better reports
 changelog to greet new user once and new changelog to greet returning user once
-
+throw proper/ understandable errors not the junk its doing now
+wait for hydration before confirming the users role so that there is no flashing of data and pages they shouldnt see
+when logging out it takes me to the login page then refreshes the login page again, its happening quite a bit when an error happens on other pages
 
 activity log for admin if possible
 

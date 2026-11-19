@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     fetchOneDocument,
+    fetchDocumentPreview,
     downloadDocument as downloadDocumentApi,
     fetchAllDocuments,
     deleteDocument
@@ -10,6 +11,26 @@ import { api } from '@/api/axios'
 import { toast } from "sonner"
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
+
+// Blob navigation does not inherit response CSP; only inert supported types may open inline.
+const openDocumentPreview = async (documentId: string) => {
+    const response = await fetchDocumentPreview(documentId);
+    const url = window.URL.createObjectURL(response.data);
+    const inline = ['application/pdf', 'image/jpeg', 'image/png'].includes(response.data.type);
+    if (inline) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'document';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+    // Allow the new tab or download to consume the bytes before releasing the URL.
+    setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+    return { success: true };
+};
 
 // ✅ For fetching document METADATA (what you were originally using)
 export const useFetchOneDocument = (documentId: string) => {
@@ -32,25 +53,7 @@ export const useFetchAllDocuments = (tenantId: string) => {
 // ✅ For VIEWING document in browser - this returns a blob/arraybuffer
 export const useViewDocument = () => {
     return useMutation({
-        mutationFn: async (documentId: string) => {
-            if (!documentId) throw new Error("Document ID is required");
-
-            // Use the download endpoint but with responseType: 'blob'
-            const response = await api.get(`/v1/document/download/${documentId}`, {
-                responseType: 'blob',
-            });
-
-            // Create URL and open in new tab
-            const url = window.URL.createObjectURL(response.data);
-            window.open(url, '_blank');
-
-            // Clean up
-            setTimeout(() => {
-                window.URL.revokeObjectURL(url);
-            }, 100);
-
-            return { success: true };
-        },
+        mutationFn: openDocumentPreview,
     });
 };
 
@@ -113,18 +116,7 @@ export const useDeleteDocument = () => {
 // ✅ Combined hook for both view and download actions
 export const useDocumentActions = () => {
     const viewMutation = useMutation({
-        mutationFn: async (documentId: string) => {
-            const response = await api.get(`/v1/document/download/${documentId}`, {
-                responseType: 'blob',
-            });
-
-            const url = window.URL.createObjectURL(response.data);
-            window.open(url, '_blank');
-
-            setTimeout(() => {
-                window.URL.revokeObjectURL(url);
-            }, 100);
-        },
+        mutationFn: openDocumentPreview,
     });
 
     const downloadMutation = useMutation({

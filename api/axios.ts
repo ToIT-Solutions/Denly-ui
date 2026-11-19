@@ -2,10 +2,10 @@ import axios from "axios";
 import useAuthStore from "@/store/useAuthStore";
 import { showErrorToast } from "@/lib/toast";
 import { redirect } from "@/lib/redirect";
+import { getApiBaseUrl } from "../lib/apiBaseUrl";
 
 export const api = axios.create({
-  // baseURL: "https://denly-backend-production.up.railway.app/api",
-  baseURL: "http://localhost:8888/api",
+  baseURL: getApiBaseUrl(process.env.NEXT_PUBLIC_API_URL, process.env.NODE_ENV === 'production'),
   timeout: 10000,
   // withCredentials: true,
 });

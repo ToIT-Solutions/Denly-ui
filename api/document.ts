@@ -49,3 +49,9 @@ export const deleteDocument = async(documentId: string) => {
         throw new Error(message);
     }
 }
+
+// Keep authenticated preview bytes on the existing company-scoped view endpoint.
+export const fetchDocumentPreview = async (documentId: string) => {
+    if (!documentId) throw new Error('Document ID is required');
+    return api.get<Blob>(`/v1/document/viewOne/${encodeURIComponent(documentId)}`, { responseType: 'blob' });
+}

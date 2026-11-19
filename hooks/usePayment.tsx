@@ -1,18 +1,25 @@
 import { addPayment, deletePayment, editPayment, fetchAllPayments, fetchOnePayment } from "@/api/payment";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 export const useAddPayment = () => {
     const router = useRouter()
+    const queryClient = useQueryClient()
 
     return useMutation({
         mutationFn: addPayment,
+        retry: false,
         onSuccess: (data) => {
-            //console.log(data)
+            // Refresh payment history, balances and summaries after the committed allocation.
+            for (const key of ["allPayments", "Payment", "allRentLedger", "rentLedger", "companyStats", "Tenant", "allTenants", "Property", "allProperties"]) {
+                queryClient.invalidateQueries({ queryKey: [key] })
+            }
             router.push('/dashboard/payments')
-            showSuccessToast('Payment added successfully')
+            showSuccessToast(data.unusedAmount > 0
+                ? `Payment added successfully. $${data.unusedAmount.toFixed(2)} was not applied or stored.`
+                : 'Payment added successfully')
         },
         onError: (error: any) => {
             showErrorToast(error)

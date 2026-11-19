@@ -4,12 +4,14 @@ import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllProperties } from '@/hooks/useProperty'
 import { useFetchAllTenants } from '@/hooks/useTenant'
 import { useFetchAllPayments } from '@/hooks/usePayment'
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Spinner from '@/components/Spinner'
+import DetailUnavailable from '@/components/DetailUnavailable'
+import { sumMoney, formatMoney } from '@/lib/money'
+import { useFetchAllRentLedger } from '@/hooks/useRentLedger'
 import useAuthStore from '@/store/useAuthStore'
 import { CAN_VIEW_REPORTS } from '@/lib/roles'
-import { useRouter } from 'next/navigation'
 import { useFetchSubscriptionData } from '@/hooks/useSubscription'
 
 export default function ReportsPage() {
@@ -18,36 +20,26 @@ export default function ReportsPage() {
     const user = useAuthStore((state) => state.user)
     const userRole = user?.role
 
-    const router = useRouter()
 
     // Fetch real data
-    const { data: properties, isLoading: propertiesLoading } = useFetchAllProperties()
-    const { data: tenants, isLoading: tenantsLoading } = useFetchAllTenants()
-    const { data: payments, isLoading: paymentsLoading } = useFetchAllPayments()
+    const { data: properties, isLoading: propertiesLoading, error: propertiesError } = useFetchAllProperties()
+    const { data: tenants, isLoading: tenantsLoading, error: tenantsError } = useFetchAllTenants()
+    const { data: payments, isLoading: paymentsLoading, error: paymentsError } = useFetchAllPayments()
     //console.log(properties, tenants, payments)
 
-    const isLoading = propertiesLoading || tenantsLoading || paymentsLoading
+    const { data: ledgers, isLoading: ledgersLoading, error: ledgersError } = useFetchAllRentLedger()
+    const loadError = propertiesError || tenantsError || paymentsError || ledgersError
+    const isLoading = propertiesLoading || tenantsLoading || paymentsLoading || ledgersLoading
 
     const [selectedReportType, setSelectedReportType] = useState('all')
     const [searchQuery, setSearchQuery] = useState('')
 
-    const { data: subPlan } = useFetchSubscriptionData()
-
-    useEffect(() => {
-        if (!CAN_VIEW_REPORTS.includes(userRole)) {
-            return router.back()
-        }
-
-        if (subPlan?.[0].subscriptionPlan.name === 'Free Trial') {
-            router.back()
-        }
-    }, [userRole, subPlan])
-
+    const { data: subPlan, isPending: subscriptionPending, error: subscriptionError } = useFetchSubscriptionData()
 
     // ============= CONSOLIDATED DATA =============
     // First, let's consolidate all our data to ensure accurate relationships
     const consolidatedData = useMemo(() => {
-        if (!properties || !tenants || !payments) {
+        if (!properties || !tenants || !payments || !ledgers) {
             return {
                 properties: [],
                 tenants: [],
@@ -86,7 +78,7 @@ export default function ReportsPage() {
 
         // Process payments and link to properties and tenants
         payments.forEach((payment: any) => {
-            const paymentAmount = Number(payment.amount || 0)
+            const paymentAmount = Number(payment.amountPaid || 0)
             const propertyId = payment.property?.id || payment.propertyId
             const tenantId = payment.tenant?.id || payment.tenantId
 
@@ -95,12 +87,8 @@ export default function ReportsPage() {
                 const property = propertyMap.get(propertyId)
                 property.payments.push(payment)
 
-                if (payment.status?.toLowerCase() === 'paid') {
-                    property.totalPaid += paymentAmount
-                    property.totalRevenue += paymentAmount
-                } else if (payment.status?.toLowerCase() === 'pending') {
-                    property.totalPending += paymentAmount
-                }
+                property.totalPaid = sumMoney([property.totalPaid, paymentAmount])
+                property.totalRevenue = sumMoney([property.totalRevenue, paymentAmount])
             }
 
             // Link payment to tenant
@@ -108,78 +96,27 @@ export default function ReportsPage() {
                 const tenant = tenantMap.get(tenantId)
                 tenant.payments.push(payment)
 
-                if (payment.status?.toLowerCase() === 'paid') {
-                    tenant.totalPaid += paymentAmount
-                } else if (payment.status?.toLowerCase() === 'pending') {
-                    tenant.totalPending += paymentAmount
-                }
+                tenant.totalPaid = sumMoney([tenant.totalPaid, paymentAmount])
             }
         })
 
-        // Calculate tenant outstanding balances
+        // Read existing obligations instead of inventing monthly charges from lease duration.
         const today = new Date()
-        tenantMap.forEach((tenant) => {
-            // Get the tenant's actual rent from their lease
-            const monthlyRent = Number(tenant.actualRent || 0)
-
-            // If tenant has no payments at all and is active, the full rent is outstanding
-            if (tenant.payments.length === 0 && tenant.status === 'active' && tenant.leaseStart) {
-                // Calculate how many months they've been tenants
-                const leaseStart = new Date(tenant.leaseStart)
-                const monthsAsTenant = Math.max(1, Math.ceil((today.getTime() - leaseStart.getTime()) / (1000 * 60 * 60 * 24 * 30)))
-                tenant.outstandingBalance = monthlyRent * monthsAsTenant
-                tenant.totalOverdue = tenant.outstandingBalance
-                return
+        for (const ledger of ledgers) {
+            const balance = Math.max(0, sumMoney([ledger.amount, -Number(ledger.amountPaid)]))
+            const overdue = new Date(ledger.dueDate) < today
+            const tenant = tenantMap.get(ledger.tenantId)
+            const property = propertyMap.get(ledger.propertyId)
+            if (tenant) {
+                tenant.outstandingBalance = sumMoney([tenant.outstandingBalance, balance])
+                tenant.totalOverdue = sumMoney([tenant.totalOverdue, overdue ? balance : 0])
+                tenant.totalPending = sumMoney([tenant.totalPending, overdue ? 0 : balance])
             }
-
-            // For tenants with payments, check each month's payment
-            // Group payments by month/year
-            const paymentsByMonth = new Map()
-            tenant.payments.forEach((payment: any) => {
-                const paymentDate = new Date(payment.date || payment.createdAt)
-                const monthKey = `${paymentDate.getFullYear()}-${paymentDate.getMonth()}`
-
-                if (!paymentsByMonth.has(monthKey)) {
-                    paymentsByMonth.set(monthKey, {
-                        totalPaid: 0,
-                        dueDate: payment.dueDate || payment.date
-                    })
-                }
-
-                if (payment.status?.toLowerCase() === 'paid') {
-                    const monthData = paymentsByMonth.get(monthKey)
-                    monthData.totalPaid += Number(payment.amount || 0)
-                }
-            })
-
-            // Check if rent was paid for each month since lease start
-            if (tenant.leaseStart) {
-                const leaseStart = new Date(tenant.leaseStart)
-                const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-                let monthsOutstanding = 0
-
-                for (let d = new Date(leaseStart); d <= currentMonth; d.setMonth(d.getMonth() + 1)) {
-                    const monthKey = `${d.getFullYear()}-${d.getMonth()}`
-                    const monthPayment = paymentsByMonth.get(monthKey)
-
-                    // If no payment or payment less than rent for this month, it's outstanding
-                    if (!monthPayment || monthPayment.totalPaid < monthlyRent) {
-                        monthsOutstanding++
-                    }
-                }
-
-                tenant.outstandingBalance = monthlyRent * monthsOutstanding
-                tenant.totalOverdue = tenant.outstandingBalance
+            if (property) {
+                property.totalOverdue = sumMoney([property.totalOverdue, overdue ? balance : 0])
+                property.totalPending = sumMoney([property.totalPending, overdue ? 0 : balance])
             }
-
-            // Update property totals for overdue
-            if (tenant.property?.id) {
-                const property = propertyMap.get(tenant.property.id)
-                if (property) {
-                    property.totalOverdue += tenant.outstandingBalance
-                }
-            }
-        })
+        }
 
         // Calculate monthly rent potential (property rent * number of tenants)
         propertyMap.forEach((property) => {
@@ -187,7 +124,7 @@ export default function ReportsPage() {
                 t.property?.id === property.id || t.propertyId === property.id
             )
             property.tenantCount = propertyTenants.length
-            property.monthlyRentPotential = Number(property.monthlyRent || 0) * property.tenantCount
+            property.monthlyRentPotential = sumMoney(propertyTenants.map(() => property.monthlyRent || 0))
         })
 
         return {
@@ -197,7 +134,7 @@ export default function ReportsPage() {
             propertyMap,
             tenantMap
         }
-    }, [properties, tenants, payments])
+    }, [properties, tenants, payments, ledgers])
 
     // ============= PROPERTY-LEVEL REPORTS =============
     const propertyReports = useMemo(() => {
@@ -223,7 +160,7 @@ export default function ReportsPage() {
         const occupancyRate = totalProperties > 0 ? ((occupiedProperties / totalProperties) * 100).toFixed(1) : '0'
 
         const totalMonthlyRentPotential = consolidatedData.properties.reduce((sum: number, p: any) =>
-            sum + (p.monthlyRentPotential || 0), 0
+            sumMoney([sum, p.monthlyRentPotential || 0]), 0
         )
 
         const propertyRevenue = consolidatedData.properties.map((property: any) => ({
@@ -300,9 +237,8 @@ export default function ReportsPage() {
                 totalOverdue: tenant.totalOverdue || 0,
                 outstandingBalance: tenant.outstandingBalance || 0,
                 paymentCount: tenant.payments?.length || 0,
-                lastPaymentDate: tenant.payments
-                    ?.filter((p: any) => p.status?.toLowerCase() === 'paid')
-                    .sort((a: any, b: any) => new Date(b.date || b.createdAt).getTime() - new Date(a.date || a.createdAt).getTime())[0]?.date || 'No payments'
+                lastPaymentDate: [...tenant.payments]
+                    .sort((a: any, b: any) => new Date(b.paymentDate || b.createdAt).getTime() - new Date(a.paymentDate || a.createdAt).getTime())[0]?.paymentDate || 'No payments'
             }
         }))
 
@@ -369,7 +305,7 @@ export default function ReportsPage() {
             }
         })
 
-        const totalOutstandingBalance = consolidatedData.tenants.reduce((sum: number, t: any) => sum + (t.outstandingBalance || 0), 0)
+        const totalOutstandingBalance = consolidatedData.tenants.reduce((sum: number, t: any) => sumMoney([sum, t.outstandingBalance || 0]), 0)
         const tenantsWithOutstandingBalance = consolidatedData.tenants.filter((t: any) => (t.outstandingBalance || 0) > 0).length
 
         return {
@@ -400,18 +336,18 @@ export default function ReportsPage() {
             }
         }
 
-        if (!consolidatedData.payments || !Array.isArray(consolidatedData.payments) || consolidatedData.payments.length === 0) {
+        if (!consolidatedData.payments || !Array.isArray(consolidatedData.payments)) {
             return defaultReport
         }
 
         const processedPayments = consolidatedData.payments.map((p: any) => ({
             ...p,
-            amount: Number(p.amount || 0)
+            amount: Number(p.amountPaid || 0)
         }))
 
         // 1. Monthly Revenue Report
         const monthlyRevenue = processedPayments.reduce((acc: any, payment: any) => {
-            const date = new Date(payment.date || payment.createdAt || new Date())
+            const date = new Date(payment.paymentDate || payment.createdAt)
             const monthYear = date.toLocaleString('default', { month: 'short', year: 'numeric' })
 
             if (!acc[monthYear]) {
@@ -425,17 +361,9 @@ export default function ReportsPage() {
                 }
             }
 
-            if (payment.status?.toLowerCase() === 'paid') {
-                acc[monthYear].total += payment.amount
-                acc[monthYear].paid += payment.amount
-                acc[monthYear].count += 1
-            } else if (payment.status?.toLowerCase() === 'pending') {
-                acc[monthYear].pending += payment.amount
-                acc[monthYear].count += 1
-            } else if (payment.status?.toLowerCase() === 'overdue') {
-                acc[monthYear].overdue += payment.amount
-                acc[monthYear].count += 1
-            }
+            acc[monthYear].total = sumMoney([acc[monthYear].total, payment.amount])
+            acc[monthYear].paid = sumMoney([acc[monthYear].paid, payment.amount])
+            acc[monthYear].count += 1
 
             return acc
         }, {})
@@ -448,14 +376,14 @@ export default function ReportsPage() {
 
         // 2. Payment Method Usage
         const paymentMethodUsage = processedPayments
-            .filter((p: any) => p.status?.toLowerCase() === 'paid')
+
             .reduce((acc: any, payment: any) => {
                 const method = payment.paymentMethod || payment.method || 'Unknown'
                 acc[method] = (acc[method] || 0) + 1
                 return acc
             }, {})
 
-        const totalPaidPayments = processedPayments.filter((p: any) => p.status?.toLowerCase() === 'paid').length
+        const totalPaidPayments = processedPayments.length
         const paymentMethodArray = Object.entries(paymentMethodUsage).map(([method, count]) => ({
             method,
             count: count as number,
@@ -467,21 +395,21 @@ export default function ReportsPage() {
         // 3. Late Payments Report
         const today = new Date()
         const latePayments = consolidatedData.tenants
-            .filter((tenant: any) => tenant.outstandingBalance > 0)
+            .filter((tenant: any) => tenant.totalOverdue > 0)
             .map((tenant: any) => ({
                 id: tenant.id,
                 tenantName: `${tenant.firstName || ''} ${tenant.lastName || ''}`.trim() || 'Unknown Tenant',
                 propertyName: tenant.property?.name || 'Unknown',
-                amount: tenant.outstandingBalance || 0,
+                amount: tenant.totalOverdue || 0,
                 monthlyRent: Number(tenant.actualRent || 0),
-                daysOverdue: Math.ceil((today.getTime() - new Date(tenant.leaseStart || today).getTime()) / (1000 * 60 * 60 * 24))
+                daysOverdue: Math.max(0, ...((ledgers || []).filter((l: { tenantId: string; amount: string; amountPaid: string; dueDate: string }) => l.tenantId === tenant.id && Number(l.amount) > Number(l.amountPaid) && new Date(l.dueDate) < today).map((l: { dueDate: string }) => Math.floor((today.getTime() - new Date(l.dueDate).getTime()) / 86400000))))
             }))
             .sort((a: any, b: any) => b.amount - a.amount)
 
         // Calculate totals
-        const totalRevenue = consolidatedData.properties.reduce((sum: number, p: any) => sum + (p.totalPaid || 0), 0)
-        const totalPending = consolidatedData.properties.reduce((sum: number, p: any) => sum + (p.totalPending || 0), 0)
-        const totalOverdue = consolidatedData.properties.reduce((sum: number, p: any) => sum + (p.totalOverdue || 0), 0)
+        const totalRevenue = consolidatedData.properties.reduce((sum: number, p: any) => sumMoney([sum, p.totalPaid || 0]), 0)
+        const totalPending = consolidatedData.properties.reduce((sum: number, p: any) => sumMoney([sum, p.totalPending || 0]), 0)
+        const totalOverdue = consolidatedData.properties.reduce((sum: number, p: any) => sumMoney([sum, p.totalOverdue || 0]), 0)
 
         return {
             monthlyRevenue: monthlyRevenueArray,
@@ -495,7 +423,7 @@ export default function ReportsPage() {
                 latePaymentCount: latePayments.length
             }
         }
-    }, [consolidatedData])
+    }, [consolidatedData, ledgers])
 
     // ============= CROSS-CUTTING REPORTS =============
     const crossCuttingReports = useMemo(() => {
@@ -557,8 +485,8 @@ export default function ReportsPage() {
         const revenueForecast = []
 
         // Calculate average collection rate
-        const totalPaid = consolidatedData.properties.reduce((sum: number, p: any) => sum + (p.totalPaid || 0), 0)
-        const totalExpected = consolidatedData.properties.reduce((sum: number, p: any) => sum + (p.totalPaid + p.totalPending + p.totalOverdue), 0)
+        const totalPaid = consolidatedData.properties.reduce((sum: number, p: any) => sumMoney([sum, p.totalPaid || 0]), 0)
+        const totalExpected = consolidatedData.properties.reduce((sum: number, p: any) => sumMoney([sum, p.totalPaid, p.totalPending, p.totalOverdue]), 0)
         const collectionRate = totalExpected > 0 ? totalPaid / totalExpected : 0.95
 
         for (let i = 0; i < 3; i++) {
@@ -567,7 +495,7 @@ export default function ReportsPage() {
             const monthName = forecastMonth.toLocaleString('default', { month: 'short', year: 'numeric' })
 
             const expectedRevenue = consolidatedData.properties.reduce((sum: number, p: any) =>
-                sum + (p.monthlyRentPotential || 0), 0
+                sumMoney([sum, p.monthlyRentPotential || 0]), 0
             )
 
             revenueForecast.push({
@@ -626,6 +554,14 @@ export default function ReportsPage() {
         return categories.length > 0 ? categories : ['all']
     }, [searchQuery])
 
+    if (loadError || subscriptionError) return <><Navbar /><DetailUnavailable error={loadError || subscriptionError} href="/dashboard" label="Dashboard" /></>
+
+    // Wait for persisted identity and plan before enforcing existing report restrictions.
+    if (!userRole || subscriptionPending) return <><Navbar /><Spinner /></>
+    if (!CAN_VIEW_REPORTS.includes(userRole) || subPlan?.[0]?.subscriptionPlan?.name === 'Free Trial') {
+        return <><Navbar /><DetailUnavailable error={{ response: { status: 403 } }} href="/dashboard" label="Dashboard" /></>
+    }
+
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
             <Navbar />
@@ -677,12 +613,12 @@ export default function ReportsPage() {
                             </div>
                             <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
                                 <p className="text-gray-600 text-sm mb-1">Total Revenue</p>
-                                <div className="text-xl sm:text-2xl font-serif text-gray-900 mb-1">${financialReports?.summary?.totalRevenue?.toLocaleString() || 0}</div>
+                                <div className="text-xl sm:text-2xl font-serif text-gray-900 mb-1">${formatMoney(financialReports?.summary?.totalRevenue || 0)}</div>
                                 <p className="text-gray-500 text-xs">{financialReports?.summary?.paymentCount || 0} payments</p>
                             </div>
                             <div className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm">
                                 <p className="text-gray-600 text-sm mb-1">Outstanding</p>
-                                <div className="text-xl sm:text-2xl font-serif text-amber-600 mb-1">${tenantReports?.summary?.totalOutstandingBalance?.toLocaleString() || 0}</div>
+                                <div className="text-xl sm:text-2xl font-serif text-amber-600 mb-1">${formatMoney(tenantReports?.summary?.totalOutstandingBalance || 0) || 0}</div>
                                 <p className="text-gray-500 text-xs">{tenantReports?.summary?.tenantsWithOutstandingBalance || 0} tenants</p>
                             </div>
                         </div>
@@ -716,7 +652,7 @@ export default function ReportsPage() {
                                             <div className="bg-green-50 rounded-xl p-4">
                                                 <p className="text-green-600 text-sm font-medium">Monthly Rent Potential</p>
                                                 <p className="text-2xl font-serif text-gray-900 mt-1">
-                                                    ${propertyReports?.summary?.totalMonthlyRentPotential?.toLocaleString() || 0}
+                                                    ${formatMoney(propertyReports?.summary?.totalMonthlyRentPotential || 0) || 0}
                                                 </p>
                                                 <p className="text-xs text-gray-600 mt-1">Based on {propertyReports?.summary?.occupiedProperties || 0} occupied properties</p>
                                             </div>
@@ -743,8 +679,8 @@ export default function ReportsPage() {
                                                                     <td className="p-3 text-sm text-gray-900">{prop.propertyName}</td>
                                                                     <td className="p-3 text-sm text-gray-600">{prop.address}</td>
                                                                     <td className="p-3 text-sm text-right text-gray-900">{prop.tenantCount}</td>
-                                                                    <td className="p-3 text-sm text-right text-gray-900">${prop.monthlyRentPotential?.toLocaleString()}</td>
-                                                                    <td className="p-3 text-sm text-right text-[#876D4A] font-medium">${prop.totalRevenue?.toLocaleString()}</td>
+                                                                    <td className="p-3 text-sm text-right text-gray-900">${formatMoney(prop.monthlyRentPotential || 0)}</td>
+                                                                    <td className="p-3 text-sm text-right text-[#876D4A] font-medium">${formatMoney(prop.totalRevenue || 0)}</td>
                                                                 </tr>
                                                             ))}
                                                         </tbody>
@@ -762,7 +698,7 @@ export default function ReportsPage() {
                                                         <div key={expiry.tenantId} className="flex justify-between items-center py-2 border-b border-amber-200 last:border-0">
                                                             <div>
                                                                 <p className="text-sm font-medium text-gray-900">{expiry.tenantName}</p>
-                                                                <p className="text-xs text-gray-600">{expiry.propertyName} • ${expiry.rentAmount.toLocaleString()}/mo</p>
+                                                                <p className="text-xs text-gray-600">{expiry.propertyName} • ${formatMoney(expiry.rentAmount || 0)}/mo</p>
                                                             </div>
                                                             <div className="text-right">
                                                                 <p className="text-sm font-medium text-amber-600">{expiry.daysUntilExpiry} days</p>
@@ -801,7 +737,7 @@ export default function ReportsPage() {
                                             </div>
                                             <div className="bg-gray-50 rounded-xl p-3">
                                                 <p className="text-gray-600 text-xs">Outstanding Balance</p>
-                                                <p className="text-xl font-serif text-amber-600">${tenantReports?.summary?.totalOutstandingBalance?.toLocaleString() || 0}</p>
+                                                <p className="text-xl font-serif text-amber-600">${formatMoney(tenantReports?.summary?.totalOutstandingBalance || 0) || 0}</p>
                                             </div>
                                             <div className="bg-gray-50 rounded-xl p-3">
                                                 <p className="text-gray-600 text-xs">Avg. Lease Duration</p>
@@ -836,9 +772,9 @@ export default function ReportsPage() {
                                                                     <tr key={tenant.tenantId} className="border-b border-gray-100">
                                                                         <td className="p-3 text-sm text-gray-900">{tenant.tenantName}</td>
                                                                         <td className="p-3 text-sm text-gray-600">{tenant.propertyName}</td>
-                                                                        <td className="p-3 text-sm text-right text-gray-900">${tenant.monthlyRent?.toLocaleString()}</td>
-                                                                        <td className="p-3 text-sm text-right text-green-600">${tenant.paymentSummary.totalPaid?.toLocaleString()}</td>
-                                                                        <td className="p-3 text-sm text-right text-red-600 font-medium">${tenant.paymentSummary.outstandingBalance?.toLocaleString()}</td>
+                                                                        <td className="p-3 text-sm text-right text-gray-900">${formatMoney(tenant.monthlyRent || 0)}</td>
+                                                                        <td className="p-3 text-sm text-right text-green-600">${formatMoney(tenant.paymentSummary.totalPaid || 0)}</td>
+                                                                        <td className="p-3 text-sm text-right text-red-600 font-medium">${formatMoney(tenant.paymentSummary.outstandingBalance || 0)}</td>
                                                                     </tr>
                                                                 ))}
                                                         </tbody>
@@ -916,22 +852,22 @@ export default function ReportsPage() {
                                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                                             <div className="bg-green-50 rounded-xl p-4">
                                                 <p className="text-green-600 text-xs font-medium">Total Revenue</p>
-                                                <p className="text-2xl font-serif text-gray-900 mt-1">${financialReports?.summary?.totalRevenue?.toLocaleString() || 0}</p>
-                                                <p className="text-xs text-gray-600 mt-1">From {consolidatedData.payments?.filter((p: any) => p.status?.toLowerCase() === 'paid').length || 0} payments</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">${formatMoney(financialReports?.summary?.totalRevenue || 0)}</p>
+                                                <p className="text-xs text-gray-600 mt-1">From {consolidatedData.payments?.length || 0} payments</p>
                                             </div>
                                             <div className="bg-yellow-50 rounded-xl p-4">
                                                 <p className="text-yellow-600 text-xs font-medium">Pending</p>
-                                                <p className="text-2xl font-serif text-gray-900 mt-1">${financialReports?.summary?.totalPending?.toLocaleString() || 0}</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">${formatMoney(financialReports?.summary?.totalPending || 0) || 0}</p>
                                                 <p className="text-xs text-gray-600 mt-1">Awaiting payment</p>
                                             </div>
                                             <div className="bg-red-50 rounded-xl p-4">
                                                 <p className="text-red-600 text-xs font-medium">Outstanding</p>
-                                                <p className="text-2xl font-serif text-gray-900 mt-1">${financialReports?.summary?.totalOverdue?.toLocaleString() || 0}</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">${formatMoney(financialReports?.summary?.totalOverdue || 0) || 0}</p>
                                                 <p className="text-xs text-gray-600 mt-1">{financialReports?.summary?.latePaymentCount || 0} tenants behind</p>
                                             </div>
                                             <div className="bg-blue-50 rounded-xl p-4">
                                                 <p className="text-blue-600 text-xs font-medium">Monthly Potential</p>
-                                                <p className="text-2xl font-serif text-gray-900 mt-1">${propertyReports?.summary?.totalMonthlyRentPotential?.toLocaleString() || 0}</p>
+                                                <p className="text-2xl font-serif text-gray-900 mt-1">${formatMoney(propertyReports?.summary?.totalMonthlyRentPotential || 0) || 0}</p>
                                                 <p className="text-xs text-gray-600 mt-1">Expected monthly revenue</p>
                                             </div>
                                         </div>
@@ -957,7 +893,7 @@ export default function ReportsPage() {
                                                                             }}
                                                                         >
                                                                             <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 text-xs font-medium text-gray-900 whitespace-nowrap">
-                                                                                ${month.paid.toLocaleString()}
+                                                                                ${formatMoney(month.paid || 0)}
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -1006,10 +942,10 @@ export default function ReportsPage() {
                                                             <div key={payment.id} className="flex justify-between items-center py-3 border-b border-red-200 last:border-0">
                                                                 <div>
                                                                     <p className="text-sm font-medium text-gray-900">{payment.tenantName}</p>
-                                                                    <p className="text-xs text-gray-600">{payment.propertyName} • ${payment.monthlyRent.toLocaleString()}/mo</p>
+                                                                    <p className="text-xs text-gray-600">{payment.propertyName} • ${formatMoney(payment.monthlyRent || 0)}/mo</p>
                                                                 </div>
                                                                 <div className="text-right">
-                                                                    <p className="text-sm font-bold text-red-600">${payment.amount.toLocaleString()}</p>
+                                                                    <p className="text-sm font-bold text-red-600">${formatMoney(payment.amount || 0)}</p>
                                                                     <p className="text-xs text-gray-600">Outstanding balance</p>
                                                                 </div>
                                                             </div>
@@ -1051,10 +987,10 @@ export default function ReportsPage() {
                                                                     </span>
                                                                     <div>
                                                                         <p className="text-sm font-medium text-gray-900">{property.name}</p>
-                                                                        <p className="text-xs text-gray-600">{property.tenants} tenants • ${property.monthlyRentPotential.toLocaleString()}/mo potential</p>
+                                                                        <p className="text-xs text-gray-600">{property.tenants} tenants • ${formatMoney(property.monthlyRentPotential || 0)}/mo potential</p>
                                                                     </div>
                                                                 </div>
-                                                                <p className="text-sm font-bold text-[#876D4A]">${property.revenue?.toLocaleString()}</p>
+                                                                <p className="text-sm font-bold text-[#876D4A]">${formatMoney(property.revenue || 0)}</p>
                                                             </div>
                                                         ))}
                                                     </div>
@@ -1069,7 +1005,7 @@ export default function ReportsPage() {
                                                             <div key={forecast.month} className="p-4 bg-gray-50 rounded-lg">
                                                                 <div className="flex justify-between items-center mb-2">
                                                                     <p className="text-sm font-semibold text-gray-900">{forecast.month}</p>
-                                                                    <p className="text-sm font-bold text-[#876D4A]">${forecast.expected?.toLocaleString()}</p>
+                                                                    <p className="text-sm font-bold text-[#876D4A]">${formatMoney(forecast.expected || 0)}</p>
                                                                 </div>
                                                                 <div className="flex items-center">
                                                                     <span className="text-xs text-gray-600 mr-2 w-16">Confidence:</span>
@@ -1146,13 +1082,13 @@ export default function ReportsPage() {
                                                     <div className="flex justify-between items-center mt-2">
                                                         <p className="text-sm text-gray-600">Total revenue</p>
                                                         <p className="text-lg font-bold text-[#876D4A]">
-                                                            ${crossCuttingReports.topRevenueProperties[0]?.revenue?.toLocaleString() || 0}
+                                                            ${formatMoney(crossCuttingReports.topRevenueProperties[0]?.revenue || 0) || 0}
                                                         </p>
                                                     </div>
                                                     <div className="flex justify-between items-center mt-1">
                                                         <p className="text-sm text-gray-600">Monthly potential</p>
                                                         <p className="text-sm font-medium text-gray-900">
-                                                            ${crossCuttingReports.topRevenueProperties[0]?.monthlyRentPotential?.toLocaleString() || 0}
+                                                            ${formatMoney(crossCuttingReports.topRevenueProperties[0]?.monthlyRentPotential || 0) || 0}
                                                         </p>
                                                     </div>
                                                 </div>

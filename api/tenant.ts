@@ -53,9 +53,8 @@ export const fetchOneTenant = async(tenantId: string) => {
     try {
         const response = await api.get(`/v1/tenant/viewOne/${tenantId}`);
         return response.data;
-    } catch (error: any) {
-        const message = error.response?.data?.message || error.message || "An error occured trying to fetch tenant";
-        throw new Error(message);
+    } catch (error) {
+        throw error;
     }
 }
 
