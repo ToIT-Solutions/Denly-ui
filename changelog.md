@@ -88,3 +88,29 @@ Your feedback is extremely valuable and will directly shape future updates.
 ---
 
 Thank you for being part of the early journey 🚀
+
+=====================================================================================================
+
+## v0.2.0: Security & Stability Update
+
+_Release date: To be announced_
+
+This release marks a significant step forward in strengthening Denly's foundation as we continue preparing for our public launch.
+
+### 🔐 Security & Reliability
+
+- Significant security enhancements across the platform.
+- Improved overall system reliability and stability.
+- Additional safeguards to support a safer, more dependable experience.
+
+### ⚙️ Improvements & Fixes
+
+- Various bug fixes and stability improvements.
+- Improved error handling and system consistency.
+- General performance and reliability refinements.
+
+### 🧪 Private Testing
+
+Denly remains in private testing as we continue improving the platform and preparing for its first public release.
+
+Thank you for being part of our journey! 🚀

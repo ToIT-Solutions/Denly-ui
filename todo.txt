@@ -93,6 +93,7 @@ when logging out it takes me to the login page then refreshes the login page aga
 
 activity log for admin if possible
 
+generate custom receipt numbers
 
 ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
                 - CHANGES SNAPSHOT(WHAT WAS CHANGED WHEN EDITED FOR ANYTHING THAT IS EDITED)
@@ -112,6 +113,7 @@ PARTIAL/ ADVANCED PAYMENTS  - keeping track of what percentage of the rent has b
 ---------------THINGS TO CONSIDER---------------------
 phone number for users
 unit management
+same email 2 different tenantss
 
 -----------------THINGS TO FIX AFTER HOSTING-----------------
 INVITE EMAIL NOT SENDING

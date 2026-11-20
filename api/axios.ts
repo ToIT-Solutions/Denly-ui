@@ -40,6 +40,14 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const errorCode = error.response?.data?.code;
     const errorMessage = error.response?.data?.message;
+    // Keep the saved invitation accessible for a retry without navigating away.
+    if (
+      status === 502 &&
+      errorCode === "INVITATION_EMAIL_UNCONFIRMED" &&
+      ["/v1/invitation/invite", "/v1/invitation/resend"].includes(error.config?.url)
+    ) {
+      return Promise.reject(error);
+    }
     // Keep an ambiguous rent payment on the form so its saved request can be retried.
     if (error.config?.url === "/v1/payment/add" && (!status || status >= 500)) {
       return Promise.reject(error);
