@@ -10,8 +10,10 @@ function ErrorContent() {
 
     const status = searchParams.get('status')
     const code = searchParams.get('code')
-    const message = searchParams.get('message')
-    const decodedMessage = message ? decodeURIComponent(message) : 'An unexpected error occurred'
+    // Use public error text instead of reflecting diagnostics from the URL.
+    const displayMessage = status === '0'
+        ? 'Unable to connect to the server. Please check your internet connection.'
+        : 'An unexpected error occurred'
 
     const getErrorConfig = () => {
         const statusNum = status ? parseInt(status) : 500
@@ -177,7 +179,7 @@ function ErrorContent() {
                         {/* Message Card */}
                         <div className="bg-linear-to-r from-[#f8f6f2] to-[#f0ede6] rounded-2xl p-5 mb-6 border border-[#e9e0d5]">
                             <p className="text-gray-700 text-center text-sm leading-relaxed">
-                                {decodedMessage}
+                                {displayMessage}
                             </p>
                         </div>
 

@@ -20,7 +20,7 @@ let isHandlingServerError = false;
 api.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().token;
-    if (token) {
+    if (token && !config.headers.Authorization) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -40,6 +40,10 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const errorCode = error.response?.data?.code;
     const errorMessage = error.response?.data?.message;
+    // Keep an ambiguous rent payment on the form so its saved request can be retried.
+    if (error.config?.url === "/v1/payment/add" && (!status || status >= 500)) {
+      return Promise.reject(error);
+    }
 
     // 🔥 Handle Network Errors FIRST (no response at all)
     if (!error.response) {
@@ -60,6 +64,14 @@ api.interceptors.response.use(
 
     // Handle Authentication Errors (401)
     if (status === 401) {
+      const { token, clearUser } = useAuthStore.getState();
+      // A late response for a previous session must not clear the current account.
+      const requestAuthorization = error.config?.headers?.Authorization;
+      const currentAuthorization = token ? `Bearer ${token}` : undefined;
+      const isLogin = ["/v1/auth/login", "/v1/admin/auth/login"].includes(error.config?.url);
+      if (requestAuthorization !== currentAuthorization || isLogin) {
+        return Promise.reject(error);
+      }
       if (!isHandlingAuthError) {
         isHandlingAuthError = true;
 
@@ -67,10 +79,11 @@ api.interceptors.response.use(
 
         showErrorToast("Your session has expired. Please log in again.");
 
-        const { clearUser } = useAuthStore.getState();
         clearUser();
 
         setTimeout(() => {
+          isHandlingAuthError = false;
+          if (useAuthStore.getState().token) return;
           window.location.href = window.location.pathname?.startsWith('/secret-panel-88') ? '/secret-panel-88/login' : '/auth/login';
         }, 1400);
       }
@@ -102,12 +115,8 @@ api.interceptors.response.use(
 
         //console.log('Server error')
 
-        // Encode the error message to safely pass in URL
-        const encodedMessage = encodeURIComponent(
-          errorMessage || "An unexpected server error occurred",
-        );
-
-        window.location.href = `/error?status=${status}&code=${errorCode || "SERVER_ERROR"}&message=${encodedMessage}`;
+        // Keep backend diagnostics out of navigation URLs, history and referrers.
+        window.location.href = `/error?status=${status}&code=SERVER_ERROR`;
       }
 
       return Promise.reject(error);
@@ -122,11 +131,8 @@ api.interceptors.response.use(
     ) {
       //console.log('Specific backend error')
 
-      const encodedMessage = encodeURIComponent(
-        errorMessage || `Error: ${errorCode}`,
-      );
-
-      window.location.href = `/error?status=${status || 500}&code=${errorCode}&message=${encodedMessage}`;
+      const query = new URLSearchParams({ status: String(status || 500), code: errorCode });
+      window.location.href = `/error?${query}`;
 
       return Promise.reject(error);
     }
@@ -156,11 +162,7 @@ api.interceptors.response.use(
     // Handle any other unhandled errors - redirect to error page
     //console.log('Unhandled error:', error)
 
-    const encodedMessage = encodeURIComponent(
-      errorMessage || error.message || "An unexpected error occurred",
-    );
-
-    window.location.href = `/error?status=${status || 500}&code=${errorCode || "UNKNOWN_ERROR"}&message=${encodedMessage}`;
+    window.location.href = `/error?status=${status || 500}&code=UNKNOWN_ERROR`;
 
     return Promise.reject(error);
   },

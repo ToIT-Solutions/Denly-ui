@@ -3,13 +3,35 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
+import type { PaymentData } from "@/api/payment";
+import { clearPaymentIntent, preparePaymentIntent } from "@/lib/rentPaymentIntent";
+import useAuthStore from "@/store/useAuthStore";
 
 export const useAddPayment = () => {
     const router = useRouter()
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: addPayment,
+        mutationFn: async ({ data, scope, companyId, actorId }: {
+            data: PaymentData; scope: string; companyId: string; actorId: string
+        }) => {
+            const intent = await preparePaymentIntent(scope, data);
+            const { user: currentUser, token } = useAuthStore.getState();
+            if (!token || currentUser?.id !== actorId || currentUser?.companyId !== companyId) {
+                throw new Error("Your session changed. Reopen the original session to recover the pending payment.");
+            }
+            try {
+                const result = await addPayment(data, intent.key, token);
+                clearPaymentIntent(scope, intent.key);
+                return result;
+            } catch (error) {
+                if (error instanceof Error && "status" in error && error.status === 400 &&
+                    (!("code" in error) || error.code !== "INVALID_IDEMPOTENCY_KEY")) {
+                    clearPaymentIntent(scope, intent.key);
+                }
+                throw error;
+            }
+        },
         retry: false,
         onSuccess: (data) => {
             // Refresh payment history, balances and summaries after the committed allocation.
@@ -22,7 +44,7 @@ export const useAddPayment = () => {
                 : 'Payment added successfully')
         },
         onError: (error: any) => {
-            showErrorToast(error)
+            showErrorToast(error.message)
         }
     })
 }

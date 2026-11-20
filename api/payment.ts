@@ -12,7 +12,7 @@ export interface PaymentRecord {
     rentLedger: { periodStart: string; periodEnd: string; property: { name: string } };
 }
 
-interface PaymentData {
+export interface PaymentData {
     // id: string,
     propertyId: string;
     tenantId: string;
@@ -35,13 +35,19 @@ interface RecordPaymentResult {
     unusedAmount: number;
 }
 
-export const addPayment = async(data: PaymentData) => {
+export const addPayment = async(data: PaymentData, key: string, token?: string) => {
     try {
-        const response = await api.post<RecordPaymentResult>("/v1/payment/add", data);
+        const response = await api.post<RecordPaymentResult>("/v1/payment/add", data, {
+            headers: { "Idempotency-Key": key, ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+        });
         return response.data;
     } catch (error: any) {
+        const status = error.response?.status;
+        if (!status || status >= 500) {
+            throw new Error("The payment may have been recorded. Retry with the same details in this tab. If you cannot recover the original request, reconcile payment history first.");
+        }
         const message = error.response?.data?.message || error.message || "An error occured when adding payment";
-        throw new Error(message);
+        throw Object.assign(new Error(message), { status, code: error.response?.data?.code });
     }
 }
 

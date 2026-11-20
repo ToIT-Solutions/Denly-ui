@@ -1,6 +1,6 @@
 'use client'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 import { usePageTitle } from '@/hooks/usePageTitle'
@@ -9,6 +9,7 @@ import { useAddPayment, useFetchOnePayment } from '@/hooks/usePayment'
 import Spinner from '@/components/Spinner'
 import { useRouter, useSearchParams } from 'next/navigation'
 import useAuthStore from '@/store/useAuthStore'
+import { paymentIntentScope } from '@/lib/rentPaymentIntent'
 
 interface Property {
     id: string
@@ -53,7 +54,8 @@ export default function RecordPaymentPage() {
     const [hydrated, setHydrated] = useState(false)
 
     const router = useRouter()
-    const { mutate: paymentMutate, isPending } = useAddPayment()
+    const { mutateAsync: paymentMutate, isPending } = useAddPayment()
+    const paymentInFlight = useRef(false)
 
 
     const [availableTenants, setAvailableTenants] = useState<Tenant[]>([])
@@ -100,15 +102,18 @@ export default function RecordPaymentPage() {
         }
     }, [watchedProperty, watchedDuration, propertyData, setValue])
 
-    const onSubmit: SubmitHandler<PaymentFormData> = (data) => {
+    const onSubmit: SubmitHandler<PaymentFormData> = async (data) => {
+        if (!user?.companyId || !user?.id || isPending || paymentInFlight.current) return
 
-        const payload: PaymentFormData = {
-            ...data,
-            amountPaid: data.amountPaid,
+        // Block a second submit before React renders the pending state.
+        paymentInFlight.current = true
+        try {
+            await paymentMutate({ data, scope: paymentIntentScope(user.companyId, user.id), companyId: user.companyId, actorId: user.id })
+        } catch {
+            // The payment mutation already reports errors and preserves ambiguous intents.
+        } finally {
+            paymentInFlight.current = false
         }
-
-        paymentMutate(payload)
-        // //console.log(payload)
     }
 
     const months = Array.from({ length: 12 }, (_, i) => i + 1)
