@@ -10,9 +10,9 @@ import {api} from './axios'
 //     }
 // }
 
-export const fetchAllDocuments = async() => {
+export const fetchAllDocuments = async(tenantId: string) => {
     try {
-        const response = await api.get(`/v1/document/viewAll`);
+        const response = await api.get(`/v1/document/viewAll/${encodeURIComponent(tenantId)}`);
         return response.data;
     } catch (error: any) {
         const message = error.response?.data?.message || error.message || "An error occured when fetching properties";
@@ -48,4 +48,10 @@ export const deleteDocument = async(documentId: string) => {
         const message = error.response?.data?.message || error.message || "An error occured trying to delete document";
         throw new Error(message);
     }
+}
+
+// Keep authenticated preview bytes on the existing company-scoped view endpoint.
+export const fetchDocumentPreview = async (documentId: string) => {
+    if (!documentId) throw new Error('Document ID is required');
+    return api.get<Blob>(`/v1/document/viewOne/${encodeURIComponent(documentId)}`, { responseType: 'blob' });
 }

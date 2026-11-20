@@ -1,23 +1,53 @@
 import {api} from './axios'
 
-interface PaymentData {
+export interface PaymentRecord {
+    id: string;
+    tenantId: string;
+    amountPaid: string;
+    paymentDate: string;
+    createdAt: string;
+    paymentMethod: string;
+    receiptNumber: string;
+    tenant: { firstName: string; lastName: string; email: string };
+    rentLedger: { periodStart: string; periodEnd: string; property: { name: string } };
+}
+
+export interface PaymentData {
     // id: string,
     propertyId: string;
     tenantId: string;
-    amountPaid: number;
+    amountPaid: number | string;
     paymentDate: string;
     paymentMethod?: string;
     notes?: string;
     duration: number;
 }
 
-export const addPayment = async(data: PaymentData) => {
+interface PaymentMetadataData {
+    paymentMethod?: string;
+    paymentDate?: string;
+    receiptNumber?: string;
+}
+
+interface RecordPaymentResult {
+    message: string;
+    payments: { id: string; amountPaid: string }[];
+    unusedAmount: number;
+}
+
+export const addPayment = async(data: PaymentData, key: string, token?: string) => {
     try {
-        const response = await api.post("/v1/payment/add", data);
+        const response = await api.post<RecordPaymentResult>("/v1/payment/add", data, {
+            headers: { "Idempotency-Key": key, ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+        });
         return response.data;
     } catch (error: any) {
+        const status = error.response?.status;
+        if (!status || status >= 500) {
+            throw new Error("The payment may have been recorded. Retry with the same details in this tab. If you cannot recover the original request, reconcile payment history first.");
+        }
         const message = error.response?.data?.message || error.message || "An error occured when adding payment";
-        throw new Error(message);
+        throw Object.assign(new Error(message), { status, code: error.response?.data?.code });
     }
 }
 
@@ -33,15 +63,14 @@ export const fetchAllPayments = async() => {
 
 export const fetchOnePayment = async(paymentId: string) => {
     try {
-        const response = await api.get(`/v1/payment/viewOne/${paymentId}`);
+        const response = await api.get<PaymentRecord>(`/v1/payment/viewOne/${paymentId}`);
         return response.data;
-    } catch (error: any) {
-        const message = error.response?.data?.message || error.message || "An error occured when fetching payment";
-        throw new Error(message);
+    } catch (error) {
+        throw error;
     }
 }
 
-export const editPayment = async(paymentId: string , data: PaymentData) => {
+export const editPayment = async(paymentId: string , data: PaymentMetadataData) => {
     try {
         const response = await api.put(`/v1/payment/edit/${paymentId}`, data);
         return response.data;

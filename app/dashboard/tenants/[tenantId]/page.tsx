@@ -1,6 +1,7 @@
 // app/dashboard/tenants/[tenantId]/page.tsx
 "use client"
 import Navbar from '@/components/Navbar'
+import DetailUnavailable from '@/components/DetailUnavailable'
 import Spinner from '@/components/Spinner'
 import { useDocumentActions } from '@/hooks/useDocument'
 import { usePageTitle } from '@/hooks/usePageTitle'
@@ -22,7 +23,7 @@ export default function ViewTenantPage() {
     const params = useParams()
     const tenantId = params.tenantId as string
 
-    const { data, isLoading } = useFetchOneTenant(tenantId)
+    const { data, isLoading, error } = useFetchOneTenant(tenantId)
     //console.log(data)
 
     const { data: ledger } = useFetchOneRentLedger(tenantId)
@@ -111,7 +112,7 @@ export default function ViewTenantPage() {
 
             {isLoading ?
                 <Spinner />
-                :
+                : error || !data ? <DetailUnavailable error={error} href="/dashboard/tenants" label="Tenants" /> :
                 <div className="pt-20 px-4 sm:px-6 lg:px-8 py-4">
                     <div className="max-w-6xl mx-auto">
                         {/* Header with Back Button */}

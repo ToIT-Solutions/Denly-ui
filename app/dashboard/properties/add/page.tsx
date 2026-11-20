@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import Spinner from '@/components/Spinner'
 import useAuthStore from '@/store/useAuthStore'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { CAN_INTERACT } from '@/lib/roles'
 
 interface PropertyForm {
@@ -44,6 +44,7 @@ export default function AddPropertyPage() {
 
     const user = useAuthStore((state) => state.user)
     const userRole = user?.role
+    const [hydrated, setHydrated] = useState(false)
 
     const {
         register,
@@ -60,11 +61,18 @@ export default function AddPropertyPage() {
 
     const router = useRouter()
 
+    // Wait for stored authentication before evaluating this page's existing role guard.
     useEffect(() => {
+        const unsubscribe = useAuthStore.persist.onFinishHydration(() => setHydrated(true))
+        setHydrated(useAuthStore.persist.hasHydrated())
+        return unsubscribe
+    }, [])
+    useEffect(() => {
+        if (!hydrated) return
         if (!CAN_INTERACT.includes(userRole)) {
             return router.back()
         }
-    }, [userRole])
+    }, [hydrated, userRole, router])
 
 
     const { mutate: propertyMutate, isPending, error } = useAddProperty()
@@ -92,6 +100,8 @@ export default function AddPropertyPage() {
 
     const residentialFeatures = ['Parking', 'Laundry', 'Borehole', 'Gym', 'Pool', 'Pet Friendly', 'Furnished', 'Air Conditioning', 'Balcony', 'Storage', 'Patio']
     const commercialFeatures = ['Parking', 'Elevator', 'Borehole', 'Security System', 'Conference Room', 'Reception Area', 'Kitchenette', 'Restrooms', 'Storage', 'Loading Dock', 'HVAC']
+
+    if (!hydrated || !CAN_INTERACT.includes(userRole)) return null
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">

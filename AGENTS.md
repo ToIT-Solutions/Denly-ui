@@ -138,3 +138,113 @@ When I request a feature:
 Keep explanations clear, practical, and concise.
 
 My priority is shipping features quickly while keeping the code understandable and maintainable.
+
+# DENLY — UPDATE CODEX AUTONOMY AND APPROVAL POLICY
+
+Update the existing AGENTS.md files in both Denly-ui and Denly-backend.
+
+Preserve their current project-specific instructions and coding conventions.
+
+Add the following permanent policy, adapting wording to avoid conflicts or duplication.
+
+## Development Autonomy
+
+Codex is authorized to autonomously complete routine, reversible, task-scoped development work.
+
+Do not request approval for ordinary implementation steps, testing, or low-risk corrections.
+
+Within the user's approved task, you may:
+
+- Inspect and modify relevant application code.
+- Create, update, and execute automated tests.
+- Run unit, integration, HTTP, browser, security, and regression tests.
+- Run frontend builds, TypeScript checks, linting, and Prisma validation.
+- Start and stop local development servers.
+- Use browser automation when available.
+- Create and remove disposable test fixtures.
+- Create or reset clearly isolated, disposable test databases.
+- Run test-only migrations against verified disposable databases.
+- Install necessary, reputable development dependencies when compatible with the existing architecture.
+- Fix confirmed regressions and rerun tests.
+- Update SECURITY.md, SECURITY_DASHBOARD.html, and relevant project documentation.
+- Run safe local performance measurements.
+- Investigate problems and choose reasonable implementation details without asking for permission at every step.
+
+Use the smallest practical changes.
+
+Preserve Denly's existing architecture, coding style, functionality, security protections, and frontend/backend contracts.
+
+## Approval Required
+
+Stop and request explicit approval before:
+
+1. Deploying or modifying production/staging infrastructure.
+2. Accessing or modifying real customer or production data.
+3. Initiating live financial transactions or sending real external communications.
+4. Changing financial business rules or subscription behavior.
+5. Modifying Paynow's working integration, provider verification, or payment activation behavior.
+6. Making breaking API changes or major architectural changes.
+7. Introducing production database schema changes or running non-test migrations.
+8. Rotating or exposing credentials or changing production environment variables.
+9. Deleting non-disposable data or performing irreversible operations.
+10. Force-pushing, rebasing shared history, merging branches, or pushing changes without an explicit request.
+11. Introducing substantial new infrastructure, services, or dependencies.
+12. Making changes outside the approved task's scope.
+
+If uncertain whether an action is safe, inspect its consequences first. Ask only when a meaningful risk or irreversible effect exists.
+
+## Testing Rules
+
+Testing is expected, not optional.
+
+Never stop merely to ask permission to run normal tests.
+
+If a test requires a database, use a verified isolated test database.
+
+Never assume an existing database is disposable.
+
+If browser automation is unavailable, attempt a reasonable supported alternative and clearly report what remains untested.
+
+Do not repeatedly ask for permission to perform safe validation already covered by this policy.
+
+Do not claim unexecuted tests passed.
+
+## Workflow
+
+For each task:
+
+1. Inspect the relevant code.
+2. Identify the smallest safe implementation.
+3. Implement it.
+4. Test it.
+5. Correct regressions.
+6. Update relevant documentation.
+7. Report the result and any genuinely blocked actions.
+
+Do not interrupt this workflow for routine decisions.
+
+## Reporting
+
+Keep final reports concise.
+
+Include:
+
+- Changes made.
+- Tests passed/failed.
+- Regressions identified or corrected.
+- Remaining risks.
+- Actions requiring my approval.
+
+Do not generate unnecessary standalone reports.
+
+## Priority
+
+This policy grants permission for routine work only.
+
+It does not override platform permissions, existing safety restrictions, or explicit user instructions for a particular task.
+
+If existing AGENTS.md instructions conflict with this policy, reconcile them so that routine testing and development can proceed autonomously while high-impact operations still require approval.
+
+Do not modify application functionality as part of this AGENTS.md update.
+
+Do not commit, push, or deploy.

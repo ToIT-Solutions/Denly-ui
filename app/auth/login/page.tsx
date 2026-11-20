@@ -108,10 +108,7 @@ export default function LoginPage() {
                                         id="password"
                                         {...register('password', {
                                             required: 'Password is required',
-                                            minLength: {
-                                                value: 8,
-                                                message: 'Password must be at least 8 characters'
-                                            }
+                                            // New-password policy is enforced on creation/change, not existing credentials.
                                         })}
                                         onBlur={() => trigger('password')}
                                         className={`w-full px-3 py-2 bg-white/90 border rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] transition-all text-sm outline-0 ${errors.password ? 'border-red-600' : 'border-gray-300'

@@ -48,6 +48,9 @@ export default function UserManagementPage() {
         { name: 'Viewer', description: 'Read-only access to reports' },
     ]
 
+    // Managers can invite teammates but cannot grant company ownership.
+    const inviteRoles = userRole === 'Owner' ? roles : roles.filter((role) => role.name !== 'Owner')
+
     function getInitials(name: string) {
         if (!name) return ''
         const namesArray = name.split(' ')
@@ -436,7 +439,7 @@ export default function UserManagementPage() {
                                         className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-transparent text-sm cursor-pointer"
                                     >
                                         <option value="">Select a role</option>
-                                        {roles.map((role) => (
+                                        {inviteRoles.map((role) => (
                                             <option key={role.name} value={role.name} className='cursor-pointer'>{role.name}</option>
                                         ))}
                                     </select>

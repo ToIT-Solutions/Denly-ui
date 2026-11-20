@@ -218,7 +218,7 @@ export default function SignupPage() {
                                     </p>
                                 ) : (
                                     <p className="mt-1 text-xs text-white/70 drop-shadow-sm">
-                                        Must be 8+ characters with uppercase, lowercase, number, and special character
+                                        Use at least 8 characters, up to 72 UTF-8 bytes.
                                     </p>
                                 )}
                             </div>

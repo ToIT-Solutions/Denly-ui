@@ -39,11 +39,11 @@ export const useInviteUser = () => {
         onSuccess: (data) => {
             //console.log(data)
             showSuccessToast('Invitation sent successfully')
-            queryClient.invalidateQueries({ queryKey: ["allInvites"] });
         },
         onError: (error: any) => {
             showErrorToast(error)
-        }
+        },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: ["allInvites"] })
     })
 }
 
@@ -56,11 +56,11 @@ export const useResendInvite = () => {
         onSuccess: (data) => {
             //console.log(data)
             showSuccessToast('Invitation resent successfully')
-            queryClient.invalidateQueries({ queryKey: ["allInvites"] });
         },
         onError: (error: any) => {
             showErrorToast(error)
-        }
+        },
+        onSettled: () => queryClient.invalidateQueries({ queryKey: ["allInvites"] })
     })
 }
 

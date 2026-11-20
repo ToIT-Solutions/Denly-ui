@@ -209,7 +209,8 @@ export default function ProfileSettingsPage() {
                                     type="password"
                                     {...registerPassword('newPassword', {
                                         required: 'New password is required',
-                                        minLength: { value: 6, message: 'Minimum 6 characters' }
+                                        minLength: { value: 8, message: 'Minimum 8 characters' },
+                                        validate: value => new TextEncoder().encode(value).length <= 72 || 'Password must not exceed 72 UTF-8 bytes'
                                     })}
                                     className="w-full border border-gray-300 rounded-2xl px-3 py-2 text-black text-sm focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A]"
                                 />

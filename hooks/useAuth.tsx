@@ -45,12 +45,15 @@ export const useLogin = () => {
 
 export const useChangePassword = () => {
     const router = useRouter()
+    const clearUser = useAuthStore((state) => state.clearUser)
 
     return useMutation({
         mutationFn: changePassword,
         onSuccess: (data) => {
             //console.log(data)
             showSuccessToast('Your password has been changed successfully')
+            clearUser()
+            router.push('/auth/login')
         },
         onError: (error: any) => {
             //console.log(error)
@@ -78,12 +81,14 @@ export const useForgotPassword = () => {
 
 export const useResetPassword = () => {
     const router = useRouter()
+    const clearUser = useAuthStore((state) => state.clearUser)
 
     return useMutation({
         mutationFn: resetPassword,
         onSuccess: (data) => {
             //console.log(data)
             showSuccessToast('You have successfully reset your password')
+            clearUser()
             router.push(`/auth/login`)
         },
         onError: (error: any) => {

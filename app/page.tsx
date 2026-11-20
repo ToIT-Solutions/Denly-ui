@@ -40,8 +40,8 @@ export default function Homepage() {
           {/* Left Content */}
           <div className="text-center lg:text-left">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-gray-800 mb-6 leading-snug">
-              Property Management for the{" "}
-              <span className="text-[#876D4A] italic">Modern Landlord</span>
+              Property Management {" "}
+              <span className="text-[#876D4A] italic">without the paperwork.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-gray-600 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">

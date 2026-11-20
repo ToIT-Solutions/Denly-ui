@@ -1,6 +1,6 @@
 'use client'
 import { useForm, SubmitHandler } from 'react-hook-form'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 import { usePageTitle } from '@/hooks/usePageTitle'
@@ -9,6 +9,7 @@ import { useAddPayment, useFetchOnePayment } from '@/hooks/usePayment'
 import Spinner from '@/components/Spinner'
 import { useRouter, useSearchParams } from 'next/navigation'
 import useAuthStore from '@/store/useAuthStore'
+import { paymentIntentScope } from '@/lib/rentPaymentIntent'
 
 interface Property {
     id: string
@@ -33,7 +34,7 @@ interface PaymentFormData {
     // id?: string
     propertyId: string
     tenantId: string
-    amountPaid: number
+    amountPaid: string
     paymentDate: string
     paymentMethod?: string
     notes?: string
@@ -47,13 +48,14 @@ export default function RecordPaymentPage() {
         data: Property[] | undefined
         isPending: boolean
     }
-    console.log(propertyData)
 
     const user = useAuthStore((state) => state.user)
     const userRole = user?.role
+    const [hydrated, setHydrated] = useState(false)
 
     const router = useRouter()
-    const { mutate: paymentMutate, isPending } = useAddPayment()
+    const { mutateAsync: paymentMutate, isPending } = useAddPayment()
+    const paymentInFlight = useRef(false)
 
 
     const [availableTenants, setAvailableTenants] = useState<Tenant[]>([])
@@ -64,8 +66,16 @@ export default function RecordPaymentPage() {
     const watchedProperty = watch('propertyId')
     const watchedDuration = watch('duration')
 
+    // Wait for stored authentication before applying the existing financial-role restriction.
+    useEffect(() => {
+        const unsubscribe = useAuthStore.persist.onFinishHydration(() => setHydrated(true))
+        setHydrated(useAuthStore.persist.hasHydrated())
+        return unsubscribe
+    }, [])
+
     // Update tenants when property changes
     useEffect(() => {
+        if (!hydrated) return
         if (userRole !== 'Owner' && userRole !== 'Manager' && userRole !== 'Agent') {
             return router.back()
         }
@@ -77,7 +87,7 @@ export default function RecordPaymentPage() {
         } else {
             setAvailableTenants([])
         }
-    }, [watchedProperty, propertyData, setValue])
+    }, [hydrated, userRole, router, watchedProperty, propertyData, setValue])
 
     // Calculate expected amount
     useEffect(() => {
@@ -86,24 +96,29 @@ export default function RecordPaymentPage() {
             const monthlyRent = selectedProp?.tenants?.[0]?.actualRent || parseFloat(selectedProp?.monthlyRent || '0')
             const totalAmount = monthlyRent * watchedDuration
             setExpectedAmount(totalAmount)
-            setValue('amountPaid', totalAmount)
+            setValue('amountPaid', totalAmount.toFixed(2))
         } else {
             setExpectedAmount(null)
         }
     }, [watchedProperty, watchedDuration, propertyData, setValue])
 
-    const onSubmit: SubmitHandler<PaymentFormData> = (data) => {
+    const onSubmit: SubmitHandler<PaymentFormData> = async (data) => {
+        if (!user?.companyId || !user?.id || isPending || paymentInFlight.current) return
 
-        const payload: PaymentFormData = {
-            ...data,
-            amountPaid: Number(data.amountPaid),
+        // Block a second submit before React renders the pending state.
+        paymentInFlight.current = true
+        try {
+            await paymentMutate({ data, scope: paymentIntentScope(user.companyId, user.id), companyId: user.companyId, actorId: user.id })
+        } catch {
+            // The payment mutation already reports errors and preserves ambiguous intents.
+        } finally {
+            paymentInFlight.current = false
         }
-
-        paymentMutate(payload)
-        // //console.log(payload)
     }
 
     const months = Array.from({ length: 12 }, (_, i) => i + 1)
+
+    if (!hydrated || !['Owner', 'Manager', 'Agent'].includes(userRole)) return null
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -190,11 +205,15 @@ export default function RecordPaymentPage() {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Amount ($)*</label>
                                 <input
                                     type="text"
-                                    {...register('amountPaid', { required: true, min: 0 })}
+                                    inputMode="decimal"
+                                    {...register('amountPaid', {
+                                        required: 'Amount is required',
+                                        validate: (value) => /^\d+(\.\d{1,2})?$/.test(value) && Number(value) > 0 && Number(value) <= 99999999.99 || 'Enter a positive amount with at most two decimal places (maximum 99999999.99)'
+                                    })}
                                     className="w-full px-3 py-2 border border-gray-300 text-black rounded-2xl focus:outline-none focus:ring-1 focus:ring-[#876D4A] focus:border-[#876D4A] text-sm"
                                     // value={expectedAmount || ''}
-                                    onChange={(e) => setValue('amountPaid', Number(e.target.value))}
                                 />
+                                {errors.amountPaid && <p className="text-red-600 text-xs mt-1">{errors.amountPaid.message}</p>}
                                 {/* {expectedAmount && (
                                     <p className="text-md text-orange-800 mt-1">
                                         Expected: ${expectedAmount.toFixed(2)}

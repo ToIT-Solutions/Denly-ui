@@ -1,5 +1,9 @@
 'use client'
 import Navbar from '@/components/Navbar'
+import Spinner from '@/components/Spinner'
+import DetailUnavailable from '@/components/DetailUnavailable'
+import { formatMoney, sumMoney } from '@/lib/money'
+import { useFetchAllRentLedger } from '@/hooks/useRentLedger'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useFetchAllPayments } from '@/hooks/usePayment'
 import { formatDate } from '@/lib/dateFormatter'
@@ -8,20 +12,14 @@ import { useState, useMemo } from 'react'
 
 export default function PaymentsPage() {
     usePageTitle('Payments - Denly')
-    const payments = [
-        { id: 1, tenant: 'John Smith', property: 'Downtown Loft', amount: 2400, date: '2024-01-15', status: 'Paid', method: 'Bank Transfer' },
-        { id: 2, tenant: 'Sarah Johnson', property: 'Garden Villa', amount: 3200, date: '2024-01-14', status: 'Paid', method: 'Credit Card' },
-        { id: 3, tenant: 'Mike Chen', property: 'Riverside Apartment', amount: 2750, date: '2024-01-10', status: 'Overdue', method: 'Bank Transfer' },
-        { id: 4, tenant: 'Emily Davis', property: 'Urban Suite', amount: 1800, date: '2024-01-05', status: 'Paid', method: 'Cash' },
-    ]
-
     const { data, isLoading, error } = useFetchAllPayments()
     //console.log(data)
     const [searchQuery, setSearchQuery] = useState('')
     const [statusFilter, setStatusFilter] = useState('All Status')
     const [monthFilter, setMonthFilter] = useState('')
 
-    const paymentData = data || payments
+    const paymentData = data || []
+    const { data: ledgers, isLoading: ledgersLoading, error: ledgerError } = useFetchAllRentLedger()
 
     const router = useRouter()
 
@@ -30,13 +28,13 @@ export default function PaymentsPage() {
 
         if (statusFilter !== 'All Status') {
             filtered = filtered.filter((payment: any) =>
-                payment.status?.toLowerCase() === statusFilter.toLowerCase()
+                'paid' === statusFilter.toLowerCase()
             )
         }
 
         if (monthFilter) {
             filtered = filtered.filter((payment: any) => {
-                const paymentDate = new Date(payment.createdAt || payment.date)
+                const paymentDate = new Date(payment.paymentDate || payment.createdAt)
                 const paymentMonth = paymentDate.toISOString().slice(0, 7)
                 return paymentMonth === monthFilter
             })
@@ -54,7 +52,7 @@ export default function PaymentsPage() {
                     payment.paymentMethod,
                     payment.method,
                     payment.status,
-                    payment.amount?.toString(),
+                    payment.amountPaid?.toString(),
                     payment.createdAt,
                     payment.date
                 ]
@@ -73,33 +71,28 @@ export default function PaymentsPage() {
         const currentMonth = currentDate.getMonth()
 
         const currentMonthPayments = paymentData.filter((payment: any) => {
-            const paymentDate = new Date(payment.createdAt || payment.date)
+            const paymentDate = new Date(payment.paymentDate || payment.createdAt)
             return paymentDate.getFullYear() === currentYear &&
                 paymentDate.getMonth() === currentMonth
         })
 
-        const totalReceived = currentMonthPayments
-            .filter((p: any) => p.status?.toLowerCase() === 'paid')
-            .reduce((sum: number, p: any) => sum + Number(p.amount), 0)
-
-        const pending = paymentData
-            .filter((p: any) => p.status?.toLowerCase() === 'pending')
-            .reduce((sum: number, p: any) => sum + Number(p.amount), 0)
-
-        const overdue = paymentData
-            .filter((p: any) => p.status?.toLowerCase() === 'overdue')
-            .reduce((sum: number, p: any) => sum + Number(p.amount), 0)
-
-        const totalExpected = totalReceived + pending + overdue
-        const collectionRate = totalExpected > 0 ? Math.round((totalReceived / totalExpected) * 100) : 100
-
-        const pendingCount = paymentData.filter((p: any) => p.status?.toLowerCase() === 'pending').length
-        const overdueCount = paymentData.filter((p: any) => p.status?.toLowerCase() === 'overdue').length
-
-        const paidPayments = paymentData.filter((p: any) => p.status?.toLowerCase() === 'paid')
-        const averagePayment = paidPayments.length > 0
-            ? paidPayments.reduce((sum: number, p: any) => sum + Number(p.amount), 0) / paidPayments.length
-            : 0
+        // Receipts are recorded allocations; outstanding amounts come from saved ledgers.
+        const totalReceived = sumMoney(currentMonthPayments.map((p: { amountPaid: string }) => p.amountPaid))
+        const pendingLedgers = (ledgers || []).filter((l: { amount: string; amountPaid: string; dueDate: string }) => Number(l.amount) > Number(l.amountPaid) && new Date(l.dueDate) >= currentDate)
+        const overdueLedgers = (ledgers || []).filter((l: { amount: string; amountPaid: string; dueDate: string }) => Number(l.amount) > Number(l.amountPaid) && new Date(l.dueDate) < currentDate)
+        const outstanding = (rows: { amount: string; amountPaid: string }[]) => sumMoney(rows.flatMap(l => [l.amount, -Number(l.amountPaid)]))
+        const pending = outstanding(pendingLedgers)
+        const overdue = outstanding(overdueLedgers)
+        const monthLedgers = (ledgers || []).filter((l: { dueDate: string }) => {
+            const date = new Date(l.dueDate)
+            return date.getFullYear() === currentYear && date.getMonth() === currentMonth
+        })
+        const charged = sumMoney(monthLedgers.map((l: { amount: string }) => l.amount))
+        const paid = sumMoney(monthLedgers.map((l: { amountPaid: string }) => l.amountPaid))
+        const collectionRate = charged > 0 ? Math.round(paid / charged * 100) : 0
+        const pendingCount = pendingLedgers.length
+        const overdueCount = overdueLedgers.length
+        const averagePayment = paymentData.length ? Number((sumMoney(paymentData.map((p: { amountPaid: string }) => p.amountPaid)) / paymentData.length).toFixed(2)) : 0
 
         return {
             totalReceived,
@@ -111,9 +104,12 @@ export default function PaymentsPage() {
             averagePayment,
             totalTransactions: currentMonthPayments.length
         }
-    }, [paymentData])
+    }, [paymentData, ledgers])
 
 
+
+    if (isLoading || ledgersLoading) return <><Navbar /><Spinner /></>
+    if (error || ledgerError) return <><Navbar /><DetailUnavailable error={error || ledgerError} href="/dashboard" label="Dashboard" /></>
 
     return (
         <div className="min-h-screen bg-linear-to-br from-[#f8f6f2] to-[#f0ede6]">
@@ -143,8 +139,7 @@ export default function PaymentsPage() {
                             >
                                 <option>All Status</option>
                                 <option>Paid</option>
-                                <option>Pending</option>
-                                <option>Overdue</option>
+
                             </select>
                             <input
                                 type="month"
@@ -181,10 +176,10 @@ export default function PaymentsPage() {
                     {/* Payment Stats */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 lg:mb-8">
                         {[
-                            { title: 'Total Received', value: `$${paymentStats.totalReceived.toLocaleString()}`, subtitle: `${paymentStats.totalTransactions} transaction${paymentStats.totalTransactions !== 1 ? 's' : ''} this month` },
-                            { title: 'Pending', value: `$${paymentStats.pending.toLocaleString()}`, subtitle: `${paymentStats.pendingCount} payment${paymentStats.pendingCount !== 1 ? 's' : ''} awaiting confirmation` },
-                            { title: 'Overdue', value: `$${paymentStats.overdue.toLocaleString()}`, subtitle: `${paymentStats.overdueCount} payment${paymentStats.overdueCount !== 1 ? 's' : ''} past due date` },
-                            { title: 'Collection Rate', value: `${paymentStats.collectionRate}%`, subtitle: `Avg payment: $${paymentStats.averagePayment.toLocaleString(undefined, { maximumFractionDigits: 0 })}` },
+                            { title: 'Total Received', value: `$${formatMoney(paymentStats.totalReceived)}`, subtitle: `${paymentStats.totalTransactions} transaction${paymentStats.totalTransactions !== 1 ? 's' : ''} this month` },
+                            { title: 'Pending', value: `$${formatMoney(paymentStats.pending)}`, subtitle: `${paymentStats.pendingCount} payment${paymentStats.pendingCount !== 1 ? 's' : ''} in outstanding rent` },
+                            { title: 'Overdue', value: `$${formatMoney(paymentStats.overdue)}`, subtitle: `${paymentStats.overdueCount} payment${paymentStats.overdueCount !== 1 ? 's' : ''} rent periods past due` },
+                            { title: 'Collection Rate', value: `${paymentStats.collectionRate}%`, subtitle: `Avg payment: $${formatMoney(paymentStats.averagePayment)}` },
                         ].map((stat, idx) => (
                             <div key={idx} className="bg-white rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                                 <p className="text-gray-600 text-sm mb-1">{stat.title}</p>
@@ -210,12 +205,12 @@ export default function PaymentsPage() {
 
                                     const propertyName = payment.rentLedger?.property.name || 'Unknown Property'
                                     const paymentMethod = payment.paymentMethod || payment.method || 'Not Paid'
-                                    const paymentDate = payment.createdAt || payment.date || 'No date'
+                                    const paymentDate = payment.paymentDate || payment.createdAt || 'No date'
                                     // const paymentStatus = payment.status || 'Unknown'
                                     const paymentAmount = Number(payment.amountPaid) || 0
 
                                     return (
-                                        <div onClick={() => router.push(`/dashboard/payments/new?id=${payment.id}`)} key={payment.id} className="p-4 sm:p-6 hover:bg-gray-200 transition-colors cursor-pointer">
+                                        <div onClick={() => router.push(`/dashboard/payments/${payment.id}`)} key={payment.id} className="p-4 sm:p-6 hover:bg-gray-200 transition-colors cursor-pointer">
                                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                                                 <div className="flex items-center space-x-3 sm:space-x-4">
                                                     <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#876D4A] rounded-lg flex items-center justify-center text-white text-sm sm:text-base">💰</div>
@@ -225,7 +220,7 @@ export default function PaymentsPage() {
                                                     </div>
                                                 </div>
                                                 <div className="text-left sm:text-right">
-                                                    <p className="text-[#876D4A] font-medium text-lg sm:text-lg">${paymentAmount.toLocaleString()}</p>
+                                                    <p className="text-[#876D4A] font-medium text-lg sm:text-lg">${formatMoney(paymentAmount)}</p>
                                                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end space-y-1 sm:space-y-0 sm:space-x-2 mt-1">
                                                         <p className="text-gray-600 text-xs sm:text-sm">{formatDate(paymentDate, 'long')}</p>
                                                         {/* <span className={`px-2 py-1 rounded-full text-xs font-medium ${paymentStatus.toLowerCase() === 'paid'
