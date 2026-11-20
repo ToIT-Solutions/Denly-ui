@@ -93,7 +93,7 @@ when logging out it takes me to the login page then refreshes the login page aga
 
 activity log for admin if possible
 
-generate custom receipt numbers
+generate custom receipt numbers 
 
 ACTIVITY LOG    - AUTHENTICATION METHOD(PASSWORD/GOOGLE/2FA)
                 - CHANGES SNAPSHOT(WHAT WAS CHANGED WHEN EDITED FOR ANYTHING THAT IS EDITED)
